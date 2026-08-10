@@ -481,7 +481,7 @@ function HomeScreen({ onStart }: { onStart: () => void }) {
           transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut" }}
         >
           <Zap size={16} className="text-yellow-400" />
-          <span className="text-sm font-mono text-purple-300">Learn by playing</span>
+          <span className="text-sm font-mono text-purple-300">Created by Elmer</span>
         </motion.div>
 
         <h1 className="text-5xl md:text-7xl font-mono font-black mb-4 leading-none tracking-tight">
@@ -490,10 +490,10 @@ function HomeScreen({ onStart }: { onStart: () => void }) {
         </h1>
 
         <p className="text-white/50 text-lg font-mono mb-2">
-          {"// Master programming through challenges"}
+          {"Relapse Time"}
         </p>
         <p className="text-white/30 text-sm mb-12">
-          Choose a language. Answer questions. Level up. Become a developer.
+          Choose a language. Answer questions. Level up. Become a better and move on.
         </p>
 
         <div className="grid grid-cols-3 gap-4 mb-10 max-w-md mx-auto">
@@ -531,7 +531,7 @@ function LanguageScreen({ onSelect }: { onSelect: (lang: string) => void }) {
           <h2 className="text-4xl font-mono font-black text-white mb-3">
             Pick Your Language
           </h2>
-          <p className="text-white/40 font-mono text-sm">{"// Choose a language to begin your quest"}</p>
+          <p className="text-white/40 font-mono text-sm">{"Choose a language to begin your quest"}</p>
         </motion.div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
