@@ -581,6 +581,17 @@ function getRank(totalXP: number) {
 
 type GameMode = "practice" | "battle" | "speed" | "debug" | "survival";
 
+type AnimeCharacter = { id: string; name: string; title: string; emoji: string; color: string; accent: string; attack: string; aura: string };
+
+const ANIME_CHARACTERS: AnimeCharacter[] = [
+  { id: "nova", name: "Nova", title: "Neon Code Mage", emoji: "🧙‍♀️", color: "#8b5cf6", accent: "#22d3ee", attack: "NEON CODE BURST!", aura: "violet" },
+  { id: "kairo", name: "Kairo", title: "Cyber Blade Runner", emoji: "⚔️", color: "#06b6d4", accent: "#3b82f6", attack: "CYBER SLASH!", aura: "cyan" },
+  { id: "akari", name: "Akari", title: "Flame Syntax Ninja", emoji: "🔥", color: "#f97316", accent: "#ec4899", attack: "FLAME SYNTAX!", aura: "fire" },
+  { id: "rei", name: "Rei", title: "Quantum Hacker", emoji: "🦋", color: "#ec4899", accent: "#a855f7", attack: "QUANTUM BREAK!", aura: "pink" },
+  { id: "zen", name: "Zen", title: "Thunder Compiler", emoji: "⚡", color: "#facc15", accent: "#22c55e", attack: "THUNDER COMPILE!", aura: "gold" },
+];
+
+
 const SPOTIFY_TRACKS = [
   { id: "2nbotE8GMs2IYte7WgtZBa", title: "Multo", artist: "Cup of Joe", category: "OPM" },
   { id: "61vyXXtY7OSYFRtSzv5ehw", title: "Mundo", artist: "IV OF SPADES", category: "OPM" },
@@ -594,6 +605,16 @@ const SPOTIFY_TRACKS = [
   { id: "6mPNCrmCQgV4ZIRwNFW9w8", title: "Code", artist: "Programming and Coding Music Club", category: "Focus" },
   { id: "6zcjD7iRPz5fgOFAFtQqEJ", title: "Coding Focus, Pt. 10", artist: "Programming Coding Ambient Chill", category: "Focus" },
   { id: "0p20HotsDDhhAUtJ2KOAg9", title: "Relaxing Beats for Late Night Coding", artist: "Lo Fi Hip Hop", category: "Focus" },
+];
+
+const DEBUG_QUESTIONS: Question[] = [
+  { id: 101, type: "code", question: "Find the bug: which change fixes this JavaScript loop?", code: `for (let i = 0; i <= 5; i--) {\n  console.log(i);\n}`, options: ["Change i-- to i++", "Change <= to >=", "Remove let", "Remove console.log"], answer: 0, explanation: "The counter must increase with i++ so the loop can reach its stopping condition.", xp: 20 },
+  { id: 102, type: "code", question: "Find the Python bug that causes an indentation error.", code: `if score > 50:\nprint("Pass")`, options: ["Indent print", "Remove if", "Change > to <", "Add a semicolon"], answer: 0, explanation: "Python uses indentation to define the body of an if statement.", xp: 20 },
+  { id: 103, type: "multiple", question: "A variable is used before it is declared. What kind of bug is this?", options: ["Logic error", "Reference/declaration error", "Styling error", "Network error"], answer: 1, explanation: "Using an undeclared variable causes a reference/declaration problem in many languages.", xp: 20 },
+  { id: 104, type: "code", question: "Which fix prevents a division-by-zero crash?", code: `result = total / count`, options: ["Check count !== 0 first", "Delete total", "Multiply by zero", "Convert count to text"], answer: 0, explanation: "Validate that count is not zero before dividing.", xp: 25 },
+  { id: 105, type: "multiple", question: "The program runs but produces the wrong result. What should you investigate first?", options: ["Logic", "Monitor brightness", "Keyboard layout", "File name color"], answer: 0, explanation: "A wrong result while the program runs is commonly a logic error.", xp: 20 },
+  { id: 106, type: "code", question: "Which line correctly checks whether a value is null in JavaScript?", code: `const value = null;`, options: ["value === null", "value = null", "value == undefined only", "null.value"], answer: 0, explanation: "Strict equality with null is the direct check for a null value.", xp: 20 },
+  { id: 107, type: "multiple", question: "What is the best debugging habit after reproducing a bug?", options: ["Inspect the failing input and trace the code", "Delete the project", "Ignore the error", "Restart forever"], answer: 0, explanation: "Reproduce, inspect inputs, trace execution, isolate the cause, then fix and retest.", xp: 25 },
 ];
 
 function WelcomeScreen({ onContinue, darkMode, onToggleTheme }: { onContinue: () => void; darkMode: boolean; onToggleTheme: () => void }) {
@@ -725,7 +746,7 @@ function MusicSelectionScreen({
             <p className="font-mono text-xs text-white/40">{selectedTrack.artist}</p>
             <iframe
               key={`preview-${selectedTrack.id}`}
-              src={`https://open.spotify.com/embed/track/${selectedTrack.id}?utm_source=generator&theme=0`}
+              src={`https://open.spotify.com/embed/track/${selectedTrack.id}?utm_source=generator&theme=0&autoplay=1&start=0`}
               width="100%" height="152" frameBorder="0"
               allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
               loading="lazy" title={`Spotify preview for ${selectedTrack.title}`} className="w-full rounded-2xl mt-3"
@@ -736,7 +757,7 @@ function MusicSelectionScreen({
             className="w-full mt-5 py-4 rounded-2xl bg-gradient-to-r from-green-500 via-cyan-500 to-purple-600 text-white font-mono font-black text-lg shadow-xl shadow-green-500/15">
             Lock In & Start Game <ArrowRight size={19} className="inline ml-2" />
           </button>
-          <p className="text-center text-white/25 text-[10px] font-mono mt-3">Spotify may require one play click because browsers block unsolicited audio.</p>
+          <p className="text-center text-white/25 text-[10px] font-mono mt-3">Selected music is locked before the game and loaded from the beginning. If Chrome blocks autoplay, tap Play once.</p>
         </div>
       </div>
     </div>
@@ -788,7 +809,7 @@ function MusicPlayer({ compact = false, selectedTrack }: { compact?: boolean; se
 
       <iframe
         key={track.id}
-        src={`https://open.spotify.com/embed/track/${track.id}?utm_source=generator&autoplay=1`}
+        src={`https://open.spotify.com/embed/track/${track.id}?utm_source=generator&autoplay=1&start=0&theme=0`}
         width="100%" height={compact ? "152" : "152"} frameBorder="0"
         allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
         loading="lazy" title={`Spotify player for ${track.title}`} className="w-full rounded-2xl"
@@ -796,14 +817,17 @@ function MusicPlayer({ compact = false, selectedTrack }: { compact?: boolean; se
 
       <div className="flex items-center gap-2 mt-2 text-[9px] font-mono text-white/35">
         <Volume2 size={11} />
-        <span>Spotify controls playback. Press play to start.</span>
+        <span>Selected track starts at 0:00. Browser autoplay policy may require one tap.</span>
       </div>
     </div>
   );
 }
 
-function AnimeCoderAvatar({ side = "player", large = false, attacking = false, hit = false }: { side?: "player" | "enemy"; large?: boolean; attacking?: boolean; hit?: boolean }) {
+function AnimeCoderAvatar({ side = "player", large = false, attacking = false, hit = false, character }: { side?: "player" | "enemy"; large?: boolean; attacking?: boolean; hit?: boolean; character?: AnimeCharacter }) {
   const player = side === "player";
+  const fighter = character ?? (player ? ANIME_CHARACTERS[0] : ANIME_CHARACTERS[1]);
+  const main = player ? fighter.color : fighter.accent;
+  const secondary = player ? fighter.accent : fighter.color;
   return (
     <motion.div
       animate={{
@@ -817,7 +841,7 @@ function AnimeCoderAvatar({ side = "player", large = false, attacking = false, h
       aria-label={player ? "Anime coding hero" : "Anime code beast"}
     >
       <div className={`absolute inset-x-1/2 -translate-x-1/2 bottom-0 ${large ? "w-32 h-24" : "w-16 h-14"} rounded-[45%_45%_25%_25%] border-2 ${
-        player ? "border-cyan-300/60 bg-gradient-to-b from-cyan-400/25 to-blue-600/20" : "border-pink-300/60 bg-gradient-to-b from-pink-400/25 to-purple-700/20"
+        player ? "border-cyan-300/60" : "border-pink-300/60"
       } shadow-[0_0_35px_rgba(34,211,238,.18)]`}>
         <div className={`absolute ${large ? "top-2" : "top-1"} left-1/2 -translate-x-1/2 ${large ? "w-20 h-9" : "w-12 h-6"} rounded-full bg-gradient-to-r from-black/80 via-white/10 to-black/80`} />
         <div className={`absolute ${large ? "top-9" : "top-7"} left-1/2 -translate-x-1/2 ${large ? "w-24 h-24" : "w-14 h-14"} rounded-[48%] ${
@@ -832,9 +856,10 @@ function AnimeCoderAvatar({ side = "player", large = false, attacking = false, h
           </div>
           <div className={`absolute ${large ? "bottom-7" : "bottom-4"} left-1/2 -translate-x-1/2 ${large ? "w-8" : "w-4"} h-1 rounded-full ${player ? "bg-cyan-400" : "bg-pink-400"}`} />
         </div>
-        <div className={`absolute ${large ? "bottom-4" : "bottom-2"} left-1/2 -translate-x-1/2 ${large ? "text-3xl" : "text-lg"}`}>{player ? "⌘" : "⚡"}</div>
+        <div className={`absolute ${large ? "bottom-4" : "bottom-2"} left-1/2 -translate-x-1/2 ${large ? "text-3xl" : "text-lg"}`}>{fighter.emoji}</div>
       </div>
-      <div className={`absolute left-1/2 -translate-x-1/2 ${large ? "top-1" : "top-0"} ${large ? "w-40 h-40" : "w-24 h-24"} rounded-full blur-2xl opacity-30 ${player ? "bg-cyan-400" : "bg-pink-500"}`} />
+      <motion.div animate={attacking ? { scale: [1, 1.5, .8, 1.25, 1], opacity: [0.25, .75, .35, .65, .25], rotate: [0, 90, 180, 270, 360] } : { scale: [1, 1.08, 1], opacity: [.2, .35, .2] }} transition={{ duration: attacking ? .65 : 2.2, repeat: attacking ? 0 : Infinity }} className="absolute left-1/2 -translate-x-1/2 top-0 w-40 h-40 rounded-full blur-2xl" style={{ background: `radial-gradient(circle, ${main}99 0%, ${secondary}40 42%, transparent 72%)` }} />
+      {attacking && <motion.div initial={{ opacity: 0, scale: .3 }} animate={{ opacity: [0, 1, 0], scale: [0.3, 1.5, 2.4], rotate: [0, 12, -12, 0] }} transition={{ duration: .65 }} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-2xl sm:text-4xl font-mono font-black z-10" style={{ color: main, textShadow: `0 0 25px ${main}` }}>{fighter.attack}</motion.div>}
     </motion.div>
   );
 }
@@ -844,8 +869,8 @@ function ModesScreen({ onSelect, onBack }: { onSelect: (mode: GameMode) => void;
     { id: "practice" as GameMode, icon: "🧠", title: "Practice Mode", desc: "Relaxed learning with explanations after every answer.", color: "#8b5cf6", questions: "7 questions" },
     { id: "battle" as GameMode, icon: "⚔️", title: "Battle Mode", desc: "Correct answers become attacks against the Code Beast with anime combat effects.", color: "#ef4444", questions: "7 questions" },
     { id: "speed" as GameMode, icon: "⚡", title: "Speed Mode", desc: "Race the clock and finish before time runs out.", color: "#f59e0b", questions: "5 questions · 60 sec" },
-    { id: "debug" as GameMode, icon: "🐛", title: "Bug Hunter", desc: "Hunt down coding mistakes and build a debugging streak.", color: "#22c55e", questions: "7 questions" },
-    { id: "survival" as GameMode, icon: "🔥", title: "Code Survival", desc: "Keep your run alive. Wrong answers drain your life and streak.", color: "#06b6d4", questions: "10 questions" },
+    { id: "debug" as GameMode, icon: "🐛", title: "Bug Hunter", desc: "Hunt down coding mistakes and build a debugging streak.", color: "#22c55e", questions: "7 bug challenges" },
+    { id: "survival" as GameMode, icon: "🔥", title: "Code Survival", desc: "Keep your run alive. Wrong answers drain your life and streak.", color: "#06b6d4", questions: "12 lives-on-the-line" },
   ];
   return (
     <div className="min-h-screen px-4 sm:px-6 py-10">
@@ -875,6 +900,8 @@ function HomeScreen({
   profile,
   totalXP,
   onDuel,
+  onMusic,
+  selectedTrack,
 }: {
   onStart: () => void;
   onProfile: () => void;
@@ -884,47 +911,45 @@ function HomeScreen({
   profile: StudentProfile;
   totalXP: number;
   onDuel: () => void;
+  onMusic: () => void;
+  selectedTrack: (typeof SPOTIFY_TRACKS)[number];
 }) {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-6 py-12 relative overflow-hidden">
-      <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 w-[calc(100%-1.5rem)] max-w-4xl flex flex-wrap items-center justify-center gap-2">
-        <button onClick={onProfile} className="flex items-center gap-2 px-3 py-2 rounded-xl border border-white/10 bg-white/5 text-white/70 font-mono text-xs">
-          <User size={14} /> {profile.username ? "Profile" : "Student Profile"}
-        </button>
-        <button onClick={onGuidelines} className="flex items-center gap-2 px-3 py-2 rounded-xl border border-white/10 bg-white/5 text-white/70 font-mono text-xs">
-          <BookOpenCheck size={14} /> Guidelines
-        </button>
-        <button onClick={onToggleTheme} className="flex items-center gap-2 px-3 py-2 rounded-xl border border-white/10 bg-white/5 text-white/70 font-mono text-xs">
-          {darkMode ? <Sun size={14} /> : <Moon size={14} />} {darkMode ? "Light" : "Dark"}
-        </button>
-        <button onClick={() => window.open("https://open.spotify.com/", "_blank", "noopener,noreferrer")}
-          className="flex items-center gap-2 px-3 py-2 rounded-xl border border-green-500/20 bg-green-500/10 text-green-400 font-mono text-xs">
-          <Music size={14} /> Spotify
-        </button>
+      <aside className="absolute left-4 top-4 bottom-4 z-20 w-72 hidden lg:flex flex-col gap-3">
+        <div className="rounded-3xl border border-white/10 bg-black/20 backdrop-blur-2xl p-4 shadow-2xl">
+          <div className="flex items-center gap-3">
+            {profile.photo ? <img src={profile.photo} className="w-16 h-16 rounded-2xl object-cover border border-cyan-400/30" alt="Profile"/> : <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500/30 to-cyan-500/20 flex items-center justify-center"><User className="text-cyan-300"/></div>}
+            <div className="min-w-0 flex-1">
+              <p className="text-white font-mono font-black truncate">{profile.username || "Code Warrior"}</p>
+              <p className="text-white/40 text-[10px] font-mono truncate">{profile.yearLevel || "Player"} · {profile.course || "Programmer"}</p>
+              <div className="mt-2"><RankBadge totalXP={totalXP} compact /></div>
+            </div>
+          </div>
+        </div>
+        <div className="rounded-3xl border border-white/10 bg-black/20 backdrop-blur-2xl p-3 space-y-2">
+          <button onClick={onProfile} className="w-full flex items-center gap-3 px-3 py-3 rounded-2xl bg-white/5 hover:bg-white/10 text-white/75 font-mono text-xs"><User size={15}/> Profile</button>
+          <button onClick={onGuidelines} className="w-full flex items-center gap-3 px-3 py-3 rounded-2xl bg-white/5 hover:bg-white/10 text-white/75 font-mono text-xs"><BookOpenCheck size={15}/> Guidelines</button>
+          <button onClick={onToggleTheme} className="w-full flex items-center gap-3 px-3 py-3 rounded-2xl bg-white/5 hover:bg-white/10 text-white/75 font-mono text-xs">{darkMode ? <Sun size={15}/> : <Moon size={15}/>} {darkMode ? "Light Mode" : "Dark Mode"}</button>
+          <button onClick={onMusic} className="w-full flex items-center gap-3 px-3 py-3 rounded-2xl bg-green-500/10 border border-green-500/20 hover:bg-green-500/15 text-green-300 font-mono text-xs"><Music size={15}/> Music Selection <span className="ml-auto truncate max-w-[105px] text-[9px] text-green-400/60">{selectedTrack.title}</span></button>
+        </div>
+      </aside>
+      <div className="absolute top-3 left-1/2 -translate-x-1/2 z-20 lg:hidden w-[calc(100%-1rem)] flex gap-2 overflow-x-auto pb-1">
+        <button onClick={onProfile} className="shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl border border-white/10 bg-white/5 text-white/70 font-mono text-xs"><User size={14}/> Profile</button>
+        <button onClick={onGuidelines} className="shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl border border-white/10 bg-white/5 text-white/70 font-mono text-xs"><BookOpenCheck size={14}/> Guidelines</button>
+        <button onClick={onToggleTheme} className="shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl border border-white/10 bg-white/5 text-white/70 font-mono text-xs">{darkMode ? <Sun size={14}/> : <Moon size={14}/>} Theme</button>
+        <button onClick={onMusic} className="shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl border border-green-500/20 bg-green-500/10 text-green-300 font-mono text-xs"><Music size={14}/> Music</button>
       </div>
       {/* background glows */}
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
 
 
-        {profile.username && (
-          <div className="max-w-2xl mx-auto mb-6 rounded-2xl border border-white/10 bg-white/5 p-4 flex items-center gap-4 text-left">
-            {profile.photo ? <img src={profile.photo} className="w-14 h-14 rounded-2xl object-cover border border-white/10" alt="Student profile" /> :
-              <div className="w-14 h-14 rounded-2xl bg-purple-500/20 flex items-center justify-center"><User className="text-purple-300" /></div>}
-            <div className="min-w-0 flex-1">
-              <p className="text-white font-mono font-bold">{profile.username}</p>
-              <p className="text-white/40 text-xs font-mono">{profile.yearLevel} · {profile.course}</p>
-              <p className="text-white/30 text-xs font-mono truncate">{profile.school}</p>
-            </div>
-            <RankBadge totalXP={totalXP} compact />
-          </div>
-        )}
-
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="text-center max-w-2xl mx-auto"
+        className="text-center max-w-3xl mx-auto lg:ml-64"
       >
         <motion.div
           className="inline-flex items-center gap-2 bg-purple-500/20 border border-purple-500/30 rounded-full px-4 py-2 mb-8"
@@ -1255,7 +1280,8 @@ function GameScreen({
   onFinish: (score: number, xp: number, correct: number) => void;
 }) {
   const allQuestions = QUESTIONS[langId] ?? [];
-  const questions = mode === "speed" ? allQuestions.slice(0, Math.min(5, allQuestions.length)) : mode === "survival" ? [...allQuestions, ...allQuestions.slice(0, 3)] : allQuestions;
+  const debugQuestions = DEBUG_QUESTIONS;
+  const questions = mode === "debug" ? debugQuestions : mode === "speed" ? allQuestions.slice(0, Math.min(5, allQuestions.length)) : mode === "survival" ? Array.from({ length: 12 }, (_, i) => allQuestions[i % Math.max(allQuestions.length, 1)]).filter(Boolean) : allQuestions;
   const lang = LANGUAGES.find((l) => l.id === langId)!;
   const [qIndex, setQIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
@@ -1362,8 +1388,11 @@ function GameScreen({
     }
     if (mode === "survival" && !correct) {
       setPlayerHP((hp) => Math.max(0, hp - 20));
+      if (playerHP <= 20) {
+        window.setTimeout(() => finishGame(), 700);
+      }
     }
-  }, [answerState, currentQ, mode, playSfx, qIndex, streak, battleSkills]);
+  }, [answerState, currentQ, mode, playSfx, qIndex, streak, battleSkills, playerHP, finishGame]);
 
   const handleNext = () => {
     if (isLast) { finishGame(); return; }
@@ -1393,6 +1422,7 @@ function GameScreen({
                   <span>⏱</span> {timeLeft}s
                 </motion.div>
               )}
+              {mode === "survival" && <div className={`flex items-center gap-1 px-3 py-1 rounded-full border ${playerHP <= 30 ? "border-red-500/60 bg-red-500/15 text-red-300" : "border-cyan-400/30 bg-cyan-400/10 text-cyan-300"}`}><Heart size={12}/><span className="font-mono font-bold text-xs">{playerHP} HP</span></div>}
               {streak >= 2 && <div className="flex items-center gap-1 bg-orange-500/20 border border-orange-500/30 rounded-full px-3 py-1"><Flame size={12} className="text-orange-400" /><span className="text-orange-400 font-mono font-bold text-xs">{streak}x</span></div>}
               <span className="text-xs sm:text-sm font-mono text-white/40">{qIndex + 1}/{questions.length}</span>
               <button onClick={() => setSoundEnabled((v) => !v)} className="p-2 rounded-xl border border-white/10 bg-white/5 text-white/60 hover:text-white" title="Toggle sound effects">
@@ -1418,7 +1448,7 @@ function GameScreen({
                     <p className="text-xs sm:text-sm font-mono font-black text-purple-300">YOUR SKILL IS YOUR WEAPON</p>
                     <div className="mt-3 text-xs font-mono font-black text-white/70">{battleMessage}</div>
                   </div>
-                  <AnimeCoderAvatar side="player" large attacking={attackFx === "player"} hit={hitFx && attackFx === "enemy"} />
+                  <AnimeCoderAvatar side="player" character={ANIME_CHARACTERS[0]} large attacking={attackFx === "player"} hit={hitFx && attackFx === "enemy"} />
                 </div>
                 <div className="grid grid-cols-2 gap-3 sm:gap-5 mt-3">
                   <div><div className="flex justify-between mb-1"><span className="text-[10px] font-mono text-red-300">CODE BEAST</span><span className="text-[10px] font-mono text-red-300">{enemyHP} HP</span></div><div className="h-3 bg-black/20 rounded-full overflow-hidden"><motion.div className="h-full bg-gradient-to-r from-red-600 to-pink-500" animate={{ width: `${enemyHP}%` }} /></div></div>
@@ -1431,7 +1461,7 @@ function GameScreen({
               <motion.div key={qIndex} initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} transition={{ duration: 0.25 }} className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2 mb-3">
                   <div className="flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-mono font-bold border" style={{ color: lang.color, borderColor: `${lang.color}40`, backgroundColor: `${lang.color}15` }}>
-                    <Target size={11} /> {currentQ.type === "multiple" ? "Multiple Choice" : currentQ.type === "code" ? "Code Challenge" : "True or False"}
+                    <Target size={11} /> {mode === "debug" ? "Bug Hunt" : currentQ.type === "multiple" ? "Multiple Choice" : currentQ.type === "code" ? "Code Challenge" : "True or False"}
                   </div>
                   <span className="text-xs font-mono text-yellow-400/70">+{currentQ.xp} XP</span>
                   {mode === "battle" && <span className="text-xs font-mono text-red-300/70">⚔ {battleSkills[qIndex % battleSkills.length]}</span>}
@@ -1517,12 +1547,15 @@ function DuelSetupScreen({
   totalXP: number;
   selectedLang: string | null;
   onSelectLanguage: (lang: string) => void;
-  onStart: (friendName: string, friendRank: string, friendPhoto: string) => void;
+  onStart: (friendName: string, friendRank: string, friendPhoto: string, characterId: string) => void;
   onBack: () => void;
 }) {
   const [friendName, setFriendName] = useState("");
   const [friendRank, setFriendRank] = useState(RANKS[2].name);
   const [friendPhoto, setFriendPhoto] = useState("");
+  const [duelCharacterId, setDuelCharacterId] = useState(ANIME_CHARACTERS[0].id);
+  const [characterId, setCharacterId] = useState(ANIME_CHARACTERS[0].id);
+  const selectedCharacter = ANIME_CHARACTERS.find((c) => c.id === characterId) ?? ANIME_CHARACTERS[0];
 
   return (
     <div className="min-h-screen px-5 py-10">
@@ -1572,6 +1605,18 @@ function DuelSetupScreen({
           </div>
         </div>
 
+        <div className="rounded-3xl border border-purple-500/20 bg-gradient-to-br from-purple-500/10 via-white/5 to-cyan-500/10 p-6 mb-7">
+          <div className="flex items-center gap-3 mb-5"><Swords className="text-pink-400"/><div><h3 className="text-white font-mono font-black text-lg">Choose Your Anime Fighter</h3><p className="text-white/30 text-xs font-mono">Each fighter has a unique attack aura and battle effect.</p></div></div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+            {ANIME_CHARACTERS.map((character) => <motion.button key={character.id} whileHover={{ y: -4, scale: 1.02 }} whileTap={{ scale: .97 }} onClick={() => setCharacterId(character.id)} className={`relative overflow-hidden text-left rounded-2xl border p-4 transition-all ${characterId === character.id ? "border-white/60 bg-white/10 shadow-xl" : "border-white/10 bg-black/10 hover:bg-white/5"}`} style={{ boxShadow: characterId === character.id ? `0 0 35px ${character.color}35` : undefined }}>
+              <div className="text-4xl mb-3">{character.emoji}</div><p className="text-white font-mono font-black text-sm">{character.name}</p><p className="text-[9px] font-mono mt-1" style={{ color: character.color }}>{character.title}</p><p className="text-[9px] text-white/30 font-mono mt-2">{character.attack}</p>
+            </motion.button>)}
+          </div>
+          <div className="mt-4 rounded-2xl border p-3 flex items-center gap-3" style={{borderColor: `${selectedCharacter.color}55`, background: `${selectedCharacter.color}12`}}>
+            <span className="text-3xl">{selectedCharacter.emoji}</span><div><p className="font-mono font-black text-sm" style={{color:selectedCharacter.color}}>{selectedCharacter.name} locked in</p><p className="text-white/40 text-[10px] font-mono">Attack effect: {selectedCharacter.attack}</p></div>
+          </div>
+        </div>
+
         <div className="rounded-3xl border border-white/10 bg-white/5 p-6 mb-7">
           <div className="flex items-center gap-3 mb-5"><Code2 className="text-purple-400"/><div><h3 className="text-white font-mono font-black text-lg">Choose the Duel Language</h3><p className="text-white/30 text-xs font-mono">Five questions per duel.</p></div></div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -1584,7 +1629,7 @@ function DuelSetupScreen({
           </div>
         </div>
 
-        <button disabled={!selectedLang || !friendName.trim()} onClick={() => onStart(friendName.trim(), friendRank, friendPhoto)}
+        <button disabled={!selectedLang || !friendName.trim()} onClick={() => onStart(friendName.trim(), friendRank, friendPhoto, characterId)}
           className="w-full py-4 rounded-2xl bg-gradient-to-r from-pink-600 via-purple-600 to-cyan-600 text-white font-mono font-black text-lg disabled:opacity-30 disabled:cursor-not-allowed shadow-xl shadow-purple-500/20">
           Enter the Arena <Swords size={19} className="inline ml-2"/>
         </button>
@@ -1600,6 +1645,7 @@ function DuelScreen({
   friendName,
   friendRankName,
   friendPhoto,
+  characterId,
   selectedTrack,
   onFinish,
 }: {
@@ -1609,12 +1655,14 @@ function DuelScreen({
   friendName: string;
   friendRankName: string;
   friendPhoto: string;
+  characterId: string;
   selectedTrack: (typeof SPOTIFY_TRACKS)[number];
   onFinish: () => void;
 }) {
   const baseQuestions = QUESTIONS[langId] ?? [];
   const questions = Array.from({ length: 10 }, (_, i) => baseQuestions[i % Math.max(baseQuestions.length, 1)]).filter(Boolean);
   const lang = LANGUAGES.find((l) => l.id === langId)!;
+  const selectedCharacter = ANIME_CHARACTERS.find((c) => c.id === characterId) ?? ANIME_CHARACTERS[0];
   const [qIndex, setQIndex] = useState(0);
   const [turn, setTurn] = useState<"you" | "friend">("you");
   const [selected, setSelected] = useState<number | null>(null);
@@ -1624,6 +1672,7 @@ function DuelScreen({
   const [attackFx, setAttackFx] = useState<"you" | "friend" | null>(null);
   const [hitFx, setHitFx] = useState(false);
   const [battleText, setBattleText] = useState("READY!");
+  const [showDuelClaps, setShowDuelClaps] = useState(false);
   const currentQ = questions[qIndex];
 
   const playDuelSfx = (correct: boolean) => {
@@ -1650,7 +1699,7 @@ function DuelScreen({
     playDuelSfx(correct);
     setHitFx(true);
     setAttackFx(correct ? turn : turn === "you" ? "friend" : "you");
-    setBattleText(correct ? (turn === "you" ? "CODE SLASH!" : "SYNTAX STRIKE!") : "COUNTER ATTACK!");
+    setBattleText(correct && turn === "you" ? selectedCharacter.attack : correct ? "SYNTAX STRIKE!" : "COUNTER ATTACK!");
     window.setTimeout(() => { setHitFx(false); setAttackFx(null); }, 650);
 
     if (turn === "you" && correct) setYouScore((s) => s + 1);
@@ -1663,7 +1712,10 @@ function DuelScreen({
       else if (qIndex < questions.length - 1) {
         setQIndex((i) => i + 1);
         setTurn("you");
-      } else onFinish();
+      } else {
+        setShowDuelClaps(true);
+        window.setTimeout(() => onFinish(), 3200);
+      }
     }, 1500);
   };
 
@@ -1671,6 +1723,7 @@ function DuelScreen({
 
   return (
     <div className="min-h-screen px-4 py-6 relative overflow-hidden">
+      {showDuelClaps && <ClapCelebration />}
       <div className="absolute inset-0 bg-gradient-to-br from-cyan-950/20 via-purple-950/20 to-pink-950/20 pointer-events-none"/>
       <div className="max-w-6xl mx-auto relative">
         <div className="flex items-center justify-between mb-5">
@@ -1708,12 +1761,12 @@ function DuelScreen({
         </div>
 
         <div className="flex items-center justify-center gap-4 sm:gap-10 mb-5">
-          <AnimeCoderAvatar side="player" large attacking={attackFx === "you"} hit={hitFx && attackFx === "friend"} />
+          <AnimeCoderAvatar side="player" character={selectedCharacter} large attacking={attackFx === "you"} hit={hitFx && attackFx === "friend"} />
           <div className="text-center min-w-[80px]">
             <motion.div animate={hitFx ? { scale: [1, 1.35, 1], rotate: [0, 8, -8, 0] } : {}} className="text-3xl sm:text-5xl font-mono font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-white to-pink-300">VS</motion.div>
             <p className="text-[9px] sm:text-[10px] font-mono text-yellow-300 tracking-[0.25em] mt-1">{battleText}</p>
           </div>
-          <AnimeCoderAvatar side="enemy" large attacking={attackFx === "friend"} hit={hitFx && attackFx === "you"} />
+          <AnimeCoderAvatar side="enemy" character={ANIME_CHARACTERS[(ANIME_CHARACTERS.findIndex((c) => c.id === selectedCharacter.id) + 1) % ANIME_CHARACTERS.length]} large attacking={attackFx === "friend"} hit={hitFx && attackFx === "you"} />
         </div>
 
         <AnimatePresence>
@@ -1751,6 +1804,32 @@ function DuelScreen({
   );
 }
 
+function ClapCelebration() {
+  const [show, setShow] = useState(true);
+  useEffect(() => {
+    const timer = window.setTimeout(() => setShow(false), 4200);
+    try {
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      const ctx = new AudioCtx();
+      [0, .22, .44, .66, .88].forEach((delay, index) => {
+        const osc = ctx.createOscillator(); const gain = ctx.createGain();
+        osc.type = "square"; osc.frequency.setValueAtTime(index % 2 ? 210 : 150, ctx.currentTime + delay);
+        gain.gain.setValueAtTime(.0001, ctx.currentTime + delay);
+        gain.gain.exponentialRampToValueAtTime(.07, ctx.currentTime + delay + .015);
+        gain.gain.exponentialRampToValueAtTime(.0001, ctx.currentTime + delay + .12);
+        osc.connect(gain); gain.connect(ctx.destination); osc.start(ctx.currentTime + delay); osc.stop(ctx.currentTime + delay + .13);
+      });
+      window.setTimeout(() => ctx.close(), 1500);
+    } catch {}
+    return () => window.clearTimeout(timer);
+  }, []);
+  if (!show) return null;
+  return <div className="fixed inset-0 z-[80] pointer-events-none overflow-hidden">
+    <motion.div initial={{opacity:0, y:30, scale:.8}} animate={{opacity:[0,1,1,0], y:[30,0,-10,-50], scale:[.8,1,1.08,1]}} transition={{duration:2.6}} className="absolute left-1/2 top-1/3 -translate-x-1/2 text-5xl sm:text-7xl font-mono font-black text-yellow-300" style={{textShadow:"0 0 30px rgba(250,204,21,.7)"}}>👏 GREAT JOB! 👏</motion.div>
+    {Array.from({length:18},(_,i)=><motion.div key={i} initial={{opacity:1,x:"50vw",y:"42vh",scale:.5}} animate={{opacity:0,x:`${8+(i*47)%84}vw`,y:`${20+(i*31)%65}vh`,rotate:360,scale:1.2}} transition={{duration:1.8+i*.03, ease:"easeOut"}} className="absolute text-2xl sm:text-4xl">{i%3===0?"👏":i%3===1?"🎉":"✨"}</motion.div>)}
+  </div>;
+}
+
 function ResultsScreen({
   langId,
   score,
@@ -1775,6 +1854,7 @@ function ResultsScreen({
   onHome: () => void;
 }) {
   const lang = LANGUAGES.find((l) => l.id === langId)!;
+  const [showClaps, setShowClaps] = useState(true);
   const grade =
     score >= 90 ? { label: "MASTER", color: "#f59e0b", icon: "🏆" } :
     score >= 70 ? { label: "SKILLED", color: "#a78bfa", icon: "⭐" } :
@@ -1783,6 +1863,8 @@ function ResultsScreen({
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-6 py-12">
+      {showClaps && <ClapCelebration />}
+      <button onClick={() => setShowClaps(false)} className="fixed top-4 right-4 z-[90] text-[10px] font-mono text-white/40 border border-white/10 rounded-full px-3 py-2 bg-black/20">Skip celebration</button>
       <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl pointer-events-none" />
 
       <motion.div
@@ -1890,13 +1972,14 @@ export default function App() {
   const [gameMode, setGameMode] = useState<GameMode>("practice");
   const [selectedLang, setSelectedLang] = useState<string | null>(null);
   const [selectedTrack, setSelectedTrack] = useState<(typeof SPOTIFY_TRACKS)[number]>(SPOTIFY_TRACKS[0]);
-  const [musicReturn, setMusicReturn] = useState<"game" | "duel">("game");
+  const [musicReturn, setMusicReturn] = useState<"game" | "duel" | "home">("game");
   const [results, setResults] = useState<{ score: number; xp: number; correct: number } | null>(null);
   const [lifetimeXP, setLifetimeXP] = useState(() => Number(localStorage.getItem("codequest-total-xp") || 0));
   const [duelLang, setDuelLang] = useState<string | null>(null);
   const [friendName, setFriendName] = useState("");
   const [friendRankName, setFriendRankName] = useState(RANKS[2].name);
   const [friendPhoto, setFriendPhoto] = useState("");
+  const [duelCharacterId, setDuelCharacterId] = useState(ANIME_CHARACTERS[0].id);
   const [darkMode, setDarkMode] = useState(() => {
     const saved = localStorage.getItem("codequest-theme");
     return saved !== "light";
@@ -2021,6 +2104,8 @@ export default function App() {
               onStart={startQuest}
               totalXP={lifetimeXP}
               onDuel={() => setScreen("duel-setup")}
+              onMusic={() => { setMusicReturn("home"); setScreen("music"); }}
+              selectedTrack={selectedTrack}
             />
           </motion.div>
         )}
@@ -2062,7 +2147,7 @@ export default function App() {
             <MusicSelectionScreen
               selectedTrack={selectedTrack}
               onSelect={setSelectedTrack}
-              onBack={() => setScreen(musicReturn === "duel" ? "duel-setup" : "language")}
+              onBack={() => setScreen(musicReturn === "duel" ? "duel-setup" : musicReturn === "home" ? "home" : "language")}
               onContinue={() => setScreen(musicReturn)}
             />
           </motion.div>
@@ -2091,10 +2176,11 @@ export default function App() {
               selectedLang={duelLang}
               onSelectLanguage={setDuelLang}
               onBack={() => setScreen("home")}
-              onStart={(name, rank, photo) => {
+              onStart={(name, rank, photo, characterId) => {
                 setFriendName(name);
                 setFriendRankName(rank);
                 setFriendPhoto(photo);
+                setDuelCharacterId(characterId);
                 setMusicReturn("duel");
                 setScreen("music");
               }}
@@ -2111,6 +2197,7 @@ export default function App() {
               friendName={friendName}
               friendRankName={friendRankName}
               friendPhoto={friendPhoto}
+              characterId={duelCharacterId}
               selectedTrack={selectedTrack}
               onFinish={() => setScreen("home")}
             />
@@ -2124,7 +2211,7 @@ export default function App() {
               score={results.score}
               xp={results.xp}
               correct={results.correct}
-              total={gameMode === "speed" ? Math.min(5, totalQs) : gameMode === "survival" ? Math.min(10, totalQs + 3) : totalQs}
+              total={gameMode === "debug" ? DEBUG_QUESTIONS.length : gameMode === "speed" ? Math.min(5, totalQs) : gameMode === "survival" ? 12 : totalQs}
               profile={profile}
               totalXP={lifetimeXP}
               onPhotoUpdate={updatePhoto}
