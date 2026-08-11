@@ -5,6 +5,79 @@ import { Code2, Zap, Trophy, Star, ArrowRight, RotateCcw, CheckCircle2, XCircle,
 
 // ─── Data ───────────────────────────────────────────────────────────────────
 
+type AppUser = {
+  id: string;
+  username: string;
+  password: string;
+  role: "player" | "admin";
+  photo: string;
+  school: string;
+  provider: "local" | "google" | "facebook";
+  totalXP: number;
+  weeklyXP: number;
+  isOnline: boolean;
+  friends: string[];
+  createdAt: string;
+};
+
+type Screen = "welcome" | "home" | "profile" | "guidelines" | "modes" | "language" | "music" | "game" | "results" | "duel-setup" | "duel" | "community" | "leaderboard" | "admin" | "login";
+
+const DEFAULT_ADMIN = { username: "admin", password: "admin123" };
+
+const readUsers = (): AppUser[] => {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem("codequest-users");
+    if (!raw) return [];
+    return JSON.parse(raw) as AppUser[];
+  } catch {
+    return [];
+  }
+};
+
+const writeUsers = (users: AppUser[]) => {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem("codequest-users", JSON.stringify(users));
+};
+
+const seedDefaultUsers = () => {
+  if (typeof window === "undefined") return [];
+  const users = readUsers();
+  if (users.length > 0) return users;
+  const adminUser: AppUser = {
+    id: "admin-1",
+    username: DEFAULT_ADMIN.username,
+    password: DEFAULT_ADMIN.password,
+    role: "admin",
+    photo: "",
+    school: "CodeQuest Academy",
+    provider: "local",
+    totalXP: 5000,
+    weeklyXP: 320,
+    isOnline: true,
+    friends: [],
+    createdAt: new Date().toISOString(),
+  };
+  const seeded = [adminUser];
+  writeUsers(seeded);
+  return seeded;
+};
+
+const makeUser = (username: string, password: string, provider: AppUser["provider"], photo = "", school = "Unknown School"): AppUser => ({
+  id: `${provider}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+  username,
+  password,
+  role: "player",
+  photo,
+  school,
+  provider,
+  totalXP: 0,
+  weeklyXP: 0,
+  isOnline: true,
+  friends: [],
+  createdAt: new Date().toISOString(),
+});
+
 const LANGUAGES = [
   { id: "python", name: "Python", icon: "🐍", color: "#3b82f6", bg: "#1e3a5f", desc: "Beginner-friendly, used in AI & data science" },
   { id: "javascript", name: "JavaScript", icon: "⚡", color: "#f59e0b", bg: "#3d2c00", desc: "The language of the web, runs everywhere" },
@@ -495,7 +568,6 @@ const QUESTIONS: Record<string, Question[]> = {
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-type Screen = "welcome" | "home" | "profile" | "guidelines" | "modes" | "language" | "music" | "game" | "results" | "duel-setup" | "duel";
 type AnswerState = "idle" | "correct" | "wrong";
 
 // ─── Components ──────────────────────────────────────────────────────────────
@@ -1012,6 +1084,10 @@ function HomeScreen({
   onDuel,
   onMusic,
   selectedTrack,
+  onCommunity,
+  onLeaderboard,
+  onAdmin,
+  currentUser,
 }: {
   onStart: () => void;
   onProfile: () => void;
@@ -1023,6 +1099,10 @@ function HomeScreen({
   onDuel: () => void;
   onMusic: () => void;
   selectedTrack: (typeof SPOTIFY_TRACKS)[number];
+  onCommunity: () => void;
+  onLeaderboard: () => void;
+  onAdmin: () => void;
+  currentUser: AppUser | null;
 }) {
   const rank = getRank(totalXP);
   const questionCount = 7;
@@ -1108,6 +1188,12 @@ function HomeScreen({
           <button onClick={onDuel} className="w-full sm:w-auto px-7 py-4 rounded-2xl border border-pink-400/30 bg-pink-500/10 text-pink-300 font-mono font-black text-sm hover:bg-pink-500/15"><Users size={17} className="inline mr-2"/>1v1 Friend Arena</button>
         </div>
 
+        <div className="mt-6 grid gap-3 sm:grid-cols-3 max-w-4xl mx-auto">
+          <button onClick={onCommunity} className="rounded-2xl border border-cyan-400/20 bg-cyan-500/10 px-4 py-3 text-left text-cyan-200 font-mono text-sm">🌐 Community Hub</button>
+          <button onClick={onLeaderboard} className="rounded-2xl border border-yellow-400/20 bg-yellow-500/10 px-4 py-3 text-left text-yellow-200 font-mono text-sm">🏆 Weekly Rankings</button>
+          {currentUser?.role === "admin" && <button onClick={onAdmin} className="rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-left text-red-200 font-mono text-sm">🛡 Admin Console</button>}
+        </div>
+
         <div className="mt-8 flex justify-center">
           <div className="w-full max-w-xl flex items-center justify-center px-4 py-3 rounded-2xl border border-white/10 bg-black/15 backdrop-blur-xl text-center">
             <div>
@@ -1129,6 +1215,10 @@ function ProfileScreen({
   onBack,
   darkMode,
   onToggleTheme,
+  currentUser,
+  onLogin,
+  onLogout,
+  onOpenLogin,
 }: {
   profile: StudentProfile;
   totalXP: number;
@@ -1136,6 +1226,10 @@ function ProfileScreen({
   onBack: () => void;
   darkMode: boolean;
   onToggleTheme: () => void;
+  currentUser: AppUser | null;
+  onLogin: (user: AppUser) => void;
+  onLogout: () => void;
+  onOpenLogin: () => void;
 }) {
   const [form, setForm] = useState<StudentProfile>(profile);
 
@@ -1195,6 +1289,19 @@ function ProfileScreen({
               </span>
               <span className="text-[11px] font-mono text-white/40">{darkMode ? "Light" : "Dark"}</span>
             </button>
+            <div className="mt-3 rounded-xl border border-white/10 bg-white/5 p-3">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-[10px] font-mono tracking-[0.24em] text-purple-300">ACCOUNT</p>
+                  <p className="text-sm font-mono text-white/80">{currentUser ? `Signed in as ${currentUser.username}` : "Join the community hub"}</p>
+                </div>
+                {currentUser ? (
+                  <button type="button" onClick={onLogout} className="rounded-full border border-red-400/20 bg-red-500/10 px-3 py-2 text-[11px] font-mono text-red-300">Log out</button>
+                ) : (
+                  <button type="button" onClick={onOpenLogin} className="rounded-full border border-cyan-400/20 bg-cyan-500/10 px-3 py-2 text-[11px] font-mono text-cyan-300">Go to login</button>
+                )}
+              </div>
+            </div>
           </div>
 
           <form onSubmit={submit} className="space-y-4 mt-7">
@@ -1277,6 +1384,179 @@ function ProfileScreen({
   );
 }
 
+function CommunityScreen({ onBack, users, currentUser, onAddFriend }: { onBack: () => void; users: AppUser[]; currentUser: AppUser | null; onAddFriend: (friendId: string) => void }) {
+  return (
+    <div className="min-h-screen px-6 py-10">
+      <div className="max-w-5xl mx-auto">
+        <button onClick={onBack} className="flex items-center gap-2 text-white/50 hover:text-white font-mono text-sm mb-8"><ArrowLeft size={16}/> Back</button>
+        <div className="rounded-3xl border border-cyan-400/20 bg-gradient-to-br from-cyan-500/10 to-white/5 p-6">
+          <div className="flex items-center justify-between mb-5">
+            <div>
+              <p className="text-cyan-300 text-[10px] font-mono font-black tracking-[0.28em]">COMMUNITY HUB</p>
+              <h2 className="text-2xl font-mono font-black text-white mt-1">Online students and friends</h2>
+            </div>
+            <div className="rounded-full border border-cyan-400/20 bg-cyan-500/10 px-3 py-1 text-cyan-300 text-xs font-mono">{users.filter((u) => u.isOnline).length} online</div>
+          </div>
+          <div className="grid gap-3 md:grid-cols-2">
+            {users.map((user) => (
+              <div key={user.id} className="rounded-2xl border border-white/10 bg-black/15 p-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-white/10 overflow-hidden flex items-center justify-center">
+                    {user.photo ? <img src={user.photo} alt={user.username} className="w-full h-full object-cover" /> : <User size={18} className="text-white/50" />}
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <p className="text-white font-mono font-black text-sm">{user.username}</p>
+                      <span className={`inline-flex h-2.5 w-2.5 rounded-full ${user.isOnline ? "bg-green-400" : "bg-white/25"}`} />
+                    </div>
+                    <p className="text-white/40 text-[10px] font-mono">{user.school} · {user.provider}</p>
+                  </div>
+                </div>
+                <div className="mt-3 flex items-center justify-between">
+                  <span className="text-[10px] font-mono text-yellow-300">{user.weeklyXP} XP this week</span>
+                  {currentUser && currentUser.id !== user.id && <button onClick={() => onAddFriend(user.id)} className="rounded-full border border-pink-400/20 bg-pink-500/10 px-3 py-1 text-[10px] font-mono text-pink-300">Add Friend</button>}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function LeaderboardScreen({ onBack, users }: { onBack: () => void; users: AppUser[] }) {
+  const ranked = [...users].sort((a, b) => b.weeklyXP - a.weeklyXP);
+  return (
+    <div className="min-h-screen px-6 py-10">
+      <div className="max-w-5xl mx-auto">
+        <button onClick={onBack} className="flex items-center gap-2 text-white/50 hover:text-white font-mono text-sm mb-8"><ArrowLeft size={16}/> Back</button>
+        <div className="rounded-3xl border border-yellow-400/20 bg-gradient-to-br from-yellow-500/10 to-white/5 p-6">
+          <div className="flex items-center justify-between mb-5">
+            <div>
+              <p className="text-yellow-300 text-[10px] font-mono font-black tracking-[0.28em]">WEEKLY RANKINGS</p>
+              <h2 className="text-2xl font-mono font-black text-white mt-1">School-based leaderboard</h2>
+            </div>
+            <div className="rounded-full border border-yellow-400/20 bg-yellow-500/10 px-3 py-1 text-yellow-300 text-xs font-mono">Top {ranked.length}</div>
+          </div>
+          <div className="space-y-2">
+            {ranked.map((user, index) => (
+              <div key={user.id} className="flex items-center justify-between rounded-2xl border border-white/10 bg-black/15 px-4 py-3">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-yellow-500/15 text-yellow-300 font-mono font-black">{index + 1}</div>
+                  <div>
+                    <p className="text-white font-mono font-black text-sm">{user.username}</p>
+                    <p className="text-white/40 text-[10px] font-mono">{user.school}</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-yellow-300 font-mono font-black text-sm">{user.weeklyXP} XP</p>
+                  <p className="text-white/35 text-[10px] font-mono">{user.role === "admin" ? "Admin" : "Player"}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AdminScreen({ onBack, users, onResetUsers }: { onBack: () => void; users: AppUser[]; onResetUsers: () => void }) {
+  return (
+    <div className="min-h-screen px-6 py-10">
+      <div className="max-w-4xl mx-auto">
+        <button onClick={onBack} className="flex items-center gap-2 text-white/50 hover:text-white font-mono text-sm mb-8"><ArrowLeft size={16}/> Back</button>
+        <div className="rounded-3xl border border-red-400/20 bg-gradient-to-br from-red-500/10 to-white/5 p-6">
+          <div className="flex items-center justify-between mb-5">
+            <div>
+              <p className="text-red-300 text-[10px] font-mono font-black tracking-[0.28em]">ADMIN CONSOLE</p>
+              <h2 className="text-2xl font-mono font-black text-white mt-1">Manage CodeQuest players</h2>
+            </div>
+            <button onClick={onResetUsers} className="rounded-xl border border-red-400/20 bg-red-500/10 px-3 py-2 text-red-300 text-xs font-mono">Reset Demo Accounts</button>
+          </div>
+          <div className="space-y-2">
+            {users.map((user) => (
+              <div key={user.id} className="flex items-center justify-between rounded-2xl border border-white/10 bg-black/15 px-4 py-3">
+                <div>
+                  <p className="text-white font-mono font-black text-sm">{user.username}</p>
+                  <p className="text-white/40 text-[10px] font-mono">{user.role} · {user.school}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-red-300 font-mono font-black text-sm">{user.totalXP} XP</p>
+                  <p className="text-white/35 text-[10px] font-mono">{user.isOnline ? "Online" : "Offline"}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function LoginScreen({ onBack, onLogin, onSwitchToSignup }: { onBack: () => void; onLogin: (user: AppUser) => void; onSwitchToSignup: () => void }) {
+  const [mode, setMode] = useState<"login" | "signup">("login");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [school, setSchool] = useState("");
+  const [provider, setProvider] = useState<AppUser["provider"]>("local");
+
+  const submit = () => {
+    const users = readUsers();
+    const existing = users.find((u) => u.username.toLowerCase() === username.trim().toLowerCase());
+    if (mode === "login") {
+      const found = users.find((u) => u.username.toLowerCase() === username.trim().toLowerCase() && u.password === password);
+      if (!found) {
+        alert("Invalid username or password");
+        return;
+      }
+      const nextUsers = users.map((u) => (u.id === found.id ? { ...u, isOnline: true } : u));
+      writeUsers(nextUsers);
+      onLogin({ ...found, isOnline: true });
+      return;
+    }
+    if (!username.trim() || !password.trim()) {
+      alert("Please enter a username and password");
+      return;
+    }
+    if (existing) {
+      alert("That username is already taken");
+      return;
+    }
+    const fresh = makeUser(username.trim(), password, provider, "", school.trim() || "Unknown School");
+    const nextUsers = [...users, fresh];
+    writeUsers(nextUsers);
+    onLogin(fresh);
+  };
+
+  return (
+    <div className="min-h-screen px-6 py-10">
+      <div className="max-w-xl mx-auto">
+        <button onClick={onBack} className="flex items-center gap-2 text-white/50 hover:text-white font-mono text-sm mb-8"><ArrowLeft size={16}/> Back</button>
+        <div className="rounded-3xl border border-purple-400/20 bg-gradient-to-br from-purple-500/10 to-white/5 p-6">
+          <div className="flex items-center justify-between mb-5">
+            <div>
+              <p className="text-purple-300 text-[10px] font-mono font-black tracking-[0.28em]">PLAYER LOGIN</p>
+              <h2 className="text-2xl font-mono font-black text-white mt-1">Join the CodeQuest arena</h2>
+            </div>
+            <div className="flex rounded-full border border-white/10 bg-black/10 p-1">
+              <button onClick={() => setMode("login")} className={`rounded-full px-3 py-1 text-[10px] font-mono ${mode === "login" ? "bg-purple-500/20 text-purple-300" : "text-white/50"}`}>Login</button>
+              <button onClick={() => setMode("signup")} className={`rounded-full px-3 py-1 text-[10px] font-mono ${mode === "signup" ? "bg-purple-500/20 text-purple-300" : "text-white/50"}`}>Sign up</button>
+            </div>
+          </div>
+          <div className="space-y-3">
+            <input value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none" />
+            <input value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" type="password" className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none" />
+            {mode === "signup" && <><input value={school} onChange={(e) => setSchool(e.target.value)} placeholder="School" className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none" /><select value={provider} onChange={(e) => setProvider(e.target.value as AppUser["provider"])} className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none"><option value="local">Local Account</option><option value="google">Continue with Google</option><option value="facebook">Continue with Facebook</option></select></>}
+            <button onClick={submit} className="w-full rounded-xl bg-gradient-to-r from-purple-600 to-cyan-600 px-4 py-3 font-mono font-black text-white">{mode === "login" ? "Log In" : "Create Account"}</button>
+            <button onClick={onSwitchToSignup} className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 font-mono text-sm text-white/70">{mode === "login" ? "Need an account? Sign up" : "Already have one? Log in"}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 function GuidelinesScreen({ onContinue, onBack }: { onContinue: () => void; onBack: () => void }) {
   const guidelines = [
     "Read each question carefully before selecting an answer.",
@@ -2238,6 +2518,16 @@ export default function App() {
       return { username: "", yearLevel: "", course: "", school: "", photo: "" };
     }
   });
+  const [users, setUsers] = useState<AppUser[]>(() => seedDefaultUsers());
+  const [currentUser, setCurrentUser] = useState<AppUser | null>(() => {
+    if (typeof window === "undefined") return null;
+    try {
+      const raw = window.localStorage.getItem("codequest-current-user");
+      return raw ? (JSON.parse(raw) as AppUser) : null;
+    } catch {
+      return null;
+    }
+  });
 
   const totalQs = selectedLang ? (QUESTIONS[selectedLang]?.length ?? 0) : 0;
 
@@ -2249,6 +2539,14 @@ export default function App() {
     localStorage.setItem("codequest-theme-mode", darkMode ? "dark" : "light");
     document.documentElement.style.colorScheme = darkMode ? "dark" : "light";
   }, [darkMode]);
+
+  useEffect(() => {
+    if (currentUser) {
+      localStorage.setItem("codequest-current-user", JSON.stringify(currentUser));
+    } else {
+      localStorage.removeItem("codequest-current-user");
+    }
+  }, [currentUser]);
 
   const saveProfile = (next: StudentProfile) => {
     const firstProfile = !profile.username;
@@ -2279,6 +2577,49 @@ export default function App() {
     const next = { ...profile, photo };
     setProfile(next);
     localStorage.setItem("codequest-profile", JSON.stringify(next));
+  };
+
+  const handleLogin = (user: AppUser) => {
+    setUsers((prev) => {
+      const next = prev.map((item) => ({ ...item, isOnline: item.id === user.id }));
+      writeUsers(next);
+      return next;
+    });
+    setCurrentUser({ ...user, isOnline: true });
+    setScreen("home");
+  };
+
+  const handleLogout = () => {
+    if (currentUser) {
+      setUsers((prev) => {
+        const next = prev.map((item) => (item.id === currentUser.id ? { ...item, isOnline: false } : item));
+        writeUsers(next);
+        return next;
+      });
+    }
+    setCurrentUser(null);
+    setScreen("home");
+  };
+
+  const handleAddFriend = (friendId: string) => {
+    if (!currentUser) return;
+    if (currentUser.friends.includes(friendId)) return;
+    const updatedUser = { ...currentUser, friends: [...currentUser.friends, friendId] };
+    setCurrentUser(updatedUser);
+    setUsers((prev) => {
+      const next = prev.map((item) => (item.id === currentUser.id ? { ...item, friends: updatedUser.friends } : item));
+      writeUsers(next);
+      return next;
+    });
+  };
+
+  const resetDemoAccounts = () => {
+    if (typeof window !== "undefined") {
+      window.localStorage.removeItem("codequest-users");
+    }
+    const seeded = seedDefaultUsers();
+    setUsers(seeded);
+    setCurrentUser(null);
   };
 
   return (
@@ -2406,6 +2747,10 @@ export default function App() {
               onDuel={() => setScreen("duel-setup")}
               onMusic={() => { setMusicReturn("home"); setScreen("music"); }}
               selectedTrack={selectedTrack}
+              onCommunity={() => setScreen("community")}
+              onLeaderboard={() => setScreen("leaderboard")}
+              onAdmin={() => setScreen("admin")}
+              currentUser={currentUser}
             />
           </motion.div>
         )}
@@ -2419,6 +2764,10 @@ export default function App() {
               onBack={() => setScreen("home")}
               darkMode={darkMode}
               onToggleTheme={() => setDarkMode((v) => !v)}
+              currentUser={currentUser}
+              onLogin={handleLogin}
+              onLogout={handleLogout}
+              onOpenLogin={() => setScreen("login")}
             />
           </motion.div>
         )}
@@ -2429,6 +2778,29 @@ export default function App() {
           </motion.div>
         )}
 
+        {screen === "login" && (
+          <motion.div key="login" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <LoginScreen onBack={() => setScreen("home")} onLogin={handleLogin} onSwitchToSignup={() => setScreen("login")} />
+          </motion.div>
+        )}
+
+        {screen === "community" && (
+          <motion.div key="community" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <CommunityScreen onBack={() => setScreen("home")} users={users} currentUser={currentUser} onAddFriend={handleAddFriend} />
+          </motion.div>
+        )}
+
+        {screen === "leaderboard" && (
+          <motion.div key="leaderboard" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <LeaderboardScreen onBack={() => setScreen("home")} users={users} />
+          </motion.div>
+        )}
+
+        {screen === "admin" && (
+          <motion.div key="admin" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <AdminScreen onBack={() => setScreen("home")} users={users} onResetUsers={resetDemoAccounts} />
+          </motion.div>
+        )}
 
         {screen === "modes" && (
           <motion.div key="modes" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
