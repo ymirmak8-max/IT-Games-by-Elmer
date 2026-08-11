@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import type { FormEvent } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Code2, Zap, Trophy, Star, ArrowRight, RotateCcw, CheckCircle2, XCircle, Flame, Target, BookOpen, ChevronRight, User, GraduationCap, School, BookOpenCheck, Moon, Sun, Music, ArrowLeft, PlayCircle } from "lucide-react";
+import { Code2, Zap, Trophy, Star, ArrowRight, RotateCcw, CheckCircle2, XCircle, Flame, Target, BookOpen, ChevronRight, User, GraduationCap, School, BookOpenCheck, Moon, Sun, Music, ArrowLeft, Swords, Shield, Pencil, Camera, Gamepad2 } from "lucide-react";
 
 // ─── Data ───────────────────────────────────────────────────────────────────
 
@@ -13,6 +13,10 @@ const LANGUAGES = [
   { id: "cpp", name: "C++", icon: "⚙️", color: "#8b5cf6", bg: "#2d1f4a", desc: "High-performance systems & game development" },
   { id: "c", name: "C", icon: "🔧", color: "#60a5fa", bg: "#102a43", desc: "Learn the fundamentals of procedural programming" },
   { id: "typescript", name: "TypeScript", icon: "🔷", color: "#06b6d4", bg: "#003d4a", desc: "JavaScript with types — safer, scalable code" },
+  { id: "php", name: "PHP", icon: "🐘", color: "#a78bfa", bg: "#2e2752", desc: "Build dynamic websites and server-side applications" },
+  { id: "sql", name: "SQL", icon: "🗄️", color: "#38bdf8", bg: "#123047", desc: "Query, manage, and analyze relational databases" },
+  { id: "csharp", name: "C#", icon: "🎯", color: "#22c55e", bg: "#123522", desc: "Modern programming for apps and game development" },
+  { id: "kotlin", name: "Kotlin", icon: "🟣", color: "#f472b6", bg: "#43213b", desc: "Modern language for Android and JVM development" },
 ];
 
 type Question = {
@@ -452,11 +456,46 @@ const QUESTIONS: Record<string, Question[]> = {
       xp: 25,
     },
   ],
-};
+  php: [
+    { id: 1, type: "multiple", question: "Which symbol starts a variable in PHP?", options: ["#", "$", "@", "%"], answer: 1, explanation: "PHP variables begin with the dollar sign, such as $name.", xp: 10 },
+    { id: 2, type: "code", question: "What does this PHP code print?", code: `<?php\n$name = "CodeQuest";\necho $name;`, options: ["$name", "CodeQuest", "echo", "Error"], answer: 1, explanation: "echo outputs the value stored in $name.", xp: 15 },
+    { id: 3, type: "multiple", question: "Which tag is commonly used to start PHP code?", options: ["<php>", "<?php", "<script>", "<?"], answer: 1, explanation: "PHP code normally starts with <?php.", xp: 10 },
+    { id: 4, type: "truefalse", question: "PHP can be used for server-side web development.", options: ["True", "False"], answer: 0, explanation: "TRUE! PHP is widely used for server-side web applications.", xp: 15 },
+    { id: 5, type: "multiple", question: "Which operator is used for string concatenation in PHP?", options: ["+", ".", "&", "::"], answer: 1, explanation: "The dot operator (.) concatenates strings in PHP.", xp: 15 },
+    { id: 6, type: "code", question: "What is printed?", code: `$x = 5;\n$y = 2;\necho $x + $y;`, options: ["3", "7", "10", "52"], answer: 1, explanation: "The + operator adds the two numbers, producing 7.", xp: 20 },
+    { id: 7, type: "multiple", question: "Which superglobal contains form data sent with POST?", options: ["$_GET", "$_POST", "$_FORM", "$_DATA"], answer: 1, explanation: "$_POST contains variables submitted through an HTTP POST request.", xp: 20 },
+  ],
+  sql: [
+    { id: 1, type: "multiple", question: "Which command is used to retrieve data from a table?", options: ["GET", "SELECT", "FETCH", "READ"], answer: 1, explanation: "SELECT retrieves rows from one or more database tables.", xp: 10 },
+    { id: 2, type: "code", question: "What does this query return?", code: `SELECT name FROM students;`, options: ["All student names", "The whole database", "Only the table name", "An error"], answer: 0, explanation: "The query selects the name column from the students table.", xp: 15 },
+    { id: 3, type: "multiple", question: "Which clause filters rows?", options: ["ORDER BY", "WHERE", "GROUP BY", "LIMIT"], answer: 1, explanation: "WHERE applies conditions to filter rows.", xp: 10 },
+    { id: 4, type: "truefalse", question: "SQL can be used to insert new records into a database.", options: ["True", "False"], answer: 0, explanation: "TRUE! INSERT INTO is used to add records.", xp: 15 },
+    { id: 5, type: "multiple", question: "Which command adds a new row?", options: ["INSERT", "ADDROW", "APPEND", "CREATE"], answer: 0, explanation: "INSERT INTO adds new rows to a table.", xp: 15 },
+    { id: 6, type: "code", question: "Which query changes a student's course?", code: `UPDATE students\nSET course = 'BSIT'\nWHERE id = 1;`, options: ["Deletes the student", "Updates the matching row", "Creates a table", "Selects the course"], answer: 1, explanation: "UPDATE changes existing records that match the WHERE condition.", xp: 20 },
+    { id: 7, type: "multiple", question: "Which clause sorts query results?", options: ["SORT BY", "ORDER BY", "ARRANGE", "GROUP BY"], answer: 1, explanation: "ORDER BY sorts returned rows.", xp: 20 },
+  ],
+  csharp: [
+    { id: 1, type: "multiple", question: "Which keyword declares a class in C#?", options: ["object", "class", "type", "structclass"], answer: 1, explanation: "The class keyword declares a class.", xp: 10 },
+    { id: 2, type: "code", question: "What does this print?", code: `int x = 4;\nConsole.WriteLine(x + 2);`, options: ["2", "4", "6", "42"], answer: 2, explanation: "4 + 2 equals 6.", xp: 15 },
+    { id: 3, type: "multiple", question: "Which method prints text to the console?", options: ["Console.WriteLine()", "print()", "echo()", "console.log()"], answer: 0, explanation: "Console.WriteLine() writes text and then moves to a new line.", xp: 10 },
+    { id: 4, type: "truefalse", question: "C# is commonly used with the .NET platform.", options: ["True", "False"], answer: 0, explanation: "TRUE! C# is a primary language of the .NET ecosystem.", xp: 15 },
+    { id: 5, type: "multiple", question: "Which type stores true or false?", options: ["bool", "boolean", "bit", "truth"], answer: 0, explanation: "C# uses bool for Boolean values.", xp: 15 },
+    { id: 6, type: "code", question: "What is the value of total?", code: `int a = 3;\nint b = 5;\nint total = a * b;`, options: ["8", "15", "35", "2"], answer: 1, explanation: "3 multiplied by 5 is 15.", xp: 20 },
+    { id: 7, type: "multiple", question: "Which symbol ends most C# statements?", options: [".", ";", ":", ","], answer: 1, explanation: "Most C# statements end with a semicolon.", xp: 20 },
+  ],
+  kotlin: [
+    { id: 1, type: "multiple", question: "Which keyword declares a read-only variable in Kotlin?", options: ["var", "let", "val", "const"], answer: 2, explanation: "val declares a read-only reference; var declares a mutable variable.", xp: 10 },
+    { id: 2, type: "code", question: "What does this print?", code: `val x = 5\nprintln(x + 3)`, options: ["2", "5", "8", "53"], answer: 2, explanation: "5 + 3 equals 8.", xp: 15 },
+    { id: 3, type: "multiple", question: "Which function is commonly used to print a line in Kotlin?", options: ["printLine()", "println()", "echo()", "console()"], answer: 1, explanation: "println() prints a value followed by a new line.", xp: 10 },
+    { id: 4, type: "truefalse", question: "Kotlin is widely used for Android development.", options: ["True", "False"], answer: 0, explanation: "TRUE! Kotlin is a major language for modern Android development.", xp: 15 },
+    { id: 5, type: "multiple", question: "Which keyword declares a mutable variable?", options: ["val", "var", "mut", "change"], answer: 1, explanation: "var declares a variable whose value can be changed.", xp: 15 },
+    { id: 6, type: "code", question: "What is the result?", code: `val a = 2\nval b = 4\nprintln(a * b)`, options: ["6", "8", "24", "2"], answer: 1, explanation: "2 multiplied by 4 equals 8.", xp: 20 },
+    { id: 7, type: "multiple", question: "Which symbol is used for a single-line comment?", options: ["#", "//", "<!--", "--"], answer: 1, explanation: "Kotlin uses // for single-line comments.", xp: 20 },
+  ]};
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-type Screen = "home" | "profile" | "guidelines" | "language" | "game" | "results";
+type Screen = "welcome" | "home" | "profile" | "guidelines" | "modes" | "language" | "game" | "results";
 type AnswerState = "idle" | "correct" | "wrong";
 
 // ─── Components ──────────────────────────────────────────────────────────────
@@ -525,6 +564,129 @@ function ParticleEffect({ active, correct }: { active: boolean; correct: boolean
 
 // ─── Screens ─────────────────────────────────────────────────────────────────
 
+
+type GameMode = "practice" | "battle" | "speed";
+
+const SPOTIFY_TRACKS = [
+  { id: "0VjIjW4GlUZAMYd2vXMi3b", title: "Blinding Lights", artist: "The Weeknd" },
+  { id: "7qiZfU4dY1lWllzX7mPBI3", title: "Shape of You", artist: "Ed Sheeran" },
+  { id: "0pqnGHJpmpxLKifKRmU6WP", title: "Believer", artist: "Imagine Dragons" },
+];
+
+function WelcomeScreen({ onContinue, darkMode, onToggleTheme }: { onContinue: () => void; darkMode: boolean; onToggleTheme: () => void }) {
+  const guidelines = [
+    "Choose a programming language and a game mode.",
+    "Answer each coding challenge to earn XP and build your streak.",
+    "In Battle Mode, every correct answer is a skill attack against the Code Beast.",
+    "Your profile appears on your results card; add a photo to complete your winning profile.",
+    "You can edit your student profile anytime from the dashboard.",
+    "Use the built-in Spotify player to listen to one of the three saved tracks while playing.",
+  ];
+  return (
+    <div className="min-h-screen px-6 py-10 relative overflow-hidden">
+      <div className="absolute top-5 right-5">
+        <button onClick={onToggleTheme} className="flex items-center gap-2 px-4 py-2 rounded-xl border border-white/10 bg-white/5 text-white/70 font-mono text-xs">
+          {darkMode ? <Sun size={15} /> : <Moon size={15} />} {darkMode ? "Light Mode" : "Dark Mode"}
+        </button>
+      </div>
+      <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-transparent to-cyan-900/20 pointer-events-none" />
+      <motion.div initial={{ opacity: 0, y: 35 }} animate={{ opacity: 1, y: 0 }} className="max-w-5xl mx-auto pt-16 md:pt-24 relative">
+        <div className="text-center mb-12">
+          <motion.div animate={{ rotate: [0, -5, 5, 0] }} transition={{ repeat: Infinity, duration: 4 }}
+            className="inline-flex w-20 h-20 rounded-3xl bg-gradient-to-br from-purple-600 to-cyan-500 items-center justify-center shadow-2xl shadow-purple-500/30 mb-6">
+            <Code2 size={38} className="text-white" />
+          </motion.div>
+          <p className="text-purple-300 font-mono font-bold tracking-widest text-sm mb-3">WELCOME TO</p>
+          <h1 className="text-6xl md:text-8xl font-mono font-black tracking-tight">
+            <span className="text-white">Code</span><span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400">Quest</span>
+          </h1>
+          <p className="text-white/50 max-w-2xl mx-auto mt-5 text-base md:text-lg font-mono">
+            Turn programming questions into a game. Learn, fight, earn XP, and level up your coding skills.
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-5 mb-8">
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
+            <div className="flex items-center gap-3 mb-5"><BookOpenCheck className="text-cyan-400" /><h2 className="text-xl font-mono font-black text-white">Quick Guidelines</h2></div>
+            <div className="space-y-3">
+              {guidelines.map((g, i) => <div key={g} className="flex gap-3 text-sm font-mono text-white/60"><span className="text-purple-400 font-bold">{i + 1}.</span><span>{g}</span></div>)}
+            </div>
+          </div>
+          <div className="rounded-2xl border border-purple-500/20 bg-purple-500/5 p-6">
+            <div className="flex items-center gap-3 mb-5"><Swords className="text-purple-400" /><h2 className="text-xl font-mono font-black text-white">Your Mission</h2></div>
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                ["⚔️", "Battle", "Attack with correct answers"],
+                ["⚡", "Speed", "Answer fast and accurately"],
+                ["🧠", "Practice", "Learn with explanations"],
+                ["🏆", "Level Up", "Earn XP and rank up"],
+              ].map(([icon, title, desc]) => <div key={title} className="rounded-xl border border-white/10 bg-white/5 p-4"><div className="text-2xl mb-2">{icon}</div><p className="font-mono font-bold text-white text-sm">{title}</p><p className="font-mono text-xs text-white/40 mt-1">{desc}</p></div>)}
+            </div>
+          </div>
+        </div>
+
+        <div className="text-center">
+          <button onClick={onContinue} className="inline-flex items-center gap-3 px-10 py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-cyan-600 text-white font-mono font-black text-lg shadow-xl shadow-purple-500/20">
+            Continue to CodeQuest <ArrowRight size={20} />
+          </button>
+          <p className="text-white/30 text-xs font-mono mt-4">Your profile and theme are saved on this device.</p>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+function MusicPlayer() {
+  const [track, setTrack] = useState(SPOTIFY_TRACKS[0]);
+  return (
+    <div className="rounded-2xl border border-green-500/20 bg-green-500/5 p-3">
+      <div className="flex items-center gap-2 mb-3">
+        <Music size={16} className="text-green-400" />
+        <span className="font-mono text-xs font-bold text-green-300">CodeQuest Music</span>
+        <span className="text-white/30 text-xs font-mono ml-auto">3 saved tracks</span>
+      </div>
+      <div className="flex flex-wrap gap-2 mb-3">
+        {SPOTIFY_TRACKS.map((item) => (
+          <button key={item.id} onClick={() => setTrack(item)}
+            className={`px-3 py-2 rounded-lg text-xs font-mono border ${track.id === item.id ? "bg-green-500/20 border-green-500/40 text-green-300" : "bg-white/5 border-white/10 text-white/50"}`}>
+            {item.title}
+          </button>
+        ))}
+      </div>
+      <iframe
+        key={track.id}
+        src={`https://open.spotify.com/embed/track/${track.id}?utm_source=generator`}
+        width="100%" height="152" frameBorder="0"
+        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+        loading="lazy"
+        title={`Spotify player for ${track.title}`}
+        className="rounded-xl"
+      />
+    </div>
+  );
+}
+
+function ModesScreen({ onSelect, onBack }: { onSelect: (mode: GameMode) => void; onBack: () => void }) {
+  const modes = [
+    { id: "practice" as GameMode, icon: "🧠", title: "Practice Mode", desc: "Relaxed learning with explanations after every answer.", color: "#8b5cf6", questions: "7 questions" },
+    { id: "battle" as GameMode, icon: "⚔️", title: "Battle Mode", desc: "Your answers become skills. Correct answers attack the Code Beast.", color: "#ef4444", questions: "7 questions" },
+    { id: "speed" as GameMode, icon: "⚡", title: "Speed Mode", desc: "Fast-paced challenge. Try to finish all questions quickly.", color: "#f59e0b", questions: "5 questions" },
+  ];
+  return (
+    <div className="min-h-screen px-6 py-12">
+      <div className="max-w-4xl mx-auto">
+        <button onClick={onBack} className="flex items-center gap-2 text-white/50 hover:text-white font-mono text-sm mb-8"><ArrowLeft size={16}/> Back</button>
+        <div className="text-center mb-10"><Gamepad2 className="mx-auto text-purple-400 mb-3" size={36}/><h2 className="text-4xl font-mono font-black text-white">Choose Your Mode</h2><p className="text-white/40 font-mono text-sm mt-2">How do you want to test your skills?</p></div>
+        <div className="grid md:grid-cols-3 gap-4">
+          {modes.map((mode) => <button key={mode.id} onClick={() => onSelect(mode.id)} className="text-left rounded-2xl border border-white/10 bg-white/5 p-6 hover:bg-white/10 transition-all">
+            <div className="text-5xl mb-5">{mode.icon}</div><h3 className="text-xl font-mono font-black text-white mb-2">{mode.title}</h3><p className="text-white/50 text-sm font-mono leading-relaxed mb-5">{mode.desc}</p><div className="flex items-center justify-between"><span className="text-xs font-mono" style={{color:mode.color}}>{mode.questions}</span><ArrowRight size={17} className="text-white/30"/></div>
+          </button>)}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function HomeScreen({
   onStart,
   onProfile,
@@ -561,6 +723,20 @@ function HomeScreen({
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
 
+
+        {profile.username && (
+          <div className="max-w-2xl mx-auto mb-6 rounded-2xl border border-white/10 bg-white/5 p-4 flex items-center gap-4 text-left">
+            {profile.photo ? <img src={profile.photo} className="w-14 h-14 rounded-2xl object-cover border border-white/10" alt="Student profile" /> :
+              <div className="w-14 h-14 rounded-2xl bg-purple-500/20 flex items-center justify-center"><User className="text-purple-300" /></div>}
+            <div className="min-w-0 flex-1">
+              <p className="text-white font-mono font-bold">{profile.username}</p>
+              <p className="text-white/40 text-xs font-mono">{profile.yearLevel} · {profile.course}</p>
+              <p className="text-white/30 text-xs font-mono truncate">{profile.school}</p>
+            </div>
+            <button onClick={onProfile} className="px-3 py-2 rounded-lg border border-white/10 bg-white/5 text-white/60 text-xs font-mono"><Pencil size={13} className="inline mr-1"/>Edit</button>
+          </div>
+        )}
+
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
@@ -582,10 +758,10 @@ function HomeScreen({
         </h1>
 
         <p className="text-white/50 text-lg font-mono mb-2">
-          {"Relapse Time"}
+          "Your Coding Adventure Starts Here"
         </p>
         <p className="text-white/30 text-sm mb-12">
-          Choose a language. Answer questions. Level up. Become a better and move on.
+          Choose your mode, pick a language, answer challenges, and level up your coding skills.
         </p>
 
         <div className="grid grid-cols-3 gap-4 mb-10 max-w-md mx-auto">
@@ -621,6 +797,7 @@ type StudentProfile = {
   yearLevel: string;
   course: string;
   school: string;
+  photo: string;
 };
 
 function ProfileScreen({
@@ -648,6 +825,7 @@ function ProfileScreen({
       yearLevel: form.yearLevel,
       course: form.course.trim(),
       school: form.school.trim(),
+      photo: form.photo || "",
     });
   };
 
@@ -720,6 +898,27 @@ function ProfileScreen({
                   className="w-full rounded-xl border border-white/10 bg-black/20 text-white placeholder:text-white/25 pl-10 pr-4 py-3 outline-none focus:border-purple-500/60" />
               </div>
             </label>
+
+
+            <div>
+              <span className="text-xs font-mono text-white/50">Profile Photo</span>
+              <div className="mt-2 flex items-center gap-4">
+                {form.photo ? <img src={form.photo} className="w-20 h-20 rounded-2xl object-cover border border-purple-500/30" alt="Profile preview" /> :
+                  <div className="w-20 h-20 rounded-2xl bg-purple-500/10 border border-white/10 flex items-center justify-center"><Camera className="text-white/30" /></div>}
+                <label className="cursor-pointer flex items-center gap-2 px-4 py-3 rounded-xl border border-white/10 bg-white/5 text-white/70 text-xs font-mono">
+                  <Camera size={15}/> {form.photo ? "Change Photo" : "Choose Photo"}
+                  <input type="file" accept="image/*" className="hidden" onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    if (file.size > 2 * 1024 * 1024) { alert("Please choose an image smaller than 2MB."); return; }
+                    const reader = new FileReader();
+                    reader.onload = () => update("photo", String(reader.result));
+                    reader.readAsDataURL(file);
+                  }} />
+                </label>
+              </div>
+              <p className="text-white/25 text-xs font-mono mt-2">For winning profiles, add a clear student photo.</p>
+            </div>
 
             <button type="submit"
               className="w-full mt-3 py-4 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-600 text-white font-mono font-bold">
@@ -800,7 +999,7 @@ function LanguageScreen({ onSelect }: { onSelect: (lang: string) => void }) {
               className="group text-left p-6 rounded-2xl border border-white/10 bg-white/5 relative overflow-hidden"
               whileHover={{ scale: 1.03, borderColor: lang.color }}
               whileTap={{ scale: 0.97 }}
-              style={{ "--hover-color": lang.color } as React.CSSProperties}
+              style={{ "--hover-color": lang.color } as any}
             >
               {/* glow background */}
               <div
@@ -836,12 +1035,16 @@ function LanguageScreen({ onSelect }: { onSelect: (lang: string) => void }) {
 
 function GameScreen({
   langId,
+  mode,
   onFinish,
 }: {
   langId: string;
+  mode: GameMode;
   onFinish: (score: number, xp: number, correct: number) => void;
 }) {
-  const questions = QUESTIONS[langId] ?? [];
+  const allQuestions = QUESTIONS[langId] ?? [];
+  const questions = mode === "speed" ? allQuestions.slice(0, Math.min(5, allQuestions.length)) : allQuestions;
+
   const lang = LANGUAGES.find((l) => l.id === langId)!;
   const [qIndex, setQIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
@@ -853,6 +1056,9 @@ function GameScreen({
   const [particleCorrect, setParticleCorrect] = useState(false);
   const [showExplanation, setShowExplanation] = useState(false);
   const [xpLevel, setXpLevel] = useState(1);
+  const [enemyHP, setEnemyHP] = useState(100);
+  const [playerHP, setPlayerHP] = useState(100);
+  const battleSkills = ["Code Slash", "Logic Strike", "Debug Blast", "Syntax Smash", "Algorithm Beam"];
 
   const currentQ = questions[qIndex];
   const isLast = qIndex === questions.length - 1;
@@ -880,6 +1086,14 @@ function GameScreen({
         setStreak((s) => s + 1);
       } else {
         setStreak(0);
+      }
+
+      if (mode === "battle") {
+        if (correct) {
+          setEnemyHP((hp) => Math.max(0, hp - 20));
+        } else {
+          setPlayerHP((hp) => Math.max(0, hp - 15));
+        }
       }
     },
     [answerState, currentQ, streak]
@@ -936,6 +1150,7 @@ function GameScreen({
           </button>
         </div>
 
+        <MusicPlayer />
         <XPBar current={totalXP} max={(xpLevel) * 50} level={xpLevel} />
 
         {/* Progress bar */}
@@ -947,6 +1162,15 @@ function GameScreen({
             transition={{ duration: 0.4 }}
           />
         </div>
+        {mode === "battle" && (
+          <div className="rounded-2xl border border-red-500/20 bg-red-500/5 p-4">
+            <div className="flex items-center justify-between mb-3"><div className="flex items-center gap-2 text-red-300 font-mono text-xs font-bold"><Swords size={15}/> CODE BEAST</div><span className="text-red-300 font-mono text-xs">{enemyHP} HP</span></div>
+            <div className="h-2 bg-white/10 rounded-full overflow-hidden mb-4"><div className="h-full bg-red-500 transition-all" style={{width:`${enemyHP}%`}}/></div>
+            <div className="flex items-center justify-between mb-2"><div className="flex items-center gap-2 text-cyan-300 font-mono text-xs font-bold"><Shield size={15}/> YOU</div><span className="text-cyan-300 font-mono text-xs">{playerHP} HP</span></div>
+            <div className="h-2 bg-white/10 rounded-full overflow-hidden"><div className="h-full bg-cyan-500 transition-all" style={{width:`${playerHP}%`}}/></div>
+            <p className="text-white/30 font-mono text-xs mt-3">Your answer is your skill. Correct = attack. Wrong = enemy attack.</p>
+          </div>
+        )}
       </div>
 
       {/* Question card */}
@@ -973,6 +1197,7 @@ function GameScreen({
               {currentQ.type === "multiple" ? "Multiple Choice" : currentQ.type === "code" ? "Code Challenge" : "True or False"}
             </div>
             <span className="text-xs font-mono text-yellow-400/60">+{currentQ.xp} XP</span>
+            {mode === "battle" && <span className="text-xs font-mono text-red-300/70">⚔ {battleSkills[qIndex % battleSkills.length]}</span>}
             {streak >= 2 && (
               <span className="text-xs font-mono text-orange-400/60">+{Math.round(currentQ.xp * 0.5)} bonus</span>
             )}
@@ -1094,6 +1319,9 @@ function ResultsScreen({
   xp,
   correct,
   total,
+  profile,
+  onPhotoUpdate,
+  onEditProfile,
   onReplay,
   onHome,
 }: {
@@ -1102,6 +1330,9 @@ function ResultsScreen({
   xp: number;
   correct: number;
   total: number;
+  profile: StudentProfile;
+  onPhotoUpdate: (photo: string) => void;
+  onEditProfile: () => void;
   onReplay: () => void;
   onHome: () => void;
 }) {
@@ -1141,6 +1372,29 @@ function ResultsScreen({
         <p className="text-white/40 font-mono text-sm mb-8">
           {correct} of {total} correct · {xp} XP earned
         </p>
+
+
+        <div className="rounded-2xl border border-white/10 bg-white/5 p-4 mb-8 text-left">
+          <div className="flex items-center gap-4">
+            {profile.photo ? <img src={profile.photo} className="w-20 h-20 rounded-2xl object-cover border border-white/10" alt="Student profile" /> :
+              <label className="w-20 h-20 rounded-2xl border border-dashed border-purple-500/50 bg-purple-500/10 flex flex-col items-center justify-center cursor-pointer">
+                <Camera size={20} className="text-purple-300"/>
+                <span className="text-[9px] text-purple-300 font-mono mt-1">Add Photo</span>
+                <input type="file" accept="image/*" className="hidden" onChange={(e) => {
+                  const file = e.target.files?.[0]; if (!file) return;
+                  if (file.size > 2 * 1024 * 1024) { alert("Please choose an image smaller than 2MB."); return; }
+                  const reader = new FileReader(); reader.onload = () => onPhotoUpdate(String(reader.result)); reader.readAsDataURL(file);
+                }} />
+              </label>}
+            <div className="flex-1 min-w-0">
+              <p className="text-white font-mono font-black">{profile.username}</p>
+              <p className="text-white/50 text-xs font-mono mt-1">{profile.yearLevel} · {profile.course}</p>
+              <p className="text-white/40 text-xs font-mono truncate">{profile.school}</p>
+              {score >= 70 && !profile.photo && <p className="text-purple-300 text-xs font-mono mt-2">🏆 Add your photo to complete your winning profile.</p>}
+            </div>
+            <button onClick={onEditProfile} className="px-3 py-2 rounded-lg border border-white/10 bg-white/5 text-white/60 text-xs font-mono"><Pencil size={13} className="inline mr-1"/>Edit</button>
+          </div>
+        </div>
 
         {/* Stat cards */}
         <div className="grid grid-cols-3 gap-3 mb-8">
@@ -1192,7 +1446,8 @@ function ResultsScreen({
 // ─── App ─────────────────────────────────────────────────────────────────────
 
 export default function App() {
-  const [screen, setScreen] = useState<Screen>("home");
+  const [screen, setScreen] = useState<Screen>("welcome");
+  const [gameMode, setGameMode] = useState<GameMode>("practice");
   const [selectedLang, setSelectedLang] = useState<string | null>(null);
   const [results, setResults] = useState<{ score: number; xp: number; correct: number } | null>(null);
   const [darkMode, setDarkMode] = useState(() => {
@@ -1201,9 +1456,9 @@ export default function App() {
   });
   const [profile, setProfile] = useState<StudentProfile>(() => {
     try {
-      return JSON.parse(localStorage.getItem("codequest-profile") || '{"username":"","yearLevel":"","course":"","school":""}');
+      return JSON.parse(localStorage.getItem("codequest-profile") || '{"username":"","yearLevel":"","course":"","school":"","photo":""}');
     } catch {
-      return { username: "", yearLevel: "", course: "", school: "" };
+      return { username: "", yearLevel: "", course: "", school: "", photo: "" };
     }
   });
 
@@ -1215,17 +1470,26 @@ export default function App() {
   }, [darkMode]);
 
   const saveProfile = (next: StudentProfile) => {
+    const firstProfile = !profile.username;
     setProfile(next);
     localStorage.setItem("codequest-profile", JSON.stringify(next));
-    setScreen("guidelines");
+    setScreen(firstProfile ? "guidelines" : "home");
   };
 
-  const startQuest = () => {
+  const continueFromWelcome = () => {
     if (!profile.username || !profile.yearLevel || !profile.course || !profile.school) {
       setScreen("profile");
-      return;
+    } else {
+      setScreen("home");
     }
-    setScreen("language");
+  };
+
+  const startQuest = () => setScreen("modes");
+
+  const updatePhoto = (photo: string) => {
+    const next = { ...profile, photo };
+    setProfile(next);
+    localStorage.setItem("codequest-profile", JSON.stringify(next));
   };
 
   return (
@@ -1260,6 +1524,13 @@ export default function App() {
       />
 
       <AnimatePresence mode="wait">
+
+        {screen === "welcome" && (
+          <motion.div key="welcome" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <WelcomeScreen darkMode={darkMode} onToggleTheme={() => setDarkMode((v) => !v)} onContinue={continueFromWelcome} />
+          </motion.div>
+        )}
+
         {screen === "home" && (
           <motion.div key="home" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
             <HomeScreen
@@ -1285,6 +1556,13 @@ export default function App() {
           </motion.div>
         )}
 
+
+        {screen === "modes" && (
+          <motion.div key="modes" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <ModesScreen onBack={() => setScreen("home")} onSelect={(mode) => { setGameMode(mode); setScreen("language"); }} />
+          </motion.div>
+        )}
+
         {screen === "language" && (
           <motion.div key="language" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
             <LanguageScreen
@@ -1301,6 +1579,7 @@ export default function App() {
           <motion.div key={`game-${selectedLang}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
             <GameScreen
               langId={selectedLang}
+              mode={gameMode}
               onFinish={(score, xp, correct) => {
                 setResults({ score, xp, correct });
                 setScreen("results");
@@ -1316,14 +1595,17 @@ export default function App() {
               score={results.score}
               xp={results.xp}
               correct={results.correct}
-              total={totalQs}
+              total={gameMode === "speed" ? Math.min(5, totalQs) : totalQs}
+              profile={profile}
+              onPhotoUpdate={updatePhoto}
+              onEditProfile={() => setScreen("profile")}
               onReplay={() => {
                 setResults(null);
                 setScreen("game");
               }}
               onHome={() => {
                 setSelectedLang(null);
-                setScreen("language");
+                setScreen("home");
               }}
             />
           </motion.div>
