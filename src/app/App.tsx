@@ -650,6 +650,26 @@ const SPOTIFY_TRACKS = [
   { id: "0p20HotsDDhhAUtJ2KOAg9", title: "Relaxing Beats for Late Night Coding", artist: "Lo Fi Hip Hop", category: "Focus" },
 ];
 
+type MusicTrack = (typeof SPOTIFY_TRACKS)[number];
+
+type MusicStyle = {
+  wave: OscillatorType;
+  notes: Array<[number, number]>;
+};
+
+const getMusicStyle = (track: MusicTrack): MusicStyle => {
+  if (track.category === "Focus") {
+    return { wave: "sine", notes: [[220, 280], [330, 392], [392, 440], [440, 330]] };
+  }
+  if (track.category === "Pop" || track.artist.includes("Weeknd")) {
+    return { wave: "triangle", notes: [[440, 523], [554, 659], [698, 783], [659, 587]] };
+  }
+  if (track.category === "Rock / Alt") {
+    return { wave: "sawtooth", notes: [[196, 246], [246, 293], [329, 392], [392, 329]] };
+  }
+  return { wave: "square", notes: [[261, 329], [329, 392], [392, 440], [440, 523]] };
+};
+
 const DEBUG_QUESTIONS_BY_LANGUAGE: Record<string, Question[]> = {
   python: [
     { id: 201, type: "code", question: "Fix the Python indentation bug.", code: `if score >= 75:\nprint("Passed")`, options: ["Indent print() under if", "Remove if", "Add ;", "Change >= to <="], answer: 0, explanation: "Python requires indentation to define the body of an if statement.", xp: 25 },
@@ -828,7 +848,7 @@ function MusicSelectionScreen({
             <p className="text-cyan-300 font-mono font-black text-xs">SELECT = PLAY NOW</p>
             <p className="text-white/35 font-mono text-[10px] mt-1">Tap any song and this menu closes immediately. Your selected soundtrack remains global while you use CodeQuest.</p>
           </div>
-          <p className="text-center text-white/25 text-[10px] font-mono mt-3">Spotify/Chrome may require one Play tap because browsers can block autoplay.</p>
+          <p className="text-center text-white/25 text-[10px] font-mono mt-3">Tap once to start the soundtrack. It will keep playing as you explore the app.</p>
         </div>
       </div>
     </div>
@@ -850,7 +870,7 @@ function MusicPlayer({ compact = false, selectedTrack }: { compact?: boolean; se
         </div>
         <div className="min-w-0">
           <p className="font-mono text-sm font-black text-green-300">CODEQUEST MUSIC</p>
-          <p className="text-white/40 text-[10px] font-mono truncate">Spotify soundtrack for your quest.</p>
+          <p className="text-white/40 text-[10px] font-mono truncate">Browser soundtrack for your quest.</p>
         </div>
         <span className="ml-auto shrink-0 text-[10px] font-mono text-white/30">{SPOTIFY_TRACKS.length} tracks</span>
       </div>
@@ -878,17 +898,17 @@ function MusicPlayer({ compact = false, selectedTrack }: { compact?: boolean; se
         ))}
       </div>
 
-      <iframe
-        key={track.id}
-        src={`https://open.spotify.com/embed/track/${track.id}?utm_source=generator&autoplay=1&start=0&theme=0`}
-        width="100%" height={compact ? "152" : "152"} frameBorder="0"
-        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-        loading="lazy" title={`Spotify player for ${track.title}`} className="w-full rounded-2xl"
-      />
+      <div className="rounded-2xl border border-green-500/15 bg-black/20 px-3 py-3 text-[10px] font-mono text-green-300">
+        <div className="flex items-center justify-between gap-2">
+          <span className="font-black">NOW PLAYING</span>
+          <span>{track.title}</span>
+        </div>
+        <p className="mt-1 text-white/45">{track.artist} · {track.category}</p>
+      </div>
 
       <div className="flex items-center gap-2 mt-2 text-[9px] font-mono text-white/35">
         <Volume2 size={11} />
-        <span>Selected track starts at 0:00. Browser autoplay policy may require one tap.</span>
+        <span>Selected track starts after your first tap. Audio is played through the browser.</span>
       </div>
     </div>
   );
@@ -1250,7 +1270,7 @@ function GuidelinesScreen({ onContinue, onBack }: { onContinue: () => void; onBa
     "After answering, review the explanation to learn from mistakes.",
     "Correct answers increase your XP and can build your streak.",
     "Do not refresh the page while answering if you want to keep your current quiz.",
-    "You can listen to Spotify while answering by using the Music button.",
+    "You can listen to your selected soundtrack while answering by using the Music button.",
     "Use the profile section to update your student information anytime.",
   ];
 
@@ -2055,30 +2075,122 @@ function ResultsScreen({
 }
 
 
-function GlobalSpotifyController({
+function GlobalMusicController({
   selectedTrack,
 }: {
-  selectedTrack: (typeof SPOTIFY_TRACKS)[number];
+  selectedTrack: MusicTrack;
 }) {
-  // Keep one Spotify embed mounted for the entire app so changing screens does not
-  // recreate the soundtrack. The player is visually hidden; the menu controls selection.
-  return (
-    <div
-      aria-hidden="true"
-      className="fixed -left-[2px] -top-[2px] w-px h-px overflow-hidden opacity-0 pointer-events-none"
-    >
-      <iframe
-        key={`global-spotify-${selectedTrack.id}`}
-        src={`https://open.spotify.com/embed/track/${selectedTrack.id}?utm_source=generator&theme=0&autoplay=1&start=0`}
-        width="1"
-        height="1"
-        frameBorder="0"
-        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-        loading="eager"
-        title={`CodeQuest global soundtrack ${selectedTrack.title}`}
-      />
-    </div>
-  );
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const masterGainRef = useRef<GainNode | null>(null);
+  const intervalRef = useRef<number | null>(null);
+  const activeNodesRef = useRef<Array<{ oscillator: OscillatorNode; gain: GainNode }>>([]);
+  const selectedTrackRef = useRef(selectedTrack);
+
+  useEffect(() => {
+    selectedTrackRef.current = selectedTrack;
+  }, [selectedTrack]);
+
+  const stopPlayback = useCallback(() => {
+    if (intervalRef.current !== null) {
+      window.clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+
+    activeNodesRef.current.forEach(({ oscillator, gain }) => {
+      try {
+        gain.gain.cancelScheduledValues(0);
+        gain.gain.setValueAtTime(0.0001, 0);
+        oscillator.stop(0);
+      } catch {}
+    });
+    activeNodesRef.current = [];
+
+    if (masterGainRef.current) {
+      try {
+        masterGainRef.current.gain.cancelScheduledValues(0);
+        masterGainRef.current.gain.setValueAtTime(0.0001, 0);
+      } catch {}
+    }
+  }, []);
+
+  const startPlayback = useCallback((track: MusicTrack) => {
+    if (typeof window === "undefined") return;
+
+    const AudioContextCtor = window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    if (!AudioContextCtor) return;
+
+    stopPlayback();
+
+    const context = audioContextRef.current ?? new AudioContextCtor();
+    audioContextRef.current = context;
+
+    if (context.state === "suspended") {
+      void context.resume();
+    }
+
+    if (!masterGainRef.current) {
+      const masterGain = context.createGain();
+      masterGain.gain.setValueAtTime(0.0001, context.currentTime);
+      masterGain.connect(context.destination);
+      masterGain.gain.exponentialRampToValueAtTime(0.035, context.currentTime + 0.25);
+      masterGainRef.current = masterGain;
+    }
+
+    const style = getMusicStyle(track);
+    let noteIndex = 0;
+
+    const playNote = () => {
+      const now = context.currentTime;
+      const [baseFreq, nextFreq] = style.notes[noteIndex % style.notes.length];
+      const oscillator = context.createOscillator();
+      const gain = context.createGain();
+
+      oscillator.type = style.wave;
+      oscillator.frequency.setValueAtTime(baseFreq, now);
+      oscillator.frequency.exponentialRampToValueAtTime(nextFreq, now + 0.25);
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(0.03, now + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.4);
+
+      oscillator.connect(gain);
+      gain.connect(masterGainRef.current!);
+      oscillator.start(now);
+      oscillator.stop(now + 0.42);
+
+      oscillator.onended = () => {
+        activeNodesRef.current = activeNodesRef.current.filter((item) => item.oscillator !== oscillator);
+      };
+
+      activeNodesRef.current.push({ oscillator, gain });
+      noteIndex = (noteIndex + 1) % style.notes.length;
+    };
+
+    playNote();
+    intervalRef.current = window.setInterval(playNote, 700);
+  }, [stopPlayback]);
+
+  useEffect(() => {
+    const beginPlayback = () => {
+      void startPlayback(selectedTrackRef.current);
+      window.removeEventListener("pointerdown", beginPlayback);
+      window.removeEventListener("keydown", beginPlayback);
+    };
+
+    window.addEventListener("pointerdown", beginPlayback);
+    window.addEventListener("keydown", beginPlayback);
+
+    return () => {
+      window.removeEventListener("pointerdown", beginPlayback);
+      window.removeEventListener("keydown", beginPlayback);
+    };
+  }, [startPlayback]);
+
+  useEffect(() => {
+    void startPlayback(selectedTrack);
+    return () => stopPlayback();
+  }, [selectedTrack, startPlayback, stopPlayback]);
+
+  return null;
 }
 
 function GlobalMenu({ onGuidelines, onToggleTheme, darkMode, onMusic }: { onGuidelines: () => void; onToggleTheme: () => void; darkMode: boolean; onMusic: () => void }) {
@@ -2274,7 +2386,7 @@ export default function App() {
       />
 
       <>
-        <GlobalSpotifyController selectedTrack={selectedTrack} />
+        <GlobalMusicController selectedTrack={selectedTrack} />
         {screen !== "welcome" && (
           <>
           <GlobalMenu
@@ -2350,7 +2462,7 @@ export default function App() {
               onSelect={(track) => {
                 setSelectedTrack(track);
                 try { localStorage.setItem("codequest-selected-track", track.id); } catch {}
-                // The global Spotify controller remounts the track from 0:00 and the menu disappears immediately.
+                // The global music controller restarts the current soundtrack and the menu disappears immediately.
                 setScreen(musicReturn);
               }}
               onBack={() => setScreen(musicReturn === "duel" ? "duel-setup" : musicReturn === "home" ? "home" : "language")}
