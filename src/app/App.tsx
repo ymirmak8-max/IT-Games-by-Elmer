@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import type { FormEvent } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Code2, Zap, Trophy, Star, ArrowRight, RotateCcw, CheckCircle2, XCircle, Flame, Target, BookOpen, ChevronRight, User, GraduationCap, School, BookOpenCheck, Moon, Sun, Music, ArrowLeft, Swords, Shield, Camera, Gamepad2, Crown, Medal, Users, Sparkles, Heart, Volume2 } from "lucide-react";
+import { Code2, Zap, Trophy, Star, ArrowRight, RotateCcw, CheckCircle2, XCircle, Flame, Target, BookOpen, ChevronRight, User, GraduationCap, School, BookOpenCheck, Moon, Sun, Music, ArrowLeft, Swords, Shield, Camera, Gamepad2, Crown, Medal, Users, Sparkles, Heart, Volume2, Palette, Pencil, Terminal, Bug, Flame as FlameIcon } from "lucide-react";
 
 // ─── Data ───────────────────────────────────────────────────────────────────
 
@@ -579,9 +579,52 @@ function getRank(totalXP: number) {
 // ─── Screens ─────────────────────────────────────────────────────────────────
 
 
-type GameMode = "practice" | "battle" | "speed" | "debug" | "survival";
+type GameMode = "practice" | "battle" | "speed" | "debug" | "survival" | "compiler";
 
 type AnimeCharacter = { id: string; name: string; title: string; emoji: string; color: string; accent: string; attack: string; aura: string };
+
+const COMPILER_CHALLENGES: Record<string, { prompt: string; code: string; expected: string; hint: string }[]> = {
+  python: [
+    { prompt: "Complete the output statement.", code: "name = \"Elmer\"\nprint(____)", expected: "name", hint: "Print the variable named name." },
+    { prompt: "Complete the loop range.", code: "for i in range(____):\n    print(i)", expected: "5", hint: "Print 0, 1, 2, 3, 4." },
+  ],
+  javascript: [
+    { prompt: "Complete the console output.", code: "const score = 100;\nconsole.log(____);", expected: "score", hint: "Output the score variable." },
+    { prompt: "Complete the increment.", code: "let xp = 10;\nxp ____ 5;", expected: "+=", hint: "Add five XP to the variable." },
+  ],
+  java: [
+    { prompt: "Complete the Java print statement.", code: 'String name = "Elmer";\nSystem.out.println(____);', expected: "name", hint: "Print the name variable." },
+    { prompt: "Complete the comparison operator.", code: "if (score ____ 75) {\n    System.out.println(\"Pass\");\n}", expected: ">=", hint: "Pass when score is 75 or higher." },
+  ],
+  cpp: [
+    { prompt: "Complete the C++ output.", code: "int score = 90;\ncout << ____;", expected: "score", hint: "Send the score variable to cout." },
+    { prompt: "Complete the increment operator.", code: "int xp = 10;\nxp ____ 5;", expected: "+=", hint: "Add five to xp." },
+  ],
+  c: [
+    { prompt: "Complete the C output statement.", code: "int score = 90;\nprintf(\"%d\", ____);", expected: "score", hint: "Pass score as printf's argument." },
+    { prompt: "Complete the comparison.", code: "if (score ____ 75) {", expected: ">=", hint: "75 should count as passing." },
+  ],
+  typescript: [
+    { prompt: "Complete the typed variable output.", code: 'const username: string = "Elmer";\nconsole.log(____);', expected: "username", hint: "Output the typed variable." },
+    { prompt: "Complete the type annotation.", code: "let xp: ____ = 100;", expected: "number", hint: "XP is numeric." },
+  ],
+  php: [
+    { prompt: "Complete the PHP output.", code: '$name = "Elmer";\necho ____;', expected: "$name", hint: "Echo the variable including its $ prefix." },
+    { prompt: "Complete the PHP comparison.", code: "if ($score ____ 75) {", expected: ">=", hint: "75 or higher passes." },
+  ],
+  sql: [
+    { prompt: "Complete the SQL query.", code: "SELECT ____ FROM students;", expected: "*", hint: "Select every column." },
+    { prompt: "Complete the filter.", code: "SELECT * FROM students WHERE score ____ 75;", expected: ">=", hint: "Keep scores 75 and above." },
+  ],
+  csharp: [
+    { prompt: "Complete the C# output.", code: 'string name = "Elmer";\nConsole.WriteLine(____);', expected: "name", hint: "Write the name variable." },
+    { prompt: "Complete the comparison.", code: "if (score ____ 75) {", expected: ">=", hint: "75 is a passing score." },
+  ],
+  kotlin: [
+    { prompt: "Complete the Kotlin output.", code: 'val name = "Elmer"\nprintln(____)', expected: "name", hint: "Print the name value." },
+    { prompt: "Complete the mutable declaration.", code: "____ xp = 100", expected: "var", hint: "Use the mutable variable keyword." },
+  ],
+};
 
 const ANIME_CHARACTERS: AnimeCharacter[] = [
   { id: "nova", name: "Nova", title: "Neon Code Mage", emoji: "🧙‍♀️", color: "#8b5cf6", accent: "#22d3ee", attack: "NEON CODE BURST!", aura: "violet" },
@@ -901,6 +944,7 @@ function ModesScreen({ onSelect, onBack }: { onSelect: (mode: GameMode) => void;
     { id: "speed" as GameMode, icon: "⚡", title: "Speed Mode", desc: "Race the clock and finish before time runs out.", color: "#f59e0b", questions: "5 questions · 60 sec" },
     { id: "debug" as GameMode, icon: "🐛", title: "Bug Hunter", desc: "Open broken code, identify the bug, and fix it in the language you choose.", color: "#22c55e", questions: "Language-specific bug fixes" },
     { id: "survival" as GameMode, icon: "🔥", title: "Code Survival", desc: "Keep your run alive. Wrong answers drain your life and streak.", color: "#06b6d4", questions: "12 lives-on-the-line" },
+    { id: "compiler" as GameMode, icon: "⌨️", title: "Compiler Lab", desc: "Type the missing code directly into a terminal-style compiler and execute your answer.", color: "#22d3ee", questions: "Typing challenge" },
   ];
   return (
     <div className="min-h-screen px-4 sm:px-6 py-10">
@@ -932,6 +976,8 @@ function HomeScreen({
   onDuel,
   onMusic,
   selectedTrack,
+  systemTheme,
+  setSystemTheme,
 }: {
   onStart: () => void;
   onProfile: () => void;
@@ -943,11 +989,23 @@ function HomeScreen({
   onDuel: () => void;
   onMusic: () => void;
   selectedTrack: (typeof SPOTIFY_TRACKS)[number];
+  systemTheme: "space" | "sunset" | "city" | "beach";
+  setSystemTheme: (theme: "space" | "sunset" | "city" | "beach") => void;
 }) {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-6 py-12 relative overflow-hidden">
-      <aside className="absolute left-4 top-4 bottom-4 z-20 w-72 hidden lg:flex flex-col gap-3">
-        <div className="rounded-3xl border border-white/10 bg-black/20 backdrop-blur-2xl p-4 shadow-2xl">
+      <aside className="absolute left-3 top-3 bottom-3 z-20 w-[300px] hidden xl:flex flex-col gap-3">
+        <div className="rounded-3xl border border-green-400/20 bg-black/30 backdrop-blur-2xl p-3 shadow-2xl shadow-green-500/10">
+          <div className="flex items-center gap-3 mb-3 px-2">
+            <Music size={15} className="text-green-300" />
+            <div className="min-w-0 flex-1"><p className="text-green-300 font-mono font-black text-[10px] tracking-[.22em]">SOUNDTRACK</p><p className="text-white/40 font-mono text-[9px] truncate">{selectedTrack.title} · {selectedTrack.artist}</p></div>
+            <button onClick={onMusic} className="px-2.5 py-1.5 rounded-xl bg-green-500/15 border border-green-400/20 text-green-300 text-[9px] font-mono">CHANGE</button>
+          </div>
+          <div className="rounded-2xl overflow-hidden border border-white/10">
+            <iframe key={`side-music-${selectedTrack.id}`} src={`https://open.spotify.com/embed/track/${selectedTrack.id}?utm_source=generator&theme=0&autoplay=1&start=0`} width="100%" height="80" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="eager" title="CodeQuest soundtrack" />
+          </div>
+        </div>
+        <button onClick={onProfile} className="text-left rounded-3xl border border-white/10 bg-black/20 backdrop-blur-2xl p-4 shadow-2xl hover:border-cyan-400/30 transition-all group">
           <div className="flex items-center gap-3">
             {profile.photo ? <img src={profile.photo} className="w-16 h-16 rounded-2xl object-cover border border-cyan-400/30" alt="Profile"/> : <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500/30 to-cyan-500/20 flex items-center justify-center"><User className="text-cyan-300"/></div>}
             <div className="min-w-0 flex-1">
@@ -959,19 +1017,26 @@ function HomeScreen({
                 <div className="h-1.5 rounded-full bg-white/10 overflow-hidden"><motion.div className="h-full rounded-full bg-gradient-to-r from-purple-500 to-cyan-400" animate={{ width: `${Math.max(5, Math.min(100, ((totalXP - getRank(totalXP).minXP) / Math.max(1, ((RANKS[RANKS.indexOf(getRank(totalXP)) + 1]?.minXP ?? getRank(totalXP).minXP + 500) - getRank(totalXP).minXP))) * 100))}%` }} /></div>
               </div>
             </div>
+            <div className="ml-auto self-start px-2 py-1 rounded-lg bg-cyan-400/10 border border-cyan-400/20 text-cyan-300 text-[8px] font-mono opacity-0 group-hover:opacity-100 transition-opacity"><Pencil size={10} className="inline mr-1"/>EDIT</div>
           </div>
-        </div>
+          <p className="mt-2 text-[9px] text-white/30 font-mono">Click your profile card to edit</p>
+        </button>
         <div className="rounded-3xl border border-white/10 bg-black/20 backdrop-blur-2xl p-3 space-y-2">
-          <button onClick={onProfile} className="w-full flex items-center gap-3 px-3 py-3 rounded-2xl bg-white/5 hover:bg-white/10 text-white/75 font-mono text-xs"><User size={15}/> Profile</button>
           <button onClick={onGuidelines} className="w-full flex items-center gap-3 px-3 py-3 rounded-2xl bg-white/5 hover:bg-white/10 text-white/75 font-mono text-xs"><BookOpenCheck size={15}/> Guidelines</button>
           <button onClick={onToggleTheme} className="w-full flex items-center gap-3 px-3 py-3 rounded-2xl bg-white/5 hover:bg-white/10 text-white/75 font-mono text-xs">{darkMode ? <Sun size={15}/> : <Moon size={15}/>} {darkMode ? "Light Mode" : "Dark Mode"}</button>
+          <div className="rounded-2xl bg-white/5 border border-white/10 p-2">
+            <div className="flex items-center gap-2 px-1 mb-2"><Palette size={14} className="text-purple-300"/><span className="text-[9px] font-mono text-white/50">SYSTEM THEME</span></div>
+            <div className="grid grid-cols-4 gap-1">
+              {([['space','🌌'],['sunset','🌇'],['city','🌃'],['beach','🏝️']] as const).map(([id,icon]) => <button key={id} onClick={() => setSystemTheme(id)} className={`py-2 rounded-xl text-sm border ${systemTheme===id ? 'border-cyan-400/50 bg-cyan-400/10' : 'border-white/5 bg-black/10'}`} title={id}>{icon}</button>)}
+            </div>
+          </div>
           <button onClick={onMusic} className="w-full flex items-center gap-3 px-3 py-3 rounded-2xl bg-green-500/10 border border-green-500/20 hover:bg-green-500/15 text-green-300 font-mono text-xs"><Music size={15}/> Music Selection <span className="ml-auto truncate max-w-[105px] text-[9px] text-green-400/60">{selectedTrack.title}</span></button>
         </div>
       </aside>
       <div className="absolute top-3 left-1/2 -translate-x-1/2 z-20 lg:hidden w-[calc(100%-1rem)] flex gap-2 overflow-x-auto pb-1">
-        <button onClick={onProfile} className="shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl border border-white/10 bg-white/5 text-white/70 font-mono text-xs"><User size={14}/> Profile</button>
         <button onClick={onGuidelines} className="shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl border border-white/10 bg-white/5 text-white/70 font-mono text-xs"><BookOpenCheck size={14}/> Guidelines</button>
         <button onClick={onToggleTheme} className="shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl border border-white/10 bg-white/5 text-white/70 font-mono text-xs">{darkMode ? <Sun size={14}/> : <Moon size={14}/>} Theme</button>
+        {([['space','🌌'],['sunset','🌇'],['city','🌃'],['beach','🏝️']] as const).map(([id,icon]) => <button key={id} onClick={() => setSystemTheme(id)} className="shrink-0 px-2.5 py-2 rounded-xl border border-white/10 bg-white/5 text-xs" title={id}>{icon}</button>)}
         <button onClick={onMusic} className="shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl border border-green-500/20 bg-green-500/10 text-green-300 font-mono text-xs"><Music size={14}/> Music</button>
       </div>
       {/* background glows */}
@@ -983,7 +1048,7 @@ function HomeScreen({
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="text-center max-w-4xl mx-auto lg:ml-64 relative"
+        className="text-center w-full max-w-5xl xl:ml-[300px] xl:w-[calc(100%-320px)] relative px-2 sm:px-4"
       >
         <motion.div
           className="inline-flex items-center gap-2 bg-purple-500/20 border border-purple-500/30 rounded-full px-4 py-2 mb-8"
@@ -1562,6 +1627,39 @@ function GameScreen({
   );
 }
 
+
+function BugHunterGameScreen({ langId, onFinish }: { langId: string; onFinish: (score: number, xp: number, correct: number) => void }) {
+  const qs = DEBUG_QUESTIONS_BY_LANGUAGE[langId] ?? DEBUG_QUESTIONS;
+  const lang = LANGUAGES.find(l => l.id === langId)!;
+  const [index,setIndex]=useState(0); const [selected,setSelected]=useState<number|null>(null); const [locked,setLocked]=useState(false); const [correct,setCorrect]=useState(0); const [xp,setXp]=useState(0); const [fixed,setFixed]=useState(false);
+  const q=qs[index];
+  const choose=(i:number)=>{ if(locked)return; setSelected(i); setLocked(true); const ok=i===q.answer; if(ok){setCorrect(c=>c+1);setXp(x=>x+q.xp);setFixed(true);} window.setTimeout(()=>{if(index===qs.length-1){onFinish(Math.round(((correct+(ok?1:0))/qs.length)*100),xp+(ok?q.xp:0),correct+(ok?1:0));}else{setIndex(n=>n+1);setSelected(null);setLocked(false);setFixed(false);}},900); };
+  return <div className="min-h-screen p-3 sm:p-6 bg-gradient-to-br from-emerald-950/40 via-black/30 to-cyan-950/30">
+    <div className="max-w-6xl mx-auto">
+      <div className="flex items-center justify-between mb-4"><div><p className="text-emerald-300 text-[10px] font-mono font-black tracking-[.3em]">BUG HUNTER // LIVE DEBUGGER</p><h1 className="text-2xl sm:text-4xl text-white font-mono font-black">FIX THE BUG</h1></div><div className="text-right"><p className="text-white/40 text-[10px] font-mono">{lang.icon} {lang.name}</p><p className="text-emerald-300 font-mono font-black">{index+1}/{qs.length}</p></div></div>
+      <div className="grid lg:grid-cols-[1.2fr_.8fr] gap-4">
+        <div className="rounded-3xl border border-emerald-400/20 bg-[#07130f]/90 overflow-hidden shadow-2xl"><div className="px-4 py-2 border-b border-white/10 flex items-center gap-2"><Bug size={14} className="text-emerald-300"/><span className="text-[10px] font-mono text-white/40">/workspace/{lang.id}/bug-{q.id}</span><span className="ml-auto text-red-300 text-[9px] font-mono">● ERROR DETECTED</span></div><pre className="p-5 text-xs sm:text-sm leading-7 font-mono text-emerald-200 overflow-x-auto whitespace-pre-wrap">{q.code}</pre><div className="border-t border-white/10 p-4 bg-black/20"><p className="text-red-300 font-mono text-xs font-black">Compiler: syntax / logic fault found</p><p className="text-white/40 font-mono text-[10px] mt-1">{q.question}</p></div></div>
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-4 sm:p-5"><div className="flex items-center justify-between mb-4"><span className="text-emerald-300 font-mono text-xs font-black">SELECT THE FIX</span><span className="text-yellow-300 font-mono text-xs">+{q.xp} XP</span></div><div className="space-y-2">{q.options.map((o,i)=><motion.button key={i} disabled={locked} onClick={()=>choose(i)} whileTap={{scale:.98}} className={`w-full text-left p-3 rounded-2xl border font-mono text-xs sm:text-sm ${selected===i?(i===q.answer?'border-emerald-400 bg-emerald-500/15 text-emerald-200':'border-red-400 bg-red-500/15 text-red-200'):'border-white/10 bg-black/10 text-white/70 hover:bg-white/10'}`}><span className="inline-flex w-7 h-7 rounded-lg bg-white/10 items-center justify-center mr-2">{String.fromCharCode(65+i)}</span>{o}</motion.button>)}</div>{locked&&<div className={`mt-4 rounded-2xl p-3 border ${selected===q.answer?'border-emerald-400/30 bg-emerald-500/10':'border-red-400/30 bg-red-500/10'}`}><p className="font-mono font-black text-sm">{selected===q.answer?'✓ BUG FIXED':'✕ FIX FAILED'}</p><p className="text-white/50 font-mono text-[10px] mt-1">{q.explanation}</p></div>}{fixed&&<motion.div initial={{scale:.7,opacity:0}} animate={{scale:1,opacity:1}} className="mt-4 text-center text-emerald-300 font-mono font-black">PATCH APPLIED ✓</motion.div>}</div>
+      </div>
+    </div>
+  </div>;
+}
+
+function SurvivalGameScreen({ langId, onFinish }: { langId: string; onFinish: (score: number, xp: number, correct: number) => void }) {
+  const base=QUESTIONS[langId]??[]; const qs=Array.from({length:10},(_,i)=>base[i%Math.max(1,base.length)]); const lang=LANGUAGES.find(l=>l.id===langId)!;
+  const [i,setI]=useState(0); const [hp,setHp]=useState(100); const [combo,setCombo]=useState(0); const [xp,setXp]=useState(0); const [correct,setCorrect]=useState(0); const [locked,setLocked]=useState(false); const [selected,setSelected]=useState<number|null>(null);
+  const q=qs[i];
+  const answer=(n:number)=>{if(locked)return; const ok=n===q.answer; setSelected(n);setLocked(true); if(ok){setCorrect(c=>c+1);setCombo(c=>c+1);setXp(x=>x+q.xp+Math.min(combo*3,15));}else{setCombo(0);setHp(h=>Math.max(0,h-25));} window.setTimeout(()=>{const nextHp=ok?hp:Math.max(0,hp-25); if(i===qs.length-1||nextHp<=0){onFinish(Math.round(((correct+(ok?1:0))/qs.length)*100),xp+(ok?q.xp:0),correct+(ok?1:0));}else{setI(x=>x+1);setLocked(false);setSelected(null);}},750);};
+  return <div className="min-h-screen p-3 sm:p-6 bg-gradient-to-br from-slate-950/80 via-cyan-950/20 to-black"><div className="max-w-5xl mx-auto"><div className="rounded-3xl border border-cyan-400/20 bg-black/50 p-4 mb-4 shadow-[0_0_50px_rgba(6,182,212,.1)]"><div className="flex items-center justify-between"><div><p className="text-cyan-300 text-[10px] font-mono font-black tracking-[.3em]">CODE SURVIVAL // RUNTIME</p><h1 className="text-2xl sm:text-4xl text-white font-mono font-black">STAY ALIVE</h1></div><div className="text-right"><p className="text-red-300 font-mono font-black text-xl">♥ {hp}</p><p className="text-white/35 font-mono text-[9px]">WAVE {i+1}/10</p></div></div><div className="mt-3 h-2 rounded-full bg-white/10 overflow-hidden"><motion.div className="h-full bg-gradient-to-r from-red-500 via-yellow-400 to-cyan-400" animate={{width:`${hp}%`}}/></div></div><div className="rounded-3xl border border-white/10 bg-white/5 p-4 sm:p-7"><div className="flex justify-between text-[10px] font-mono text-white/40 mb-3"><span>{lang.icon} {lang.name} SURVIVAL</span><span>{combo}x COMBO</span></div><h2 className="text-xl sm:text-3xl font-mono font-black text-white leading-snug mb-5">{q.question}</h2>{q.code&&<CodeBlock code={q.code}/>}<div className="grid sm:grid-cols-2 gap-3 mt-5">{q.options.map((o,n)=><button key={n} disabled={locked} onClick={()=>answer(n)} className={`p-4 rounded-2xl border text-left font-mono text-sm ${selected===n?(n===q.answer?'border-green-400 bg-green-500/15 text-green-200':'border-red-400 bg-red-500/15 text-red-200'):'border-white/10 bg-black/10 text-white/70 hover:bg-white/10'}`}>{String.fromCharCode(65+n)}. {o}</button>)}</div></div></div></div>;
+}
+
+function CompilerGameScreen({ langId, onFinish }: { langId: string; onFinish: (score: number, xp: number, correct: number) => void }) {
+  const lang=LANGUAGES.find(l=>l.id===langId)!; const qs=COMPILER_CHALLENGES[langId]??COMPILER_CHALLENGES.javascript; const [i,setI]=useState(0); const [value,setValue]=useState(''); const [status,setStatus]=useState<'idle'|'ok'|'fail'>('idle'); const [correct,setCorrect]=useState(0); const [xp,setXp]=useState(0); const q=qs[i];
+  const run=()=>{if(status!=='idle')return; const ok=value.trim()===q.expected.trim();setStatus(ok?'ok':'fail');if(ok){setCorrect(c=>c+1);setXp(x=>x+35);}window.setTimeout(()=>{if(i===qs.length-1){onFinish(Math.round(((correct+(ok?1:0))/qs.length)*100),xp+(ok?35:0),correct+(ok?1:0));}else{setI(n=>n+1);setValue('');setStatus('idle');}},900);};
+  const rendered=q.code.replace('____',value||'____');
+  return <div className="min-h-screen p-3 sm:p-6 bg-[#03050a]"><div className="max-w-6xl mx-auto"><div className="flex items-center justify-between mb-4"><div><p className="text-cyan-300 text-[10px] font-mono font-black tracking-[.3em]">CODEQUEST COMPILER // TERMINAL</p><h1 className="text-2xl sm:text-4xl text-white font-mono font-black">COMPILE & RUN</h1></div><div className="text-right"><p className="text-cyan-300 font-mono font-black">{lang.icon} {lang.name}</p><p className="text-white/35 font-mono text-[9px]">CHALLENGE {i+1}/{qs.length}</p></div></div><div className="grid lg:grid-cols-[1.25fr_.75fr] gap-4"><div className="rounded-3xl border border-cyan-400/20 bg-[#071018] overflow-hidden shadow-[0_0_60px_rgba(6,182,212,.1)]"><div className="flex items-center gap-2 px-4 py-3 border-b border-white/10"><Terminal size={14} className="text-cyan-300"/><span className="text-[10px] font-mono text-white/40">compiler://codequest/{lang.id}</span><span className="ml-auto text-[9px] font-mono text-green-300">READY</span></div><pre className="p-5 text-xs sm:text-sm font-mono leading-7 text-cyan-200 whitespace-pre-wrap overflow-x-auto">{rendered}</pre><div className="border-t border-white/10 p-3 font-mono text-[10px] text-white/35">$ codequest --compile --run<br/><span className={status==='ok'?'text-green-300':status==='fail'?'text-red-300':'text-white/30'}>{status==='ok'?'BUILD SUCCESSFUL ✓':status==='fail'?`BUILD FAILED ✕ Expected: ${q.expected}`:'Waiting for source code...'}</span></div></div><div className="rounded-3xl border border-white/10 bg-white/5 p-4"><p className="text-purple-300 font-mono text-xs font-black mb-2">TYPE YOUR ANSWER</p><p className="text-white/60 font-mono text-sm mb-4">{q.prompt}</p><textarea autoFocus value={value} onChange={e=>setValue(e.target.value)} disabled={status!=='idle'} spellCheck={false} className="w-full h-36 rounded-2xl border border-cyan-400/20 bg-[#02050a] text-green-300 p-4 font-mono text-sm outline-none focus:border-cyan-400/60 resize-none" placeholder="Type the missing code here..."/><p className="text-white/30 font-mono text-[9px] mt-2">HINT: {q.hint}</p><button onClick={run} disabled={!value.trim()||status!=='idle'} className="w-full mt-4 py-3.5 rounded-2xl bg-gradient-to-r from-cyan-600 to-purple-600 text-white font-mono font-black disabled:opacity-30">▶ COMPILE & RUN</button></div></div></div></div>;
+}
+
 function DuelSetupScreen({
   profile,
   totalXP,
@@ -1991,7 +2089,7 @@ function ResultsScreen({
 
 function GlobalMusicDock({ selectedTrack, onChange }: { selectedTrack: (typeof SPOTIFY_TRACKS)[number]; onChange: (track: (typeof SPOTIFY_TRACKS)[number]) => void }) {
   return (
-    <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} className="fixed bottom-4 right-4 z-[70] w-[min(360px,calc(100vw-2rem))] rounded-3xl border border-green-400/20 bg-[#08110f]/95 backdrop-blur-2xl shadow-[0_0_60px_rgba(34,197,94,.15)] p-3">
+    <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} className="fixed top-3 left-3 z-[70] w-[min(300px,calc(100vw-2rem))] xl:hidden rounded-3xl border border-green-400/20 bg-[#08110f]/95 backdrop-blur-2xl shadow-[0_0_60px_rgba(34,197,94,.15)] p-3">
       <div className="flex items-center gap-2 mb-2">
         <div className="w-8 h-8 rounded-xl bg-green-500/15 flex items-center justify-center"><Music size={15} className="text-green-300" /></div>
         <div className="min-w-0 flex-1"><p className="text-green-300 font-mono font-black text-[10px] tracking-widest">CODEQUEST SOUNDTRACK</p><p className="text-white/50 font-mono text-[9px] truncate">{selectedTrack.title} · {selectedTrack.artist}</p></div>
@@ -2023,9 +2121,11 @@ export default function App() {
   const [friendPhoto, setFriendPhoto] = useState("");
   const [duelCharacterId, setDuelCharacterId] = useState(ANIME_CHARACTERS[0].id);
   const [darkMode, setDarkMode] = useState(() => {
-    const saved = localStorage.getItem("codequest-theme");
+    const saved = localStorage.getItem("codequest-theme-mode");
     return saved !== "light";
   });
+  type ThemeName = "space" | "sunset" | "city" | "beach";
+  const [systemTheme, setSystemTheme] = useState<ThemeName>(() => (localStorage.getItem("codequest-system-theme") as ThemeName) || "space");
   const [profile, setProfile] = useState<StudentProfile>(() => {
     try {
       return JSON.parse(localStorage.getItem("codequest-profile") || '{"username":"","yearLevel":"","course":"","school":"","photo":""}');
@@ -2041,9 +2141,10 @@ export default function App() {
   }, [selectedTrack]);
 
   useEffect(() => {
-    localStorage.setItem("codequest-theme", darkMode ? "dark" : "light");
+    localStorage.setItem("codequest-theme-mode", darkMode ? "dark" : "light");
+    localStorage.setItem("codequest-system-theme", systemTheme);
     document.documentElement.style.colorScheme = darkMode ? "dark" : "light";
-  }, [darkMode]);
+  }, [darkMode, systemTheme]);
 
   const saveProfile = (next: StudentProfile) => {
     const firstProfile = !profile.username;
@@ -2077,7 +2178,7 @@ export default function App() {
   };
 
   return (
-    <div className={`${darkMode ? "dark-mode" : "light-mode"} min-h-screen text-foreground overflow-x-hidden`}
+    <div className={`${darkMode ? "dark-mode" : "light-mode"} theme-${systemTheme} min-h-screen text-foreground overflow-x-hidden`}
       style={{ fontFamily: "'JetBrains Mono', 'Inter', monospace" }}>
       <style>{`
         html, body, #root { width: 100%; min-height: 100%; margin: 0; }
@@ -2118,6 +2219,17 @@ export default function App() {
         .light-mode input::placeholder { color: #9ca3af !important; }
         .light-mode .text-white\/10 { color: rgba(17,24,39,.15) !important; }
         .light-mode iframe { filter: none; }
+
+        .theme-space { --cq-a:#8b5cf6; --cq-b:#06b6d4; }
+        .theme-sunset { --cq-a:#f97316; --cq-b:#ec4899; }
+        .theme-city { --cq-a:#38bdf8; --cq-b:#6366f1; }
+        .theme-beach { --cq-a:#14b8a6; --cq-b:#facc15; }
+        .theme-space .bg-gradient-to-r.from-purple-600 { }
+        .light-mode { text-shadow: none; }
+        .light-mode button, .light-mode input, .light-mode select, .light-mode textarea { filter: contrast(1.05) saturate(1.05); }
+        .theme-sunset .fixed.inset-0 { background-image: radial-gradient(circle at 15% 20%, rgba(249,115,22,.13), transparent 32%), radial-gradient(circle at 80% 70%, rgba(236,72,153,.12), transparent 34%) !important; }
+        .theme-city .fixed.inset-0 { background-image: linear-gradient(rgba(56,189,248,.04) 1px, transparent 1px), linear-gradient(90deg, rgba(99,102,241,.04) 1px, transparent 1px) !important; background-size: 34px 34px !important; }
+        .theme-beach .fixed.inset-0 { background-image: radial-gradient(circle at 20% 20%, rgba(20,184,166,.13), transparent 34%), radial-gradient(circle at 80% 20%, rgba(250,204,21,.10), transparent 32%) !important; }
         button { -webkit-tap-highlight-color: transparent; }
         @media (max-width: 640px) { body { min-width: 0; } }
       `}</style>
@@ -2152,6 +2264,8 @@ export default function App() {
               onDuel={() => setScreen("duel-setup")}
               onMusic={() => { setMusicReturn("home"); setScreen("music"); }}
               selectedTrack={selectedTrack}
+              systemTheme={systemTheme}
+              setSystemTheme={setSystemTheme}
             />
           </motion.div>
         )}
@@ -2181,8 +2295,7 @@ export default function App() {
               onSelect={(lang) => {
                 setSelectedLang(lang);
                 setResults(null);
-                setMusicReturn("game");
-                setScreen("music");
+                setScreen("game");
               }}
             />
           </motion.div>
@@ -2201,15 +2314,15 @@ export default function App() {
 
         {screen === "game" && selectedLang && (
           <motion.div key={`game-${selectedLang}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <GameScreen
-              langId={selectedLang}
-              mode={gameMode}
-              onFinish={(score, xp, correct) => {
-                setResults({ score, xp, correct });
-                addLifetimeXP(xp);
-                setScreen("results");
-              }}
-            />
+            {gameMode === "compiler" ? (
+              <CompilerGameScreen langId={selectedLang} onFinish={(score, xp, correct) => { setResults({ score, xp, correct }); addLifetimeXP(xp); setScreen("results"); }} />
+            ) : gameMode === "debug" ? (
+              <BugHunterGameScreen langId={selectedLang} onFinish={(score, xp, correct) => { setResults({ score, xp, correct }); addLifetimeXP(xp); setScreen("results"); }} />
+            ) : gameMode === "survival" ? (
+              <SurvivalGameScreen langId={selectedLang} onFinish={(score, xp, correct) => { setResults({ score, xp, correct }); addLifetimeXP(xp); setScreen("results"); }} />
+            ) : (
+              <GameScreen langId={selectedLang} mode={gameMode} onFinish={(score, xp, correct) => { setResults({ score, xp, correct }); addLifetimeXP(xp); setScreen("results"); }} />
+            )}
           </motion.div>
         )}
 
@@ -2226,8 +2339,7 @@ export default function App() {
                 setFriendRankName(rank);
                 setFriendPhoto(photo);
                 setDuelCharacterId(characterId);
-                setMusicReturn("duel");
-                setScreen("music");
+                setScreen("duel");
               }}
             />
           </motion.div>
@@ -2255,14 +2367,13 @@ export default function App() {
               score={results.score}
               xp={results.xp}
               correct={results.correct}
-              total={gameMode === "debug" ? (DEBUG_QUESTIONS_BY_LANGUAGE[selectedLang]?.length ?? 0) : gameMode === "speed" ? Math.min(5, totalQs) : gameMode === "survival" ? 12 : totalQs}
+              total={gameMode === "debug" ? (DEBUG_QUESTIONS_BY_LANGUAGE[selectedLang]?.length ?? 0) : gameMode === "compiler" ? (COMPILER_CHALLENGES[selectedLang]?.length ?? 0) : gameMode === "speed" ? Math.min(5, totalQs) : gameMode === "survival" ? 10 : totalQs}
               profile={profile}
               totalXP={lifetimeXP}
               onPhotoUpdate={updatePhoto}
               onReplay={() => {
                 setResults(null);
-                setMusicReturn("game");
-                setScreen("music");
+                setScreen("game");
               }}
               onHome={() => {
                 setSelectedLang(null);
