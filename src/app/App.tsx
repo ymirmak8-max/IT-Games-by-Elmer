@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import type { FormEvent } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Code2, Zap, Trophy, Star, ArrowRight, RotateCcw, CheckCircle2, XCircle, Flame, Target, BookOpen, ChevronRight, User, GraduationCap, School, BookOpenCheck, Moon, Sun, Music, ArrowLeft, Swords, Shield, Camera, Gamepad2, Crown, Medal, Users, Sparkles, Heart, Volume2 } from "lucide-react";
+import { Code2, Zap, Trophy, Star, ArrowRight, RotateCcw, CheckCircle2, XCircle, Flame, Target, BookOpen, ChevronRight, User, GraduationCap, School, BookOpenCheck, Moon, Sun, Music, ArrowLeft, Swords, Shield, Camera, Gamepad2, Crown, Medal, Users, Sparkles, Heart, Volume2, Palette, Pencil, Terminal, Bug, Flame as FlameIcon, Menu, X } from "lucide-react";
 
 // ─── Data ───────────────────────────────────────────────────────────────────
 
@@ -579,16 +579,59 @@ function getRank(totalXP: number) {
 // ─── Screens ─────────────────────────────────────────────────────────────────
 
 
-type GameMode = "practice" | "battle" | "speed" | "debug" | "survival";
+type GameMode = "practice" | "battle" | "speed" | "debug" | "survival" | "compiler";
 
-type AnimeCharacter = { id: string; name: string; title: string; emoji: string; color: string; accent: string; attack: string; aura: string; weapon: string; power: string };
+type AnimeCharacter = { id: string; name: string; title: string; emoji: string; color: string; accent: string; attack: string; aura: string };
+
+const COMPILER_CHALLENGES: Record<string, { prompt: string; code: string; expected: string; hint: string }[]> = {
+  python: [
+    { prompt: "Complete the output statement.", code: "name = \"Elmer\"\nprint(____)", expected: "name", hint: "Print the variable named name." },
+    { prompt: "Complete the loop range.", code: "for i in range(____):\n    print(i)", expected: "5", hint: "Print 0, 1, 2, 3, 4." },
+  ],
+  javascript: [
+    { prompt: "Complete the console output.", code: "const score = 100;\nconsole.log(____);", expected: "score", hint: "Output the score variable." },
+    { prompt: "Complete the increment.", code: "let xp = 10;\nxp ____ 5;", expected: "+=", hint: "Add five XP to the variable." },
+  ],
+  java: [
+    { prompt: "Complete the Java print statement.", code: 'String name = "Elmer";\nSystem.out.println(____);', expected: "name", hint: "Print the name variable." },
+    { prompt: "Complete the comparison operator.", code: "if (score ____ 75) {\n    System.out.println(\"Pass\");\n}", expected: ">=", hint: "Pass when score is 75 or higher." },
+  ],
+  cpp: [
+    { prompt: "Complete the C++ output.", code: "int score = 90;\ncout << ____;", expected: "score", hint: "Send the score variable to cout." },
+    { prompt: "Complete the increment operator.", code: "int xp = 10;\nxp ____ 5;", expected: "+=", hint: "Add five to xp." },
+  ],
+  c: [
+    { prompt: "Complete the C output statement.", code: "int score = 90;\nprintf(\"%d\", ____);", expected: "score", hint: "Pass score as printf's argument." },
+    { prompt: "Complete the comparison.", code: "if (score ____ 75) {", expected: ">=", hint: "75 should count as passing." },
+  ],
+  typescript: [
+    { prompt: "Complete the typed variable output.", code: 'const username: string = "Elmer";\nconsole.log(____);', expected: "username", hint: "Output the typed variable." },
+    { prompt: "Complete the type annotation.", code: "let xp: ____ = 100;", expected: "number", hint: "XP is numeric." },
+  ],
+  php: [
+    { prompt: "Complete the PHP output.", code: '$name = "Elmer";\necho ____;', expected: "$name", hint: "Echo the variable including its $ prefix." },
+    { prompt: "Complete the PHP comparison.", code: "if ($score ____ 75) {", expected: ">=", hint: "75 or higher passes." },
+  ],
+  sql: [
+    { prompt: "Complete the SQL query.", code: "SELECT ____ FROM students;", expected: "*", hint: "Select every column." },
+    { prompt: "Complete the filter.", code: "SELECT * FROM students WHERE score ____ 75;", expected: ">=", hint: "Keep scores 75 and above." },
+  ],
+  csharp: [
+    { prompt: "Complete the C# output.", code: 'string name = "Elmer";\nConsole.WriteLine(____);', expected: "name", hint: "Write the name variable." },
+    { prompt: "Complete the comparison.", code: "if (score ____ 75) {", expected: ">=", hint: "75 is a passing score." },
+  ],
+  kotlin: [
+    { prompt: "Complete the Kotlin output.", code: 'val name = "Elmer"\nprintln(____)', expected: "name", hint: "Print the name value." },
+    { prompt: "Complete the mutable declaration.", code: "____ xp = 100", expected: "var", hint: "Use the mutable variable keyword." },
+  ],
+};
 
 const ANIME_CHARACTERS: AnimeCharacter[] = [
-  { id: "nova", name: "Nova", title: "Neon Code Mage", emoji: "🧙‍♀️", color: "#8b5cf6", accent: "#22d3ee", attack: "NEON CODE BURST!", aura: "violet", weapon: "✦", power: "ARCANE OVERDRIVE" },
-  { id: "kairo", name: "Kairo", title: "Cyber Blade Runner", emoji: "⚔️", color: "#06b6d4", accent: "#3b82f6", attack: "CYBER SLASH!", aura: "cyan", weapon: "⚔", power: "CYBER OVERDRIVE" },
-  { id: "akari", name: "Akari", title: "Flame Syntax Ninja", emoji: "🔥", color: "#f97316", accent: "#ec4899", attack: "FLAME SYNTAX!", aura: "fire", weapon: "刀", power: "INFERNO COMPILE" },
-  { id: "rei", name: "Rei", title: "Quantum Hacker", emoji: "🦋", color: "#ec4899", accent: "#a855f7", attack: "QUANTUM BREAK!", aura: "pink", weapon: "⌁", power: "QUANTUM ASCENSION" },
-  { id: "zen", name: "Zen", title: "Thunder Compiler", emoji: "⚡", color: "#facc15", accent: "#22c55e", attack: "THUNDER COMPILE!", aura: "gold", weapon: "⚡", power: "THUNDER PROTOCOL" },
+  { id: "nova", name: "Nova", title: "Neon Code Mage", emoji: "🧙‍♀️", color: "#8b5cf6", accent: "#22d3ee", attack: "NEON CODE BURST!", aura: "violet" },
+  { id: "kairo", name: "Kairo", title: "Cyber Blade Runner", emoji: "⚔️", color: "#06b6d4", accent: "#3b82f6", attack: "CYBER SLASH!", aura: "cyan" },
+  { id: "akari", name: "Akari", title: "Flame Syntax Ninja", emoji: "🔥", color: "#f97316", accent: "#ec4899", attack: "FLAME SYNTAX!", aura: "fire" },
+  { id: "rei", name: "Rei", title: "Quantum Hacker", emoji: "🦋", color: "#ec4899", accent: "#a855f7", attack: "QUANTUM BREAK!", aura: "pink" },
+  { id: "zen", name: "Zen", title: "Thunder Compiler", emoji: "⚡", color: "#facc15", accent: "#22c55e", attack: "THUNDER COMPILE!", aura: "gold" },
 ];
 
 
@@ -607,17 +650,76 @@ const SPOTIFY_TRACKS = [
   { id: "0p20HotsDDhhAUtJ2KOAg9", title: "Relaxing Beats for Late Night Coding", artist: "Lo Fi Hip Hop", category: "Focus" },
 ];
 
-const DEBUG_QUESTIONS: Question[] = [
-  { id: 101, type: "code", question: "Find the bug: which change fixes this JavaScript loop?", code: `for (let i = 0; i <= 5; i--) {\n  console.log(i);\n}`, options: ["Change i-- to i++", "Change <= to >=", "Remove let", "Remove console.log"], answer: 0, explanation: "The counter must increase with i++ so the loop can reach its stopping condition.", xp: 20 },
-  { id: 102, type: "code", question: "Find the Python bug that causes an indentation error.", code: `if score > 50:\nprint("Pass")`, options: ["Indent print", "Remove if", "Change > to <", "Add a semicolon"], answer: 0, explanation: "Python uses indentation to define the body of an if statement.", xp: 20 },
-  { id: 103, type: "multiple", question: "A variable is used before it is declared. What kind of bug is this?", options: ["Logic error", "Reference/declaration error", "Styling error", "Network error"], answer: 1, explanation: "Using an undeclared variable causes a reference/declaration problem in many languages.", xp: 20 },
-  { id: 104, type: "code", question: "Which fix prevents a division-by-zero crash?", code: `result = total / count`, options: ["Check count !== 0 first", "Delete total", "Multiply by zero", "Convert count to text"], answer: 0, explanation: "Validate that count is not zero before dividing.", xp: 25 },
-  { id: 105, type: "multiple", question: "The program runs but produces the wrong result. What should you investigate first?", options: ["Logic", "Monitor brightness", "Keyboard layout", "File name color"], answer: 0, explanation: "A wrong result while the program runs is commonly a logic error.", xp: 20 },
-  { id: 106, type: "code", question: "Which line correctly checks whether a value is null in JavaScript?", code: `const value = null;`, options: ["value === null", "value = null", "value == undefined only", "null.value"], answer: 0, explanation: "Strict equality with null is the direct check for a null value.", xp: 20 },
-  { id: 107, type: "multiple", question: "What is the best debugging habit after reproducing a bug?", options: ["Inspect the failing input and trace the code", "Delete the project", "Ignore the error", "Restart forever"], answer: 0, explanation: "Reproduce, inspect inputs, trace execution, isolate the cause, then fix and retest.", xp: 25 },
-];
+type MusicTrack = (typeof SPOTIFY_TRACKS)[number];
 
-function WelcomeScreen({ onContinue, darkMode, onToggleTheme }: { onContinue: () => void; darkMode: boolean; onToggleTheme: () => void }) {
+type MusicStyle = {
+  wave: OscillatorType;
+  notes: Array<[number, number]>;
+};
+
+const getMusicStyle = (track: MusicTrack): MusicStyle => {
+  if (track.category === "Focus") {
+    return { wave: "sine", notes: [[220, 280], [330, 392], [392, 440], [440, 330]] };
+  }
+  if (track.category === "Pop" || track.artist.includes("Weeknd")) {
+    return { wave: "triangle", notes: [[440, 523], [554, 659], [698, 783], [659, 587]] };
+  }
+  if (track.category === "Rock / Alt") {
+    return { wave: "sawtooth", notes: [[196, 246], [246, 293], [329, 392], [392, 329]] };
+  }
+  return { wave: "square", notes: [[261, 329], [329, 392], [392, 440], [440, 523]] };
+};
+
+const DEBUG_QUESTIONS_BY_LANGUAGE: Record<string, Question[]> = {
+  python: [
+    { id: 201, type: "code", question: "Fix the Python indentation bug.", code: `if score >= 75:\nprint("Passed")`, options: ["Indent print() under if", "Remove if", "Add ;", "Change >= to <="], answer: 0, explanation: "Python requires indentation to define the body of an if statement.", xp: 25 },
+    { id: 202, type: "code", question: "Fix the Python loop so it counts upward.", code: `for i in range(5):\n    print(i)`, options: ["This code is already correct", "Change range to range(-5)", "Remove print", "Use i--"], answer: 0, explanation: "range(5) correctly produces 0 through 4, so no fix is needed.", xp: 25 },
+  ],
+  javascript: [
+    { id: 211, type: "code", question: "Fix the JavaScript loop that never reaches the end.", code: `for (let i = 0; i < 5; i--) {\n  console.log(i);\n}`, options: ["Change i-- to i++", "Change < to >", "Remove let", "Remove console.log"], answer: 0, explanation: "The counter must increase toward 5, so i++ is required.", xp: 25 },
+    { id: 212, type: "code", question: "Fix the JavaScript null-check bug.", code: `const user = null;\nconsole.log(user.name);`, options: ["Check user before reading name", "Use user.name = null", "Remove const", "Convert user to number"], answer: 0, explanation: "Accessing a property on null throws an error. Check that user exists first.", xp: 25 },
+  ],
+  html: [
+    { id: 221, type: "code", question: "Fix the HTML form bug: the input cannot be submitted with the intended field name.", code: `<form>\n  <input id="email">\n</form>`, options: ["Add name=\"email\"", "Remove the input", "Change form to div", "Add Python code"], answer: 0, explanation: "A form control should have a name attribute so its value can be submitted as form data.", xp: 25 },
+    { id: 222, type: "code", question: "Fix the CSS bug that prevents the text color rule from applying.", code: `.title { color: bluish; }`, options: ["Use a valid color such as blue", "Add Python", "Remove color", "Change .title to <title>"], answer: 0, explanation: "bluish is not a valid CSS color keyword. Use blue, a hex value, rgb(), etc.", xp: 25 },
+  ],
+  java: [
+    { id: 231, type: "code", question: "Fix the Java comparison bug.", code: `int age = 18;\nif (age = 18) {\n  System.out.println("Adult");\n}`, options: ["Change = to ==", "Change int to string", "Remove if", "Use ==="], answer: 0, explanation: "Java uses == for comparison; = assigns a value.", xp: 25 },
+    { id: 232, type: "code", question: "Fix the Java array index bug.", code: `int[] nums = {1,2,3};\nSystem.out.println(nums[3]);`, options: ["Use nums[2]", "Use nums[4]", "Remove the array", "Use nums[-1]"], answer: 0, explanation: "The last valid index is 2 because Java arrays are zero-indexed.", xp: 25 },
+  ],
+  cpp: [
+    { id: 241, type: "code", question: "Fix the C++ output bug.", code: `int x = 5;\ncout << x`, options: ["Add a semicolon", "Remove cout", "Change int to string", "Add Python"], answer: 0, explanation: "The C++ statement needs a semicolon at the end.", xp: 25 },
+    { id: 242, type: "code", question: "Fix the C++ array bounds bug.", code: `int a[3] = {1,2,3};\ncout << a[3];`, options: ["Use a[2]", "Use a[4]", "Use a[-3]", "Delete a"], answer: 0, explanation: "Valid indexes are 0, 1, and 2. Index 3 is out of bounds.", xp: 25 },
+  ],
+  c: [
+    { id: 251, type: "code", question: "Fix the C format-specifier bug.", code: `int age = 20;\nprintf("%s", age);`, options: ["Use %d", "Use %f", "Use %c only", "Remove age"], answer: 0, explanation: "%d is the correct printf format specifier for an int.", xp: 25 },
+    { id: 252, type: "code", question: "Fix the C pointer bug.", code: `int x = 5;\nint *p;\n*p = x;`, options: ["Set p = &x before dereferencing", "Delete x", "Use p++", "Change int to float"], answer: 0, explanation: "p must point to valid memory before *p is used.", xp: 25 },
+  ],
+  typescript: [
+    { id: 261, type: "code", question: "Fix the TypeScript type bug.", code: `let score: number = "100";`, options: ["Use 100 without quotes", "Change number to boolean", "Remove score", "Use undefined"], answer: 0, explanation: "A number variable must receive a number, not a string.", xp: 25 },
+    { id: 262, type: "code", question: "Fix the TypeScript optional-value bug.", code: `let name: string | undefined;\nconsole.log(name.toUpperCase());`, options: ["Check name before calling toUpperCase()", "Remove string", "Use name = false", "Add a semicolon only"], answer: 0, explanation: "name can be undefined, so TypeScript requires a guard before calling a string method.", xp: 25 },
+  ],
+  php: [
+    { id: 271, type: "code", question: "Fix the PHP variable bug.", code: `$name = "Elmer";\necho name;`, options: ["Use echo $name;", "Use echo #name;", "Remove $ from assignment", "Use console.log"], answer: 0, explanation: "PHP variables require the $ prefix when they are referenced.", xp: 25 },
+    { id: 272, type: "code", question: "Fix the PHP comparison bug.", code: `$age = 18;\nif ($age = 20) { echo "OK"; }`, options: ["Change = to == or ===", "Remove $age", "Use =>", "Use ===="], answer: 0, explanation: "= assigns a value; == or === compares values.", xp: 25 },
+  ],
+  sql: [
+    { id: 281, type: "code", question: "Fix the SQL query that has the wrong clause order.", code: `SELECT name FROM users\nWHERE age > 18\nORDER BY name;`, options: ["This query is already correct", "Move WHERE after ORDER BY", "Remove SELECT", "Replace WHERE with if"], answer: 0, explanation: "SELECT, FROM, WHERE, then ORDER BY is valid SQL clause order.", xp: 25 },
+    { id: 282, type: "code", question: "Fix the SQL NULL comparison bug.", code: `SELECT * FROM users WHERE email = NULL;`, options: ["Use email IS NULL", "Use email == NULL", "Use email := NULL", "Remove WHERE"], answer: 0, explanation: "SQL uses IS NULL / IS NOT NULL for NULL checks.", xp: 25 },
+  ],
+  csharp: [
+    { id: 291, type: "code", question: "Fix the C# comparison bug.", code: `int score = 90;\nif (score = 90) Console.WriteLine("A");`, options: ["Change = to ==", "Change int to string", "Remove if", "Use ==="], answer: 0, explanation: "C# uses == for equality comparison.", xp: 25 },
+    { id: 292, type: "code", question: "Fix the C# array index bug.", code: `int[] nums = {1,2,3};\nConsole.WriteLine(nums[3]);`, options: ["Use nums[2]", "Use nums[4]", "Use nums[-1]", "Delete nums"], answer: 0, explanation: "The last valid index is 2 for a three-item array.", xp: 25 },
+  ],
+  kotlin: [
+    { id: 301, type: "code", question: "Fix the Kotlin null-safety bug.", code: `var name: String? = null\nprintln(name.length)`, options: ["Use name?.length", "Remove String?", "Use name++", "Use === only"], answer: 0, explanation: "A nullable String must be safely accessed with ?. or checked first.", xp: 25 },
+    { id: 302, type: "code", question: "Fix the Kotlin mutable-variable bug.", code: `val score = 10\nscore = 20`, options: ["Change val to var", "Change 20 to null", "Remove score", "Use const"], answer: 0, explanation: "val is read-only; use var when the value needs to change.", xp: 25 },
+  ],
+};
+
+const DEBUG_QUESTIONS: Question[] = DEBUG_QUESTIONS_BY_LANGUAGE.javascript;
+
+function WelcomeScreen({ onContinue }: { onContinue: () => void }) {
   return (
     <div className="min-h-screen relative overflow-hidden flex items-center justify-center px-4 py-10">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_25%,rgba(124,58,237,.24),transparent_32%),radial-gradient(circle_at_20%_80%,rgba(6,182,212,.14),transparent_30%),radial-gradient(circle_at_85%_70%,rgba(236,72,153,.12),transparent_30%)]" />
@@ -625,10 +727,6 @@ function WelcomeScreen({ onContinue, darkMode, onToggleTheme }: { onContinue: ()
         <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 28, ease: "linear" }} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[70vw] max-w-[720px] aspect-square rounded-full border border-purple-400/10" />
         <motion.div animate={{ rotate: -360 }} transition={{ repeat: Infinity, duration: 18, ease: "linear" }} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[48vw] max-w-[500px] aspect-square rounded-full border border-cyan-400/10 border-dashed" />
       </div>
-
-      <button onClick={onToggleTheme} className="absolute top-5 right-5 z-20 flex items-center gap-2 px-4 py-2.5 rounded-xl border border-white/10 bg-black/20 backdrop-blur-xl text-white/70 font-mono text-xs hover:bg-white/10">
-        {darkMode ? <Sun size={15} /> : <Moon size={15} />} {darkMode ? "Light Mode" : "Dark Mode"}
-      </button>
 
       <div className="absolute hidden lg:block top-24 left-8 text-[11px] font-mono text-cyan-300/30 rotate-[-8deg]">{`while(skill){ learn(); levelUp(); }`}</div>
       <div className="absolute hidden lg:block bottom-28 right-8 text-[11px] font-mono text-purple-300/30 rotate-[7deg]">{`if(correct) { attack(); }`}</div>
@@ -669,7 +767,7 @@ function WelcomeScreen({ onContinue, darkMode, onToggleTheme }: { onContinue: ()
           className="group inline-flex items-center gap-3 px-9 sm:px-12 py-4 sm:py-5 rounded-2xl bg-gradient-to-r from-violet-600 via-fuchsia-500 to-cyan-500 text-white font-mono font-black text-base sm:text-lg shadow-2xl shadow-purple-500/25">
           ENTER CODEQUEST <ArrowRight size={21} className="group-hover:translate-x-1 transition-transform"/>
         </motion.button>
-        <p className="text-white/25 text-[10px] font-mono mt-4">Create your profile → choose your game → choose your music → PLAY.</p>
+        <p className="text-white/25 text-[10px] font-mono mt-4">Built by Elmer Makig-angay — an aspiring web developer turning code into interactive adventures.</p>
       </motion.div>
     </div>
   );
@@ -678,12 +776,10 @@ function WelcomeScreen({ onContinue, darkMode, onToggleTheme }: { onContinue: ()
 function MusicSelectionScreen({
   selectedTrack,
   onSelect,
-  onContinue,
   onBack,
 }: {
   selectedTrack: (typeof SPOTIFY_TRACKS)[number];
   onSelect: (track: (typeof SPOTIFY_TRACKS)[number]) => void;
-  onContinue: () => void;
   onBack: () => void;
 }) {
   const [category, setCategory] = useState("All");
@@ -691,7 +787,7 @@ function MusicSelectionScreen({
   const visibleTracks = category === "All" ? SPOTIFY_TRACKS : SPOTIFY_TRACKS.filter((t) => t.category === category);
 
   return (
-    <div className="min-h-screen px-4 sm:px-6 py-8 sm:py-12 relative overflow-hidden">
+    <div className="min-h-screen px-3 sm:px-5 py-6 sm:py-8 relative overflow-hidden">
       <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_20%_20%,rgba(168,85,247,.18),transparent_35%),radial-gradient(circle_at_80%_70%,rgba(6,182,212,.14),transparent_35%)]" />
       <div className="max-w-5xl mx-auto relative">
         <button onClick={onBack} className="flex items-center gap-2 text-white/50 hover:text-white font-mono text-sm mb-8">
@@ -703,13 +799,13 @@ function MusicSelectionScreen({
             className="mx-auto w-16 h-16 rounded-2xl bg-gradient-to-br from-green-500 to-cyan-500 flex items-center justify-center shadow-2xl shadow-green-500/25 mb-4">
             <Music size={30} className="text-white" />
           </motion.div>
-          <p className="text-green-300 text-xs font-mono font-black tracking-[0.3em]">SOUNDTRACK LOCK-IN</p>
-          <h2 className="text-4xl md:text-6xl font-mono font-black text-white mt-2">CHOOSE YOUR BATTLE MUSIC</h2>
-          <p className="text-white/40 font-mono text-sm mt-3">Pick one track before you play. Your choice follows you into the game.</p>
+          <p className="text-green-300 text-xs font-mono font-black tracking-[0.3em]">GLOBAL SOUNDTRACK</p>
+          <h2 className="text-4xl md:text-6xl font-mono font-black text-white mt-2">CHOOSE YOUR SOUNDTRACK</h2>
+          <p className="text-white/40 font-mono text-sm mt-3">Choose a track anytime. Selecting one closes this screen and keeps the soundtrack playing globally.</p>
         </motion.div>
 
         <div className="rounded-3xl border border-green-500/20 bg-gradient-to-br from-green-500/10 via-white/5 to-cyan-500/10 p-4 sm:p-6 shadow-2xl">
-          <div className="flex gap-2 overflow-x-auto pb-2 mb-4">
+          <div className="flex flex-wrap gap-2 pb-2 mb-4">
             {categories.map((item) => (
               <button key={item} onClick={() => setCategory(item)}
                 className={`shrink-0 px-3 py-2 rounded-full text-[10px] font-mono border ${
@@ -720,7 +816,7 @@ function MusicSelectionScreen({
             ))}
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[360px] overflow-y-auto pr-1">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {visibleTracks.map((track) => (
               <motion.button key={track.id} whileHover={{ y: -2 }} whileTap={{ scale: .98 }} onClick={() => onSelect(track)}
                 className={`text-left p-4 rounded-2xl border transition-all ${
@@ -739,25 +835,16 @@ function MusicSelectionScreen({
               </motion.button>
             ))}
           </div>
-
-          <div className="mt-5 rounded-2xl border border-white/10 bg-black/20 p-3">
-            <p className="text-[10px] font-mono text-white/40 mb-2">SELECTED TRACK</p>
-            <p className="font-mono font-black text-green-300">{selectedTrack.title}</p>
-            <p className="font-mono text-xs text-white/40">{selectedTrack.artist}</p>
-            <iframe
-              key={`preview-${selectedTrack.id}`}
-              src={`https://open.spotify.com/embed/track/${selectedTrack.id}?utm_source=generator&theme=0&autoplay=1&start=0`}
-              width="100%" height="152" frameBorder="0"
-              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-              loading="lazy" title={`Spotify preview for ${selectedTrack.title}`} className="w-full rounded-2xl mt-3"
-            />
+          <div className="mt-5 rounded-2xl border border-green-500/20 bg-green-500/5 p-4 text-center">
+            <Music size={24} className="mx-auto text-green-300 mb-2" />
+            <p className="text-green-300 font-mono font-black text-sm">GLOBAL SOUNDTRACK ARMED</p>
+            <p className="text-white/35 font-mono text-[10px] mt-1">Your selected track plays from the beginning and stays with you across the whole website.</p>
           </div>
-
-          <button onClick={onContinue}
-            className="w-full mt-5 py-4 rounded-2xl bg-gradient-to-r from-green-500 via-cyan-500 to-purple-600 text-white font-mono font-black text-lg shadow-xl shadow-green-500/15">
-            Lock In & Start Game <ArrowRight size={19} className="inline ml-2" />
-          </button>
-          <p className="text-center text-white/25 text-[10px] font-mono mt-3">Selected music is locked before the game and loaded from the beginning. If Chrome blocks autoplay, tap Play once.</p>
+          <div className="mt-5 rounded-2xl border border-cyan-400/15 bg-cyan-500/5 px-4 py-3 text-center">
+            <p className="text-cyan-300 font-mono font-black text-xs">SELECT = PLAY NOW</p>
+            <p className="text-white/35 font-mono text-[10px] mt-1">Tap any song and this menu closes immediately. Your selected soundtrack remains global while you use CodeQuest.</p>
+          </div>
+          <p className="text-center text-white/25 text-[10px] font-mono mt-3">Tap once to start the soundtrack. It will keep playing as you explore the app.</p>
         </div>
       </div>
     </div>
@@ -779,12 +866,12 @@ function MusicPlayer({ compact = false, selectedTrack }: { compact?: boolean; se
         </div>
         <div className="min-w-0">
           <p className="font-mono text-sm font-black text-green-300">CODEQUEST MUSIC</p>
-          <p className="text-white/40 text-[10px] font-mono truncate">Spotify soundtrack for your quest.</p>
+          <p className="text-white/40 text-[10px] font-mono truncate">Browser soundtrack for your quest.</p>
         </div>
         <span className="ml-auto shrink-0 text-[10px] font-mono text-white/30">{SPOTIFY_TRACKS.length} tracks</span>
       </div>
 
-      <div className="flex gap-1.5 overflow-x-auto pb-1 mb-3 scrollbar-thin">
+      <div className="flex flex-wrap gap-1.5 pb-1 mb-3">
         {categories.map((item) => (
           <button key={item} onClick={() => setCategory(item)}
             className={`shrink-0 px-2.5 py-1.5 rounded-full text-[9px] font-mono border transition-all ${
@@ -795,7 +882,7 @@ function MusicPlayer({ compact = false, selectedTrack }: { compact?: boolean; se
         ))}
       </div>
 
-      <div className="grid grid-cols-2 gap-2 mb-3 max-h-36 overflow-y-auto pr-1">
+      <div className="grid grid-cols-2 gap-2 mb-3">
         {visibleTracks.map((item) => (
           <button key={item.id} onClick={() => setTrack(item)}
             className={`min-w-0 text-left p-2.5 rounded-xl border transition-all ${
@@ -807,17 +894,17 @@ function MusicPlayer({ compact = false, selectedTrack }: { compact?: boolean; se
         ))}
       </div>
 
-      <iframe
-        key={track.id}
-        src={`https://open.spotify.com/embed/track/${track.id}?utm_source=generator&autoplay=1&start=0&theme=0`}
-        width="100%" height={compact ? "152" : "152"} frameBorder="0"
-        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-        loading="lazy" title={`Spotify player for ${track.title}`} className="w-full rounded-2xl"
-      />
+      <div className="rounded-2xl border border-green-500/15 bg-black/20 px-3 py-3 text-[10px] font-mono text-green-300">
+        <div className="flex items-center justify-between gap-2">
+          <span className="font-black">NOW PLAYING</span>
+          <span>{track.title}</span>
+        </div>
+        <p className="mt-1 text-white/45">{track.artist} · {track.category}</p>
+      </div>
 
       <div className="flex items-center gap-2 mt-2 text-[9px] font-mono text-white/35">
         <Volume2 size={11} />
-        <span>Selected track starts at 0:00. Browser autoplay policy may require one tap.</span>
+        <span>Selected track starts after your first tap. Audio is played through the browser.</span>
       </div>
     </div>
   );
@@ -831,36 +918,35 @@ function AnimeCoderAvatar({ side = "player", large = false, attacking = false, h
   return (
     <motion.div
       animate={{
-        y: hit ? [0, -8, 8, -4, 0] : [0, -5, 0],
-        x: attacking ? (player ? [0, 46, 10, 0] : [0, -46, -10, 0]) : 0,
-        rotate: attacking ? (player ? [0, 14, -5, 0] : [0, -14, 5, 0]) : (player ? [0, 1, 0] : [0, -1, 0]),
-        scale: hit ? [1, 1.12, .92, 1] : attacking ? [1, 1.08, .96, 1] : 1,
+        y: hit ? [0, -5, 5, -3, 0] : [0, -5, 0],
+        x: attacking ? (player ? [0, 30, 0] : [0, -30, 0]) : 0,
+        rotate: attacking ? (player ? [0, 8, -2, 0] : [0, -8, 2, 0]) : (player ? [0, 1, 0] : [0, -1, 0]),
+        scale: hit ? [1, 1.06, .96, 1] : 1,
       }}
-      transition={{ duration: attacking || hit ? .62 : 2.4, ease: "easeInOut", repeat: attacking || hit ? 0 : Infinity }}
-      className={`${large ? "w-36 h-44 sm:w-48 sm:h-56" : "w-20 h-24"} relative shrink-0`}
-      aria-label={player ? "Anime coding warrior" : "Anime code warrior opponent"}
+      transition={{ duration: attacking || hit ? .55 : 2.4, ease: "easeInOut", repeat: attacking || hit ? 0 : Infinity }}
+      className={`${large ? "w-32 h-40 sm:w-40 sm:h-48" : "w-20 h-24"} relative shrink-0`}
+      aria-label={player ? "Anime coding hero" : "Anime code beast"}
     >
-      {attacking && (
-        <>
-          <motion.div initial={{ opacity: 0, scale: .2, rotate: player ? -35 : 35 }} animate={{ opacity: [0, .9, 0], scale: [0.2, 1.1, 1.8], rotate: player ? [-35, 12, 60] : [35, -12, -60] }} transition={{ duration: .62 }} className="absolute z-20 top-1/2 left-1/2 w-40 sm:w-64 h-2 rounded-full blur-[2px]" style={{ background: `linear-gradient(90deg, transparent, ${main}, white, ${secondary}, transparent)`, transformOrigin: player ? "left center" : "right center" }} />
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: [0, 1, 0] }} transition={{ duration: .45 }} className="absolute inset-[-20px] rounded-full border-2 z-10" style={{ borderColor: main, boxShadow: `0 0 35px ${main}, inset 0 0 25px ${secondary}55` }} />
-        </>
-      )}
-      <div className={`absolute inset-x-1/2 -translate-x-1/2 bottom-0 ${large ? "w-36 h-28 sm:w-44 sm:h-32" : "w-16 h-14"} rounded-[45%_45%_25%_25%] border-2 ${player ? "border-cyan-300/70" : "border-pink-300/70"} overflow-visible`} style={{ boxShadow: `0 0 30px ${main}44` }}>
-        <div className={`absolute ${large ? "top-2" : "top-1"} left-1/2 -translate-x-1/2 ${large ? "w-24 h-11" : "w-12 h-6"} rounded-full bg-gradient-to-r from-black/90 via-white/10 to-black/90`} />
-        <div className={`absolute ${large ? "top-10" : "top-7"} left-1/2 -translate-x-1/2 ${large ? "w-28 h-28" : "w-14 h-14"} rounded-[48%] ${player ? "bg-gradient-to-br from-amber-100 via-orange-100 to-amber-200" : "bg-gradient-to-br from-pink-100 via-rose-100 to-purple-100"} border-2 ${player ? "border-cyan-200/70" : "border-pink-200/70"} shadow-2xl`}>
-          <div className={`absolute -top-4 left-1/2 -translate-x-1/2 ${large ? "w-32 h-14" : "w-16 h-7"} rounded-[70%_70%_30%_30%] ${player ? "bg-gradient-to-b from-slate-950 via-cyan-950 to-slate-900" : "bg-gradient-to-b from-slate-950 via-fuchsia-950 to-slate-900"}`} />
-          <div className={`absolute ${large ? "top-11" : "top-7"} left-1/2 -translate-x-1/2 flex ${large ? "gap-8" : "gap-3"}`}>
-            <span className={`${large ? "w-4 h-5" : "w-2 h-3"} rounded-full bg-gradient-to-b from-cyan-300 to-blue-500 shadow-[0_0_12px_rgba(34,211,238,.9)]`} />
-            <span className={`${large ? "w-4 h-5" : "w-2 h-3"} rounded-full bg-gradient-to-b from-pink-300 to-purple-500 shadow-[0_0_12px_rgba(236,72,153,.9)]`} />
+      <div className={`absolute inset-x-1/2 -translate-x-1/2 bottom-0 ${large ? "w-32 h-24" : "w-16 h-14"} rounded-[45%_45%_25%_25%] border-2 ${
+        player ? "border-cyan-300/60" : "border-pink-300/60"
+      } shadow-[0_0_35px_rgba(34,211,238,.18)]`}>
+        <div className={`absolute ${large ? "top-2" : "top-1"} left-1/2 -translate-x-1/2 ${large ? "w-20 h-9" : "w-12 h-6"} rounded-full bg-gradient-to-r from-black/80 via-white/10 to-black/80`} />
+        <div className={`absolute ${large ? "top-9" : "top-7"} left-1/2 -translate-x-1/2 ${large ? "w-24 h-24" : "w-14 h-14"} rounded-[48%] ${
+          player ? "bg-gradient-to-br from-amber-100 via-orange-100 to-amber-200" : "bg-gradient-to-br from-pink-100 via-rose-100 to-purple-100"
+        } border-2 ${player ? "border-cyan-200/60" : "border-pink-200/60"} shadow-xl`}>
+          <div className={`absolute -top-3 left-1/2 -translate-x-1/2 ${large ? "w-28 h-12" : "w-16 h-7"} rounded-[70%_70%_30%_30%] ${
+            player ? "bg-gradient-to-b from-slate-950 via-cyan-950 to-slate-900" : "bg-gradient-to-b from-slate-950 via-fuchsia-950 to-slate-900"
+          }`} />
+          <div className={`absolute ${large ? "top-10" : "top-7"} left-1/2 -translate-x-1/2 flex ${large ? "gap-7" : "gap-3"}`}>
+            <span className={`${large ? "w-4 h-5" : "w-2 h-3"} rounded-full bg-gradient-to-b from-cyan-300 to-blue-500 shadow-[0_0_10px_rgba(34,211,238,.8)]`} />
+            <span className={`${large ? "w-4 h-5" : "w-2 h-3"} rounded-full bg-gradient-to-b from-pink-300 to-purple-500 shadow-[0_0_10px_rgba(236,72,153,.8)]`} />
           </div>
-          <div className={`absolute ${large ? "bottom-8" : "bottom-4"} left-1/2 -translate-x-1/2 ${large ? "w-9" : "w-4"} h-1 rounded-full`} style={{ background: main, boxShadow: `0 0 12px ${main}` }} />
+          <div className={`absolute ${large ? "bottom-7" : "bottom-4"} left-1/2 -translate-x-1/2 ${large ? "w-8" : "w-4"} h-1 rounded-full ${player ? "bg-cyan-400" : "bg-pink-400"}`} />
         </div>
         <div className={`absolute ${large ? "bottom-4" : "bottom-2"} left-1/2 -translate-x-1/2 ${large ? "text-3xl" : "text-lg"}`}>{fighter.emoji}</div>
-        <div className={`absolute ${player ? "right-[-18px]" : "left-[-18px]"} ${large ? "bottom-7 text-3xl" : "bottom-4 text-lg"} font-black z-20`} style={{ color: main, textShadow: `0 0 14px ${main}` }}>{fighter.weapon}</div>
       </div>
-      <motion.div animate={attacking ? { scale: [1, 1.7, .8, 1.4, 1], opacity: [0.25, .9, .25, .75, .2], rotate: [0, 90, 180, 270, 360] } : { scale: [1, 1.08, 1], opacity: [.2, .35, .2] }} transition={{ duration: attacking ? .65 : 2.2, repeat: attacking ? 0 : Infinity }} className="absolute left-1/2 -translate-x-1/2 top-0 w-44 h-44 sm:w-60 sm:h-60 rounded-full blur-2xl" style={{ background: `radial-gradient(circle, ${main}bb 0%, ${secondary}50 42%, transparent 72%)` }} />
-      {attacking && <motion.div initial={{ opacity: 0, scale: .3 }} animate={{ opacity: [0, 1, 0], scale: [0.3, 1.5, 2.4], rotate: [0, 12, -12, 0] }} transition={{ duration: .65 }} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-2xl sm:text-4xl font-mono font-black z-30 whitespace-nowrap" style={{ color: main, textShadow: `0 0 25px ${main}` }}>{fighter.attack}</motion.div>}
+      <motion.div animate={attacking ? { scale: [1, 1.5, .8, 1.25, 1], opacity: [0.25, .75, .35, .65, .25], rotate: [0, 90, 180, 270, 360] } : { scale: [1, 1.08, 1], opacity: [.2, .35, .2] }} transition={{ duration: attacking ? .65 : 2.2, repeat: attacking ? 0 : Infinity }} className="absolute left-1/2 -translate-x-1/2 top-0 w-40 h-40 rounded-full blur-2xl" style={{ background: `radial-gradient(circle, ${main}99 0%, ${secondary}40 42%, transparent 72%)` }} />
+      {attacking && <motion.div initial={{ opacity: 0, scale: .3 }} animate={{ opacity: [0, 1, 0], scale: [0.3, 1.5, 2.4], rotate: [0, 12, -12, 0] }} transition={{ duration: .65 }} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-2xl sm:text-4xl font-mono font-black z-10" style={{ color: main, textShadow: `0 0 25px ${main}` }}>{fighter.attack}</motion.div>}
     </motion.div>
   );
 }
@@ -870,14 +956,15 @@ function ModesScreen({ onSelect, onBack }: { onSelect: (mode: GameMode) => void;
     { id: "practice" as GameMode, icon: "🧠", title: "Practice Mode", desc: "Relaxed learning with explanations after every answer.", color: "#8b5cf6", questions: "7 questions" },
     { id: "battle" as GameMode, icon: "⚔️", title: "Battle Mode", desc: "Correct answers become attacks against the Code Beast with anime combat effects.", color: "#ef4444", questions: "7 questions" },
     { id: "speed" as GameMode, icon: "⚡", title: "Speed Mode", desc: "Race the clock and finish before time runs out.", color: "#f59e0b", questions: "5 questions · 60 sec" },
-    { id: "debug" as GameMode, icon: "🐛", title: "Bug Hunter", desc: "Hunt down coding mistakes and build a debugging streak.", color: "#22c55e", questions: "7 bug challenges" },
+    { id: "debug" as GameMode, icon: "🐛", title: "Bug Hunter", desc: "Open broken code, identify the bug, and fix it in the language you choose.", color: "#22c55e", questions: "Language-specific bug fixes" },
     { id: "survival" as GameMode, icon: "🔥", title: "Code Survival", desc: "Keep your run alive. Wrong answers drain your life and streak.", color: "#06b6d4", questions: "12 lives-on-the-line" },
+    { id: "compiler" as GameMode, icon: "⌨️", title: "Compiler Lab", desc: "Type the missing code directly into a terminal-style compiler and execute your answer.", color: "#22d3ee", questions: "Typing challenge" },
   ];
   return (
     <div className="min-h-screen px-4 sm:px-6 py-10">
       <div className="max-w-5xl mx-auto">
         <button onClick={onBack} className="flex items-center gap-2 text-white/50 hover:text-white font-mono text-sm mb-8"><ArrowLeft size={16}/> Back</button>
-        <div className="text-center mb-10"><Gamepad2 className="mx-auto text-purple-400 mb-3" size={40}/><h2 className="text-4xl md:text-5xl font-mono font-black text-white">CHOOSE YOUR GAME</h2><p className="text-white/40 font-mono text-sm mt-2">Every mode plays with your chosen soundtrack.</p></div>
+        <div className="text-center mb-10"><Gamepad2 className="mx-auto text-purple-400 mb-3" size={40}/><h2 className="text-4xl md:text-5xl font-mono font-black text-white">CHOOSE YOUR GAME</h2><p className="text-white/40 font-mono text-sm mt-2">Your soundtrack stays active while you explore the whole CodeQuest world.</p></div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {modes.map((mode) => <motion.button key={mode.id} onClick={() => onSelect(mode.id)} whileHover={{ y: -5, scale: 1.01 }} whileTap={{ scale: .98 }}
             className="text-left rounded-3xl border border-white/10 bg-white/5 p-6 hover:bg-white/10 transition-all shadow-xl">
@@ -891,6 +978,28 @@ function ModesScreen({ onSelect, onBack }: { onSelect: (mode: GameMode) => void;
     </div>
   );
 }
+
+function RankBadge({ totalXP, compact = false }: { totalXP: number; compact?: boolean }) {
+  const rank = getRank(totalXP);
+  return (
+    <div className={`flex items-center gap-2 rounded-xl border bg-black/10 ${compact ? "px-2.5 py-1.5" : "px-3 py-2"}`} style={{ borderColor: `${rank.color}55` }}>
+      <span className={compact ? "text-base" : "text-xl"}>{rank.icon}</span>
+      <div className="min-w-0">
+        <p className="font-mono font-black truncate" style={{ color: rank.color, fontSize: compact ? 10 : 12 }}>{rank.name}</p>
+        <p className="text-white/30 font-mono" style={{ fontSize: compact ? 8 : 9 }}>{totalXP} XP</p>
+      </div>
+      <Trophy size={compact ? 12 : 15} style={{ color: rank.color }} className="ml-auto shrink-0" />
+    </div>
+  );
+}
+
+type StudentProfile = {
+  username: string;
+  yearLevel: string;
+  course: string;
+  school: string;
+  photo: string;
+};
 
 function HomeScreen({
   onStart,
@@ -915,131 +1024,118 @@ function HomeScreen({
   onMusic: () => void;
   selectedTrack: (typeof SPOTIFY_TRACKS)[number];
 }) {
+  const rank = getRank(totalXP);
+  const questionCount = 7;
+  const nextRank = RANKS[RANKS.indexOf(rank) + 1];
+  const progress = nextRank
+    ? Math.max(4, Math.min(100, ((totalXP - rank.minXP) / Math.max(1, nextRank.minXP - rank.minXP)) * 100))
+    : 100;
+
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-6 py-12 relative overflow-hidden">
-      <aside className="absolute left-4 top-4 bottom-4 z-20 w-72 hidden lg:flex flex-col gap-3">
-        <div className="rounded-3xl border border-white/10 bg-black/20 backdrop-blur-2xl p-4 shadow-2xl">
-          <div className="flex items-center gap-3">
-            {profile.photo ? <img src={profile.photo} className="w-16 h-16 rounded-2xl object-cover border border-cyan-400/30" alt="Profile"/> : <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500/30 to-cyan-500/20 flex items-center justify-center"><User className="text-cyan-300"/></div>}
+    <div className="min-h-screen relative overflow-hidden px-3 sm:px-5 lg:px-8 py-4 sm:py-6">
+      <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_45%_28%,rgba(139,92,246,.16),transparent_30%),radial-gradient(circle_at_75%_70%,rgba(6,182,212,.12),transparent_30%)]" />
+      <div className="absolute -top-24 left-1/3 w-80 h-80 rounded-full bg-purple-600/10 blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full bg-cyan-500/10 blur-3xl pointer-events-none" />
+
+      {/* Profile is intentionally the main top-center identity card. Clicking it opens the editable profile. */}
+      <div className="relative z-20 flex justify-center">
+        <motion.button
+          onClick={onProfile}
+          initial={{ opacity: 0, y: -18 }}
+          animate={{ opacity: 1, y: 0 }}
+          whileHover={{ y: -2, scale: 1.01 }}
+          className="group w-full max-w-[520px] rounded-[28px] border border-white/10 bg-black/25 backdrop-blur-2xl p-3 sm:p-4 shadow-2xl shadow-purple-500/10 text-left"
+          aria-label="Edit profile"
+        >
+          <div className="flex items-center gap-3 sm:gap-4">
+            {profile.photo ? (
+              <img src={profile.photo} className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover border-2 border-cyan-400/40 shadow-lg" alt="Profile" />
+            ) : (
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-purple-500/30 to-cyan-500/20 border border-cyan-400/30 flex items-center justify-center"><User className="text-cyan-300" size={28}/></div>
+            )}
             <div className="min-w-0 flex-1">
-              <p className="text-white font-mono font-black truncate">{profile.username || "Code Warrior"}</p>
-              <p className="text-white/40 text-[10px] font-mono truncate">{profile.yearLevel || "Player"} · {profile.course || "Programmer"}</p>
+              <div className="flex items-center gap-2">
+                <p className="text-white font-mono font-black text-base sm:text-lg truncate">{profile.username || "Code Warrior"}</p>
+                <span className="text-[8px] font-mono text-cyan-300 border border-cyan-400/20 bg-cyan-400/10 rounded-full px-2 py-1 opacity-70 group-hover:opacity-100">EDIT</span>
+              </div>
+              <p className="text-white/40 text-[10px] sm:text-xs font-mono truncate">{profile.yearLevel || "Player"} · {profile.course || "Programmer"}</p>
               <div className="mt-2"><RankBadge totalXP={totalXP} compact /></div>
+            </div>
+            <div className="hidden sm:block text-right shrink-0">
+              <p className="text-cyan-300 font-mono font-black text-sm">{totalXP} XP</p>
+              <p className="text-white/25 text-[8px] font-mono mt-1">{nextRank ? `${nextRank.minXP - totalXP} XP TO NEXT` : "MAX RANK"}</p>
+            </div>
+          </div>
+          <div className="mt-3">
+            <div className="flex justify-between text-[8px] font-mono text-white/30 mb-1"><span>RANK PROGRESS</span><span>{Math.round(progress)}%</span></div>
+            <div className="h-1.5 rounded-full bg-white/10 overflow-hidden"><motion.div className="h-full rounded-full bg-gradient-to-r from-purple-500 via-fuchsia-400 to-cyan-400" animate={{ width: `${progress}%` }} /></div>
+          </div>
+        </motion.button>
+      </div>
+
+      <motion.main initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: .08, duration: .55 }} className="relative z-10 w-full max-w-6xl mx-auto mt-6 sm:mt-8 lg:mt-10 pb-10">
+        <div className="text-center">
+          <motion.div className="inline-flex items-center gap-2 bg-purple-500/15 border border-purple-400/30 rounded-full px-4 py-2 mb-5" animate={{ scale: [1, 1.025, 1] }} transition={{ repeat: Infinity, duration: 2.8 }}>
+            <Zap size={16} className="text-yellow-400" />
+            <span className="text-xs sm:text-sm font-mono text-purple-300">Made with code, imagination &amp; ambition</span>
+          </motion.div>
+          <h1 className="text-6xl sm:text-7xl md:text-8xl font-mono font-black tracking-tight leading-none bg-gradient-to-r from-white via-purple-300 to-cyan-300 bg-clip-text text-transparent drop-shadow-[0_0_35px_rgba(139,92,246,.18)]">CodeQuest</h1>
+          <p className="text-white/55 font-mono text-base sm:text-lg md:text-xl mt-4">&quot;Your Coding Adventure Starts Here&quot;</p>
+          <p className="text-white/30 font-mono text-[10px] sm:text-xs md:text-sm max-w-2xl mx-auto mt-3 leading-6">Choose a mode, master a language, debug broken code, survive the compiler, and become the next coding legend.</p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-3xl mx-auto mt-7">
+          {(
+            [
+              [BookOpen, `${questionCount} Questions`, "Challenge yourself"],
+              [Zap, "Earn XP", "Build your rank"],
+              [Trophy, rank.name, "Level up your skills"],
+            ] as Array<[typeof BookOpen, string, string]>
+          ).map(([Icon, title, sub], i) => {
+            const C = Icon;
+            return <motion.div key={String(title)} whileHover={{ y: -3 }} className={`rounded-2xl border p-4 text-center ${i === 0 ? "border-purple-400/20 bg-purple-500/10" : i === 1 ? "border-yellow-400/20 bg-yellow-500/10" : "border-cyan-400/20 bg-cyan-500/10"}`}><C size={22} className="mx-auto mb-2" /><p className="font-mono font-black text-sm text-white">{title}</p><p className="font-mono text-[9px] text-white/35 mt-1">{sub}</p></motion.div>;
+          })}
+        </div>
+
+        <div className="rounded-[28px] border border-purple-400/20 bg-gradient-to-br from-purple-500/10 via-black/10 to-cyan-500/10 p-4 sm:p-5 mt-5 max-w-4xl mx-auto">
+          <div className="flex items-center justify-between gap-3 mb-2"><div><p className="text-[9px] font-mono tracking-[.28em] text-purple-300">CODING JOURNEY</p><p className="font-mono font-black text-white mt-1">{rank.name}</p></div><p className="font-mono font-black text-cyan-300">{totalXP} XP</p></div>
+          <div className="h-2.5 rounded-full bg-white/10 overflow-hidden"><motion.div className="h-full rounded-full bg-gradient-to-r from-purple-500 via-fuchsia-400 to-cyan-400" animate={{ width: `${progress}%` }} transition={{ duration: .8 }} /></div>
+          <p className="text-[8px] font-mono text-white/30 mt-2">{nextRank ? `${nextRank.minXP - totalXP} XP until ${nextRank.name}` : "You have reached the highest rank."}</p>
+        </div>
+
+        <div className="flex flex-col sm:flex-row justify-center items-center gap-3 mt-6">
+          <motion.button onClick={onStart} whileHover={{ scale: 1.03 }} whileTap={{ scale: .98 }} className="w-full sm:w-auto min-w-[250px] px-8 py-4 rounded-2xl bg-gradient-to-r from-purple-600 via-fuchsia-500 to-cyan-500 text-white font-mono font-black text-lg shadow-2xl shadow-purple-500/20">Start Playing <ArrowRight size={20} className="inline ml-2"/></motion.button>
+          <button onClick={onDuel} className="w-full sm:w-auto px-7 py-4 rounded-2xl border border-pink-400/30 bg-pink-500/10 text-pink-300 font-mono font-black text-sm hover:bg-pink-500/15"><Users size={17} className="inline mr-2"/>1v1 Friend Arena</button>
+        </div>
+
+        <div className="mt-8 flex justify-center">
+          <div className="w-full max-w-xl flex items-center justify-center px-4 py-3 rounded-2xl border border-white/10 bg-black/15 backdrop-blur-xl text-center">
+            <div>
+              <p className="text-[8px] font-mono tracking-[.22em] text-cyan-300">CODEQUEST CREATOR</p>
+              <p className="text-xs sm:text-sm font-mono font-black text-white mt-1">Made by Elmer Makig-angay</p>
+              <p className="text-[9px] sm:text-[10px] font-mono text-white/35 mt-1">An aspiring web developer turning code into interactive adventures.</p>
             </div>
           </div>
         </div>
-        <div className="rounded-3xl border border-white/10 bg-black/20 backdrop-blur-2xl p-3 space-y-2">
-          <button onClick={onProfile} className="w-full flex items-center gap-3 px-3 py-3 rounded-2xl bg-white/5 hover:bg-white/10 text-white/75 font-mono text-xs"><User size={15}/> Profile</button>
-          <button onClick={onGuidelines} className="w-full flex items-center gap-3 px-3 py-3 rounded-2xl bg-white/5 hover:bg-white/10 text-white/75 font-mono text-xs"><BookOpenCheck size={15}/> Guidelines</button>
-          <button onClick={onToggleTheme} className="w-full flex items-center gap-3 px-3 py-3 rounded-2xl bg-white/5 hover:bg-white/10 text-white/75 font-mono text-xs">{darkMode ? <Sun size={15}/> : <Moon size={15}/>} {darkMode ? "Light Mode" : "Dark Mode"}</button>
-          <button onClick={onMusic} className="w-full flex items-center gap-3 px-3 py-3 rounded-2xl bg-green-500/10 border border-green-500/20 hover:bg-green-500/15 text-green-300 font-mono text-xs"><Music size={15}/> Music Selection <span className="ml-auto truncate max-w-[105px] text-[9px] text-green-400/60">{selectedTrack.title}</span></button>
-        </div>
-      </aside>
-      <div className="absolute top-3 left-1/2 -translate-x-1/2 z-20 lg:hidden w-[calc(100%-1rem)] flex gap-2 overflow-x-auto pb-1">
-        <button onClick={onProfile} className="shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl border border-white/10 bg-white/5 text-white/70 font-mono text-xs"><User size={14}/> Profile</button>
-        <button onClick={onGuidelines} className="shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl border border-white/10 bg-white/5 text-white/70 font-mono text-xs"><BookOpenCheck size={14}/> Guidelines</button>
-        <button onClick={onToggleTheme} className="shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl border border-white/10 bg-white/5 text-white/70 font-mono text-xs">{darkMode ? <Sun size={14}/> : <Moon size={14}/>} Theme</button>
-        <button onClick={onMusic} className="shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl border border-green-500/20 bg-green-500/10 text-green-300 font-mono text-xs"><Music size={14}/> Music</button>
-      </div>
-      {/* background glows */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
-
-
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="text-center max-w-3xl mx-auto lg:ml-64"
-      >
-        <motion.div
-          className="inline-flex items-center gap-2 bg-purple-500/20 border border-purple-500/30 rounded-full px-4 py-2 mb-8"
-          animate={{ scale: [1, 1.03, 1] }}
-          transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut" }}
-        >
-          <Zap size={16} className="text-yellow-400" />
-          <span className="text-sm font-mono text-purple-300">Created by Elmer</span>
-        </motion.div>
-
-        <h1 className="text-5xl md:text-7xl font-mono font-black mb-4 leading-none tracking-tight">
-          <span className="text-white">Code</span>
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400">Quest</span>
-        </h1>
-
-        <p className="text-white/50 text-lg font-mono mb-2">
-          "Your Coding Adventure Starts Here"
-        </p>
-        <p className="text-white/30 text-sm mb-12">
-          Choose your mode, pick a language, answer challenges, and level up your coding skills.
-        </p>
-
-        <div className="grid grid-cols-3 gap-4 mb-10 max-w-md mx-auto">
-          {[
-            { icon: <BookOpen size={18} />, label: "7 Questions", color: "text-purple-400" },
-            { icon: <Zap size={18} />, label: "Earn XP", color: "text-yellow-400" },
-            { icon: <Trophy size={18} />, label: "Rank Up", color: "text-cyan-400" },
-          ].map((item) => (
-            <div key={item.label} className="bg-white/5 border border-white/10 rounded-xl p-3 flex flex-col items-center gap-2">
-              <span className={item.color}>{item.icon}</span>
-              <span className="text-xs font-mono text-white/60">{item.label}</span>
-            </div>
-          ))}
-        </div>
-
-        <motion.button
-          onClick={onStart}
-          className="group relative inline-flex items-center gap-3 bg-gradient-to-r from-purple-600 to-cyan-600 text-white font-mono font-bold text-lg px-10 py-4 rounded-2xl shadow-lg shadow-purple-500/25"
-          whileHover={{ scale: 1.04, boxShadow: "0 0 40px rgba(124, 58, 237, 0.5)" }}
-          whileTap={{ scale: 0.97 }}
-        >
-          Start Playing
-          <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-        </motion.button>
-
-        <div className="flex flex-wrap items-center justify-center gap-3 mt-4">
-          <button onClick={onDuel}
-            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl border border-pink-500/30 bg-pink-500/10 text-pink-300 font-mono font-bold text-sm hover:bg-pink-500/20 transition-all">
-            <Users size={16} /> 1v1 Friend Arena
-          </button>
-        </div>
-      </motion.div>
+      </motion.main>
     </div>
   );
 }
-
-
-function RankBadge({ totalXP, compact = false }: { totalXP: number; compact?: boolean }) {
-  const rank = getRank(totalXP);
-  return (
-    <div className={`flex items-center gap-2 rounded-xl border bg-black/10 ${compact ? "px-2.5 py-1.5" : "px-3 py-2"}`} style={{ borderColor: `${rank.color}55` }}>
-      <span className={compact ? "text-base" : "text-xl"}>{rank.icon}</span>
-      <div className="min-w-0">
-        <p className="font-mono font-black truncate" style={{ color: rank.color, fontSize: compact ? 10 : 12 }}>{rank.name}</p>
-        <p className="text-white/30 font-mono" style={{ fontSize: compact ? 8 : 9 }}>{totalXP} XP</p>
-      </div>
-      <Trophy size={compact ? 12 : 15} style={{ color: rank.color }} className="ml-auto shrink-0" />
-    </div>
-  );
-}
-
-type StudentProfile = {
-  username: string;
-  yearLevel: string;
-  course: string;
-  school: string;
-  photo: string;
-};
 
 function ProfileScreen({
   profile,
   totalXP,
   onSave,
   onBack,
+  darkMode,
+  onToggleTheme,
 }: {
   profile: StudentProfile;
   totalXP: number;
   onSave: (profile: StudentProfile) => void;
   onBack: () => void;
+  darkMode: boolean;
+  onToggleTheme: () => void;
 }) {
   const [form, setForm] = useState<StudentProfile>(profile);
 
@@ -1085,6 +1181,20 @@ function ProfileScreen({
 
           <div className="mb-5">
             <RankBadge totalXP={totalXP} />
+          </div>
+
+          <div className="mb-5 rounded-2xl border border-white/10 bg-black/10 p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <Menu size={15} className="text-cyan-300" />
+              <span className="text-[10px] font-mono font-black tracking-[0.24em] text-cyan-300">SETTINGS</span>
+            </div>
+            <button type="button" onClick={onToggleTheme} className="flex w-full items-center justify-between rounded-xl border border-white/10 bg-white/5 px-3 py-3 text-left">
+              <span className="flex items-center gap-2">
+                {darkMode ? <Sun size={16} className="text-yellow-300" /> : <Moon size={16} className="text-cyan-300" />}
+                <span className="text-sm font-mono text-white/80">{darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}</span>
+              </span>
+              <span className="text-[11px] font-mono text-white/40">{darkMode ? "Light" : "Dark"}</span>
+            </button>
           </div>
 
           <form onSubmit={submit} className="space-y-4 mt-7">
@@ -1174,7 +1284,7 @@ function GuidelinesScreen({ onContinue, onBack }: { onContinue: () => void; onBa
     "After answering, review the explanation to learn from mistakes.",
     "Correct answers increase your XP and can build your streak.",
     "Do not refresh the page while answering if you want to keep your current quiz.",
-    "You can listen to Spotify while answering by using the Music button.",
+    "You can listen to your selected soundtrack while answering by using the Music button.",
     "Use the profile section to update your student information anytime.",
   ];
 
@@ -1269,55 +1379,17 @@ function LanguageScreen({ onSelect }: { onSelect: (lang: string) => void }) {
   );
 }
 
-
-function BattlePowerFX({ active, color = "#22d3ee", text = "POWER STRIKE!", ultimate = false }: { active: boolean; color?: string; text?: string; ultimate?: boolean }) {
-  if (!active) return null;
-  return (
-    <div className="absolute inset-0 pointer-events-none z-30 overflow-hidden rounded-3xl">
-      <motion.div initial={{ opacity: 0, scale: .1 }} animate={{ opacity: [0, .9, 0], scale: [0.1, 1, 2.4] }} transition={{ duration: .8 }} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-28 h-28 sm:w-48 sm:h-48 rounded-full border-4" style={{ borderColor: color, boxShadow: `0 0 70px ${color}, inset 0 0 40px ${color}` }} />
-      {[...Array(12)].map((_, i) => (
-        <motion.span key={i} initial={{ opacity: 0, x: 0, y: 0, scale: .4 }} animate={{ opacity: [0, 1, 0], x: Math.cos(i * Math.PI / 6) * (ultimate ? 330 : 220), y: Math.sin(i * Math.PI / 6) * (ultimate ? 220 : 150), scale: [0.4, 1.2, .1], rotate: i * 40 }} transition={{ duration: .75, delay: i * .015 }} className="absolute left-1/2 top-1/2 w-2 h-10 sm:w-3 sm:h-16 rounded-full" style={{ background: `linear-gradient(to bottom, white, ${color}, transparent)`, boxShadow: `0 0 18px ${color}` }} />
-      ))}
-      <motion.div initial={{ opacity: 0, y: 25, scale: .5 }} animate={{ opacity: [0, 1, 0], y: [25, -5, -45], scale: [0.5, 1.15, 1] }} transition={{ duration: .85 }} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-mono font-black text-2xl sm:text-5xl whitespace-nowrap" style={{ color, textShadow: `0 0 12px ${color}, 0 0 40px ${color}` }}>{text}</motion.div>
-    </div>
-  );
-}
-
-function playWarriorSfx(kind: "charge" | "slash" | "impact" | "counter" | "ultimate" | "victory") {
-  try {
-    const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
-    const ctx = new AudioCtx();
-    const master = ctx.createGain(); master.gain.value = .16; master.connect(ctx.destination);
-    const now = ctx.currentTime;
-    const make = (type: OscillatorType, from: number, to: number, dur: number, vol: number, delay = 0) => {
-      const osc = ctx.createOscillator(); const gain = ctx.createGain();
-      osc.type = type; osc.frequency.setValueAtTime(from, now + delay); osc.frequency.exponentialRampToValueAtTime(Math.max(30, to), now + delay + dur);
-      gain.gain.setValueAtTime(.0001, now + delay); gain.gain.exponentialRampToValueAtTime(vol, now + delay + .015); gain.gain.exponentialRampToValueAtTime(.0001, now + delay + dur);
-      osc.connect(gain); gain.connect(master); osc.start(now + delay); osc.stop(now + delay + dur);
-    };
-    if (kind === "charge") { make("sine", 120, 760, .42, .18); make("triangle", 260, 1040, .34, .08, .08); }
-    if (kind === "slash") { make("sawtooth", 900, 110, .24, .13); make("square", 1400, 220, .16, .06, .03); }
-    if (kind === "impact") { make("square", 95, 42, .24, .2); make("sine", 420, 80, .34, .11); }
-    if (kind === "counter") { make("sawtooth", 220, 55, .35, .15); make("triangle", 620, 150, .25, .08, .06); }
-    if (kind === "ultimate") { make("sine", 90, 1200, .7, .2); make("triangle", 180, 1800, .62, .12, .08); make("square", 800, 90, .38, .08, .2); }
-    if (kind === "victory") { [523,659,784,1046].forEach((f,i)=>make("sine",f,f*1.02,.24,.08,i*.11)); }
-    window.setTimeout(() => ctx.close(), 1100);
-  } catch {}
-}
-
 function GameScreen({
   langId,
   mode,
-  selectedTrack,
   onFinish,
 }: {
   langId: string;
   mode: GameMode;
-  selectedTrack: (typeof SPOTIFY_TRACKS)[number];
   onFinish: (score: number, xp: number, correct: number) => void;
 }) {
   const allQuestions = QUESTIONS[langId] ?? [];
-  const debugQuestions = DEBUG_QUESTIONS;
+  const debugQuestions = DEBUG_QUESTIONS_BY_LANGUAGE[langId] ?? DEBUG_QUESTIONS;
   const questions = mode === "debug" ? debugQuestions : mode === "speed" ? allQuestions.slice(0, Math.min(5, allQuestions.length)) : mode === "survival" ? Array.from({ length: 12 }, (_, i) => allQuestions[i % Math.max(allQuestions.length, 1)]).filter(Boolean) : allQuestions;
   const lang = LANGUAGES.find((l) => l.id === langId)!;
   const [qIndex, setQIndex] = useState(0);
@@ -1335,10 +1407,6 @@ function GameScreen({
   const [battleMessage, setBattleMessage] = useState("Choose your attack.");
   const [attackFx, setAttackFx] = useState<"player" | "enemy" | null>(null);
   const [hitFx, setHitFx] = useState(false);
-  const [battlePower, setBattlePower] = useState(false);
-  const [battleUltimate, setBattleUltimate] = useState(false);
-  const [battleCombo, setBattleCombo] = useState(0);
-  const [battleImpact, setBattleImpact] = useState(0);
   const [timeLeft, setTimeLeft] = useState(mode === "speed" ? 60 : 0);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const finishedRef = useRef(false);
@@ -1415,25 +1483,17 @@ function GameScreen({
     }
 
     if (mode === "battle") {
-      const nextCombo = correct ? battleCombo + 1 : 0;
-      setBattleCombo(nextCombo);
       setHitFx(true);
       setAttackFx(correct ? "player" : "enemy");
-      setBattlePower(true);
-      setBattleUltimate(correct && nextCombo >= 3);
-      setBattleImpact((v) => v + 1);
+      window.setTimeout(() => { setHitFx(false); setAttackFx(null); }, 650);
       if (correct) {
-        const ultimate = nextCombo >= 3;
-        const damage = (ultimate ? 32 : 18) + Math.min(streak * 3, 18);
+        const damage = 18 + Math.min(streak * 2, 12);
         setEnemyHP((hp) => Math.max(0, hp - damage));
-        setBattleMessage(ultimate ? `🔥 ${ANIME_CHARACTERS[qIndex % ANIME_CHARACTERS.length].power}! -${damage} HP` : `⚔ ${battleSkills[qIndex % battleSkills.length]}! -${damage} HP`);
-        playWarriorSfx(ultimate ? "ultimate" : "slash");
+        setBattleMessage(`⚡ ${battleSkills[qIndex % battleSkills.length]}! -${damage} HP`);
       } else {
         setPlayerHP((hp) => Math.max(0, hp - 15));
-        setBattleMessage("💥 CODE BEAST COUNTERATTACK! -15 HP");
-        playWarriorSfx("counter");
+        setBattleMessage("💥 Code Beast counterattacks! -15 HP");
       }
-      window.setTimeout(() => { setHitFx(false); setAttackFx(null); setBattlePower(false); setBattleUltimate(false); }, 900);
     }
     if (mode === "survival" && !correct) {
       setPlayerHP((hp) => Math.max(0, hp - 20));
@@ -1441,7 +1501,7 @@ function GameScreen({
         window.setTimeout(() => finishGame(), 700);
       }
     }
-  }, [answerState, currentQ, mode, playSfx, qIndex, streak, battleSkills, playerHP, finishGame, battleCombo]);
+  }, [answerState, currentQ, mode, playSfx, qIndex, streak, battleSkills, playerHP, finishGame]);
 
   const handleNext = () => {
     if (isLast) { finishGame(); return; }
@@ -1463,7 +1523,7 @@ function GameScreen({
             <div className="flex items-center gap-2 min-w-0">
               <span className="text-2xl">{lang.icon}</span>
               <span className="font-mono font-bold text-white truncate">{lang.name}</span>
-              <span className="hidden sm:inline text-xs font-mono text-white/30">· {mode.toUpperCase()}</span><span className="hidden md:inline text-[10px] font-mono text-green-300/60">· 🎵 {selectedTrack.title}</span>
+              <span className="hidden sm:inline text-xs font-mono text-white/30">· {mode.toUpperCase()}</span><span className="hidden md:inline text-[10px] font-mono text-green-300/60">· 🎵 GLOBAL SOUNDTRACK</span>
             </div>
             <div className="flex items-center gap-2">
               {mode === "speed" && (
@@ -1488,28 +1548,21 @@ function GameScreen({
         <div className={`${mode === "battle" ? "grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_330px] gap-5 lg:items-start" : ""}`}>
           <main className="min-w-0">
             {mode === "battle" && (
-              <motion.div animate={{ x: hitFx ? [0, -6, 6, -3, 3, 0] : 0, boxShadow: ["0 0 0 rgba(239,68,68,0)", "0 0 55px rgba(168,85,247,.20)", "0 0 0 rgba(239,68,68,0)"] }} transition={{ x: { duration: .32 }, boxShadow: { repeat: Infinity, duration: 2.2 } }}
-                className="rounded-[2rem] border border-purple-500/30 bg-[radial-gradient(circle_at_50%_45%,rgba(168,85,247,.18),transparent_28%),linear-gradient(135deg,rgba(239,68,68,.12),rgba(6,182,212,.10),rgba(0,0,0,.35))] p-3 sm:p-5 mb-5 overflow-hidden relative min-h-[330px]">
-                <BattlePowerFX active={battlePower} color={attackFx === "enemy" ? "#f43f5e" : (ANIME_CHARACTERS[qIndex % ANIME_CHARACTERS.length]?.color ?? "#22d3ee")} text={battleUltimate ? "ULTIMATE CODE BREAK!" : (attackFx === "enemy" ? "COUNTER STRIKE!" : ANIME_CHARACTERS[qIndex % ANIME_CHARACTERS.length]?.attack ?? "POWER STRIKE!")} ultimate={battleUltimate} />
-                <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.08) 1px, transparent 1px)", backgroundSize: "34px 34px" }} />
-                <div className="relative z-10 flex items-center justify-between gap-1 sm:gap-4 mb-2">
-                  <div><p className="text-[9px] font-mono font-black text-cyan-300 tracking-[.35em]">PLAYER WARRIOR</p><p className="text-[10px] font-mono text-white/40">COMBO {battleCombo}x</p></div>
-                  <div className="px-3 py-1 rounded-full border border-yellow-400/30 bg-yellow-400/10 text-yellow-300 text-[9px] font-mono font-black tracking-widest">⚔ CODE WARS ⚔</div>
-                  <div className="text-right"><p className="text-[9px] font-mono font-black text-pink-300 tracking-[.35em]">CODE BEAST</p><p className="text-[10px] font-mono text-white/40">BATTLE RAGE</p></div>
-                </div>
-                <div className="relative z-10 flex items-center justify-center gap-0 sm:gap-10 min-h-[205px]">
-                  <AnimeCoderAvatar side="enemy" character={ANIME_CHARACTERS[(qIndex + 2) % ANIME_CHARACTERS.length]} large attacking={attackFx === "enemy"} hit={hitFx && attackFx === "player"} />
-                  <div className="relative w-20 sm:w-28 h-40 flex items-center justify-center shrink-0">
-                    <motion.div animate={hitFx ? { scale: [1, 1.4, .7, 1], rotate: [0, 90, -60, 0] } : { scale: [1, 1.06, 1] }} transition={{ duration: hitFx ? .55 : 1.6, repeat: hitFx ? 0 : Infinity }} className="text-4xl sm:text-6xl font-black italic text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-white to-pink-400">VS</motion.div>
-                    <div className="absolute bottom-3 text-center w-40"><p className="text-[8px] sm:text-[9px] font-mono font-black text-yellow-300 truncate">{battleMessage}</p></div>
+              <motion.div animate={{ boxShadow: ["0 0 0 rgba(239,68,68,0)", "0 0 35px rgba(168,85,247,.16)", "0 0 0 rgba(239,68,68,0)"] }} transition={{ repeat: Infinity, duration: 2.5 }}
+                className="rounded-3xl border border-purple-500/20 bg-gradient-to-br from-red-500/10 via-purple-500/10 to-cyan-500/10 p-3 sm:p-4 mb-5 overflow-hidden relative">
+                <div className="flex items-center justify-center gap-3 sm:gap-8 relative">
+                  <AnimeCoderAvatar side="enemy" large attacking={attackFx === "enemy"} hit={hitFx && attackFx === "player"} />
+                  <div className="text-center min-w-0">
+                    <p className="text-[10px] font-mono text-white/30 tracking-[0.25em]">CODE BATTLE</p>
+                    <p className="text-xs sm:text-sm font-mono font-black text-purple-300">YOUR SKILL IS YOUR WEAPON</p>
+                    <div className="mt-3 text-xs font-mono font-black text-white/70">{battleMessage}</div>
                   </div>
-                  <AnimeCoderAvatar side="player" character={ANIME_CHARACTERS[qIndex % ANIME_CHARACTERS.length]} large attacking={attackFx === "player"} hit={hitFx && attackFx === "enemy"} />
+                  <AnimeCoderAvatar side="player" character={ANIME_CHARACTERS[0]} large attacking={attackFx === "player"} hit={hitFx && attackFx === "enemy"} />
                 </div>
-                <div className="relative z-10 grid grid-cols-2 gap-3 sm:gap-6 mt-1">
-                  <div><div className="flex justify-between mb-1"><span className="text-[9px] font-mono text-red-300">BEAST HP</span><span className="text-[9px] font-mono text-red-300">{enemyHP}</span></div><div className="h-3 rounded-full bg-black/50 border border-red-500/20 overflow-hidden"><motion.div className="h-full bg-gradient-to-r from-red-700 via-fuchsia-500 to-orange-400" animate={{ width: `${enemyHP}%` }} transition={{ type: "spring", bounce: .25 }} /></div></div>
-                  <div><div className="flex justify-between mb-1"><span className="text-[9px] font-mono text-cyan-300">WARRIOR HP</span><span className="text-[9px] font-mono text-cyan-300">{playerHP}</span></div><div className="h-3 rounded-full bg-black/50 border border-cyan-500/20 overflow-hidden"><motion.div className="h-full bg-gradient-to-r from-cyan-500 via-blue-500 to-violet-500" animate={{ width: `${playerHP}%` }} transition={{ type: "spring", bounce: .25 }} /></div></div>
+                <div className="grid grid-cols-2 gap-3 sm:gap-5 mt-3">
+                  <div><div className="flex justify-between mb-1"><span className="text-[10px] font-mono text-red-300">CODE BEAST</span><span className="text-[10px] font-mono text-red-300">{enemyHP} HP</span></div><div className="h-3 bg-black/20 rounded-full overflow-hidden"><motion.div className="h-full bg-gradient-to-r from-red-600 to-pink-500" animate={{ width: `${enemyHP}%` }} /></div></div>
+                  <div><div className="flex justify-between mb-1"><span className="text-[10px] font-mono text-cyan-300">YOU</span><span className="text-[10px] font-mono text-cyan-300">{playerHP} HP</span></div><div className="h-3 bg-black/20 rounded-full overflow-hidden"><motion.div className="h-full bg-gradient-to-r from-cyan-500 to-blue-500" animate={{ width: `${playerHP}%` }} /></div></div>
                 </div>
-                <div className="relative z-10 mt-3 flex items-center gap-2"><span className="text-[8px] font-mono text-white/30">POWER</span>{[1,2,3,4,5].map(n=><div key={n} className={`h-2 flex-1 rounded-full border ${battleCombo >= n ? "bg-gradient-to-r from-yellow-400 to-orange-500 border-yellow-300/40 shadow-[0_0_10px_rgba(250,204,21,.35)]" : "bg-white/5 border-white/10"}`} />)}<span className="text-[8px] font-mono text-yellow-300">{battleCombo >= 3 ? "ULTIMATE READY" : "BUILD COMBO"}</span></div>
               </motion.div>
             )}
 
@@ -1517,7 +1570,7 @@ function GameScreen({
               <motion.div key={qIndex} initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} transition={{ duration: 0.25 }} className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2 mb-3">
                   <div className="flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-mono font-bold border" style={{ color: lang.color, borderColor: `${lang.color}40`, backgroundColor: `${lang.color}15` }}>
-                    <Target size={11} /> {mode === "debug" ? "Bug Hunt" : currentQ.type === "multiple" ? "Multiple Choice" : currentQ.type === "code" ? "Code Challenge" : "True or False"}
+                    <Target size={11} /> {mode === "debug" ? `${lang.name} Bug Fix` : currentQ.type === "multiple" ? "Multiple Choice" : currentQ.type === "code" ? "Code Challenge" : "True or False"}
                   </div>
                   <span className="text-xs font-mono text-yellow-400/70">+{currentQ.xp} XP</span>
                   {mode === "battle" && <span className="text-xs font-mono text-red-300/70">⚔ {battleSkills[qIndex % battleSkills.length]}</span>}
@@ -1569,26 +1622,43 @@ function GameScreen({
               </motion.div>
             </AnimatePresence>
           </main>
-
-          {mode === "battle" && (
-            <aside className="min-w-0 lg:sticky lg:top-4">
-              <div className="mb-2 flex items-center justify-between">
-                <p className="text-[10px] font-mono font-black text-green-300 tracking-widest">BATTLE SOUNDTRACK</p>
-                <span className="text-[9px] font-mono text-white/30">Desktop side panel · Mobile below battle</span>
-              </div>
-              <MusicPlayer compact selectedTrack={selectedTrack} />
-            </aside>
-          )}
         </div>
-
-        {mode !== "battle" && (
-          <div className="mt-5 max-w-2xl mx-auto">
-            <MusicPlayer compact selectedTrack={selectedTrack} />
-          </div>
-        )}
       </div>
     </div>
   );
+}
+
+
+function BugHunterGameScreen({ langId, onFinish }: { langId: string; onFinish: (score: number, xp: number, correct: number) => void }) {
+  const qs = DEBUG_QUESTIONS_BY_LANGUAGE[langId] ?? DEBUG_QUESTIONS;
+  const lang = LANGUAGES.find(l => l.id === langId)!;
+  const [index,setIndex]=useState(0); const [selected,setSelected]=useState<number|null>(null); const [locked,setLocked]=useState(false); const [correct,setCorrect]=useState(0); const [xp,setXp]=useState(0); const [fixed,setFixed]=useState(false);
+  const q=qs[index];
+  const choose=(i:number)=>{ if(locked)return; setSelected(i); setLocked(true); const ok=i===q.answer; if(ok){setCorrect(c=>c+1);setXp(x=>x+q.xp);setFixed(true);} window.setTimeout(()=>{if(index===qs.length-1){onFinish(Math.round(((correct+(ok?1:0))/qs.length)*100),xp+(ok?q.xp:0),correct+(ok?1:0));}else{setIndex(n=>n+1);setSelected(null);setLocked(false);setFixed(false);}},900); };
+  return <div className="min-h-screen p-3 sm:p-6 bg-gradient-to-br from-emerald-950/40 via-black/30 to-cyan-950/30">
+    <div className="max-w-6xl mx-auto">
+      <div className="flex items-center justify-between mb-4"><div><p className="text-emerald-300 text-[10px] font-mono font-black tracking-[.3em]">BUG HUNTER // LIVE DEBUGGER</p><h1 className="text-2xl sm:text-4xl text-white font-mono font-black">FIX THE BUG</h1></div><div className="text-right"><p className="text-white/40 text-[10px] font-mono">{lang.icon} {lang.name}</p><p className="text-emerald-300 font-mono font-black">{index+1}/{qs.length}</p></div></div>
+      <div className="grid lg:grid-cols-[1.2fr_.8fr] gap-4">
+        <div className="rounded-3xl border border-emerald-400/20 bg-[#07130f]/90 overflow-hidden shadow-2xl"><div className="px-4 py-2 border-b border-white/10 flex items-center gap-2"><Bug size={14} className="text-emerald-300"/><span className="text-[10px] font-mono text-white/40">/workspace/{lang.id}/bug-{q.id}</span><span className="ml-auto text-red-300 text-[9px] font-mono">● ERROR DETECTED</span></div><pre className="p-5 text-xs sm:text-sm leading-7 font-mono text-emerald-200 overflow-x-auto whitespace-pre-wrap">{q.code}</pre><div className="border-t border-white/10 p-4 bg-black/20"><p className="text-red-300 font-mono text-xs font-black">Compiler: syntax / logic fault found</p><p className="text-white/40 font-mono text-[10px] mt-1">{q.question}</p></div></div>
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-4 sm:p-5"><div className="flex items-center justify-between mb-4"><span className="text-emerald-300 font-mono text-xs font-black">SELECT THE FIX</span><span className="text-yellow-300 font-mono text-xs">+{q.xp} XP</span></div><div className="space-y-2">{q.options.map((o,i)=><motion.button key={i} disabled={locked} onClick={()=>choose(i)} whileTap={{scale:.98}} className={`w-full text-left p-3 rounded-2xl border font-mono text-xs sm:text-sm ${selected===i?(i===q.answer?'border-emerald-400 bg-emerald-500/15 text-emerald-200':'border-red-400 bg-red-500/15 text-red-200'):'border-white/10 bg-black/10 text-white/70 hover:bg-white/10'}`}><span className="inline-flex w-7 h-7 rounded-lg bg-white/10 items-center justify-center mr-2">{String.fromCharCode(65+i)}</span>{o}</motion.button>)}</div>{locked&&<div className={`mt-4 rounded-2xl p-3 border ${selected===q.answer?'border-emerald-400/30 bg-emerald-500/10':'border-red-400/30 bg-red-500/10'}`}><p className="font-mono font-black text-sm">{selected===q.answer?'✓ BUG FIXED':'✕ FIX FAILED'}</p><p className="text-white/50 font-mono text-[10px] mt-1">{q.explanation}</p></div>}{fixed&&<motion.div initial={{scale:.7,opacity:0}} animate={{scale:1,opacity:1}} className="mt-4 text-center text-emerald-300 font-mono font-black">PATCH APPLIED ✓</motion.div>}</div>
+      </div>
+    </div>
+  </div>;
+}
+
+function SurvivalGameScreen({ langId, onFinish }: { langId: string; onFinish: (score: number, xp: number, correct: number) => void }) {
+  const base=QUESTIONS[langId]??[]; const qs=Array.from({length:10},(_,i)=>base[i%Math.max(1,base.length)]); const lang=LANGUAGES.find(l=>l.id===langId)!;
+  const [i,setI]=useState(0); const [hp,setHp]=useState(100); const [combo,setCombo]=useState(0); const [xp,setXp]=useState(0); const [correct,setCorrect]=useState(0); const [locked,setLocked]=useState(false); const [selected,setSelected]=useState<number|null>(null);
+  const q=qs[i];
+  const answer=(n:number)=>{if(locked)return; const ok=n===q.answer; setSelected(n);setLocked(true); if(ok){setCorrect(c=>c+1);setCombo(c=>c+1);setXp(x=>x+q.xp+Math.min(combo*3,15));}else{setCombo(0);setHp(h=>Math.max(0,h-25));} window.setTimeout(()=>{const nextHp=ok?hp:Math.max(0,hp-25); if(i===qs.length-1||nextHp<=0){onFinish(Math.round(((correct+(ok?1:0))/qs.length)*100),xp+(ok?q.xp:0),correct+(ok?1:0));}else{setI(x=>x+1);setLocked(false);setSelected(null);}},750);};
+  return <div className="min-h-screen p-3 sm:p-6 bg-gradient-to-br from-slate-950/80 via-cyan-950/20 to-black"><div className="max-w-5xl mx-auto"><div className="rounded-3xl border border-cyan-400/20 bg-black/50 p-4 mb-4 shadow-[0_0_50px_rgba(6,182,212,.1)]"><div className="flex items-center justify-between"><div><p className="text-cyan-300 text-[10px] font-mono font-black tracking-[.3em]">CODE SURVIVAL // RUNTIME</p><h1 className="text-2xl sm:text-4xl text-white font-mono font-black">STAY ALIVE</h1></div><div className="text-right"><p className="text-red-300 font-mono font-black text-xl">♥ {hp}</p><p className="text-white/35 font-mono text-[9px]">WAVE {i+1}/10</p></div></div><div className="mt-3 h-2 rounded-full bg-white/10 overflow-hidden"><motion.div className="h-full bg-gradient-to-r from-red-500 via-yellow-400 to-cyan-400" animate={{width:`${hp}%`}}/></div></div><div className="rounded-3xl border border-white/10 bg-white/5 p-4 sm:p-7"><div className="flex justify-between text-[10px] font-mono text-white/40 mb-3"><span>{lang.icon} {lang.name} SURVIVAL</span><span>{combo}x COMBO</span></div><h2 className="text-xl sm:text-3xl font-mono font-black text-white leading-snug mb-5">{q.question}</h2>{q.code&&<CodeBlock code={q.code}/>}<div className="grid sm:grid-cols-2 gap-3 mt-5">{q.options.map((o,n)=><button key={n} disabled={locked} onClick={()=>answer(n)} className={`p-4 rounded-2xl border text-left font-mono text-sm ${selected===n?(n===q.answer?'border-green-400 bg-green-500/15 text-green-200':'border-red-400 bg-red-500/15 text-red-200'):'border-white/10 bg-black/10 text-white/70 hover:bg-white/10'}`}>{String.fromCharCode(65+n)}. {o}</button>)}</div></div></div></div>;
+}
+
+function CompilerGameScreen({ langId, onFinish }: { langId: string; onFinish: (score: number, xp: number, correct: number) => void }) {
+  const lang=LANGUAGES.find(l=>l.id===langId)!; const qs=COMPILER_CHALLENGES[langId]??COMPILER_CHALLENGES.javascript; const [i,setI]=useState(0); const [value,setValue]=useState(''); const [status,setStatus]=useState<'idle'|'ok'|'fail'>('idle'); const [correct,setCorrect]=useState(0); const [xp,setXp]=useState(0); const q=qs[i];
+  const run=()=>{if(status!=='idle')return; const ok=value.trim()===q.expected.trim();setStatus(ok?'ok':'fail');if(ok){setCorrect(c=>c+1);setXp(x=>x+35);}window.setTimeout(()=>{if(i===qs.length-1){onFinish(Math.round(((correct+(ok?1:0))/qs.length)*100),xp+(ok?35:0),correct+(ok?1:0));}else{setI(n=>n+1);setValue('');setStatus('idle');}},900);};
+  const rendered=q.code.replace('____',value||'____');
+  return <div className="min-h-screen p-3 sm:p-6 bg-[#03050a]"><div className="max-w-6xl mx-auto"><div className="flex items-center justify-between mb-4"><div><p className="text-cyan-300 text-[10px] font-mono font-black tracking-[.3em]">CODEQUEST COMPILER // TERMINAL</p><h1 className="text-2xl sm:text-4xl text-white font-mono font-black">COMPILE & RUN</h1></div><div className="text-right"><p className="text-cyan-300 font-mono font-black">{lang.icon} {lang.name}</p><p className="text-white/35 font-mono text-[9px]">CHALLENGE {i+1}/{qs.length}</p></div></div><div className="grid lg:grid-cols-[1.25fr_.75fr] gap-4"><div className="rounded-3xl border border-cyan-400/20 bg-[#071018] overflow-hidden shadow-[0_0_60px_rgba(6,182,212,.1)]"><div className="flex items-center gap-2 px-4 py-3 border-b border-white/10"><Terminal size={14} className="text-cyan-300"/><span className="text-[10px] font-mono text-white/40">compiler://codequest/{lang.id}</span><span className="ml-auto text-[9px] font-mono text-green-300">READY</span></div><pre className="p-5 text-xs sm:text-sm font-mono leading-7 text-cyan-200 whitespace-pre-wrap overflow-x-auto">{rendered}</pre><div className="border-t border-white/10 p-3 font-mono text-[10px] text-white/35">$ codequest --compile --run<br/><span className={status==='ok'?'text-green-300':status==='fail'?'text-red-300':'text-white/30'}>{status==='ok'?'BUILD SUCCESSFUL ✓':status==='fail'?`BUILD FAILED ✕ Expected: ${q.expected}`:'Waiting for source code...'}</span></div></div><div className="rounded-3xl border border-white/10 bg-white/5 p-4"><p className="text-purple-300 font-mono text-xs font-black mb-2">TYPE YOUR ANSWER</p><p className="text-white/60 font-mono text-sm mb-4">{q.prompt}</p><textarea autoFocus value={value} onChange={e=>setValue(e.target.value)} disabled={status!=='idle'} spellCheck={false} className="w-full h-36 rounded-2xl border border-cyan-400/20 bg-[#02050a] text-green-300 p-4 font-mono text-sm outline-none focus:border-cyan-400/60 resize-none" placeholder="Type the missing code here..."/><p className="text-white/30 font-mono text-[9px] mt-2">HINT: {q.hint}</p><button onClick={run} disabled={!value.trim()||status!=='idle'} className="w-full mt-4 py-3.5 rounded-2xl bg-gradient-to-r from-cyan-600 to-purple-600 text-white font-mono font-black disabled:opacity-30">▶ COMPILE & RUN</button></div></div></div></div>;
 }
 
 function DuelSetupScreen({
@@ -1702,7 +1772,6 @@ function DuelScreen({
   friendRankName,
   friendPhoto,
   characterId,
-  selectedTrack,
   onFinish,
 }: {
   langId: string;
@@ -1712,7 +1781,6 @@ function DuelScreen({
   friendRankName: string;
   friendPhoto: string;
   characterId: string;
-  selectedTrack: (typeof SPOTIFY_TRACKS)[number];
   onFinish: () => void;
 }) {
   const baseQuestions = QUESTIONS[langId] ?? [];
@@ -1729,14 +1797,22 @@ function DuelScreen({
   const [hitFx, setHitFx] = useState(false);
   const [battleText, setBattleText] = useState("READY!");
   const [showDuelClaps, setShowDuelClaps] = useState(false);
-  const [duelCombo, setDuelCombo] = useState(0);
-  const [duelPower, setDuelPower] = useState(false);
-  const [duelUltimate, setDuelUltimate] = useState(false);
   const currentQ = questions[qIndex];
 
   const playDuelSfx = (correct: boolean) => {
-    playWarriorSfx(correct ? "slash" : "counter");
-    if (correct) window.setTimeout(() => playWarriorSfx("impact"), 180);
+    try {
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator(); const gain = ctx.createGain();
+      osc.type = correct ? "sine" : "sawtooth";
+      osc.frequency.setValueAtTime(correct ? 880 : 180, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(correct ? 1320 : 90, ctx.currentTime + .22);
+      gain.gain.setValueAtTime(.0001, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(.09, ctx.currentTime + .02);
+      gain.gain.exponentialRampToValueAtTime(.0001, ctx.currentTime + .28);
+      osc.connect(gain); gain.connect(ctx.destination); osc.start(); osc.stop(ctx.currentTime + .3);
+      setTimeout(() => ctx.close(), 400);
+    } catch {}
   };
 
   const answer = (index: number) => {
@@ -1745,15 +1821,10 @@ function DuelScreen({
     const correct = index === currentQ.answer;
     setLocked(true);
     playDuelSfx(correct);
-    const nextCombo = correct ? duelCombo + 1 : 0;
-    setDuelCombo(nextCombo);
-    setDuelPower(true);
-    setDuelUltimate(correct && nextCombo >= 3);
     setHitFx(true);
     setAttackFx(correct ? turn : turn === "you" ? "friend" : "you");
-    const attacker = turn === "you" ? selectedCharacter : ANIME_CHARACTERS[(ANIME_CHARACTERS.findIndex((c) => c.id === selectedCharacter.id) + 1) % ANIME_CHARACTERS.length];
-    setBattleText(correct ? (nextCombo >= 3 ? attacker.power : attacker.attack) : "COUNTER ATTACK!");
-    window.setTimeout(() => { setHitFx(false); setAttackFx(null); setDuelPower(false); setDuelUltimate(false); }, 900);
+    setBattleText(correct && turn === "you" ? selectedCharacter.attack : correct ? "SYNTAX STRIKE!" : "COUNTER ATTACK!");
+    window.setTimeout(() => { setHitFx(false); setAttackFx(null); }, 650);
 
     if (turn === "you" && correct) setYouScore((s) => s + 1);
     if (turn === "friend" && correct) setFriendScore((s) => s + 1);
@@ -1767,7 +1838,6 @@ function DuelScreen({
         setTurn("you");
       } else {
         setShowDuelClaps(true);
-        playWarriorSfx("victory");
         window.setTimeout(() => onFinish(), 3200);
       }
     }, 1500);
@@ -1779,7 +1849,6 @@ function DuelScreen({
     <div className="min-h-screen px-4 py-6 relative overflow-hidden">
       {showDuelClaps && <ClapCelebration />}
       <div className="absolute inset-0 bg-gradient-to-br from-cyan-950/20 via-purple-950/20 to-pink-950/20 pointer-events-none"/>
-      <BattlePowerFX active={duelPower} color={attackFx === "friend" ? "#ec4899" : selectedCharacter.color} text={duelUltimate ? "ULTIMATE DUEL BREAK!" : battleText} ultimate={duelUltimate} />
       <div className="max-w-6xl mx-auto relative">
         <div className="flex items-center justify-between mb-5">
           <div><p className="text-purple-300 text-xs font-mono font-black">1V1 CODE ARENA</p><p className="text-white/30 text-xs font-mono mt-1">{lang.icon} {lang.name} · Round {qIndex + 1}/{questions.length}</p></div>
@@ -1835,13 +1904,7 @@ function DuelScreen({
           )}
         </AnimatePresence>
 
-        <div className="max-w-3xl mx-auto mb-5"><MusicPlayer compact selectedTrack={selectedTrack} /></div>
 
-        <div className="max-w-3xl mx-auto mb-3 flex items-center justify-center gap-2">
-          <span className="text-[9px] font-mono text-white/35 tracking-widest">DUEL POWER</span>
-          {[1,2,3,4,5].map(n => <div key={n} className={`h-2.5 w-12 rounded-full border ${duelCombo >= n ? "bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-400 border-white/30 shadow-[0_0_12px_rgba(168,85,247,.5)]" : "bg-white/5 border-white/10"}`} />)}
-          <span className="text-[9px] font-mono text-yellow-300">{duelCombo >= 3 ? "ULTIMATE" : `${duelCombo}x`}</span>
-        </div>
         <div className="max-w-3xl mx-auto rounded-3xl border border-white/10 bg-white/5 p-5 md:p-7 shadow-2xl">
           <div className="flex items-center justify-between mb-4"><span className="text-xs font-mono text-white/35">Question {qIndex + 1}</span><span className="text-xs font-mono text-yellow-300">+{currentQ.xp} XP</span></div>
           <h2 className="text-xl md:text-2xl font-mono font-black text-white leading-relaxed mb-5">{currentQ.question}</h2>
@@ -2025,13 +2088,137 @@ function ResultsScreen({
   );
 }
 
+
+function GlobalMusicController({
+  selectedTrack,
+}: {
+  selectedTrack: MusicTrack;
+}) {
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const masterGainRef = useRef<GainNode | null>(null);
+  const intervalRef = useRef<number | null>(null);
+  const activeNodesRef = useRef<Array<{ oscillator: OscillatorNode; gain: GainNode }>>([]);
+  const selectedTrackRef = useRef(selectedTrack);
+
+  useEffect(() => {
+    selectedTrackRef.current = selectedTrack;
+  }, [selectedTrack]);
+
+  const stopPlayback = useCallback(() => {
+    if (intervalRef.current !== null) {
+      window.clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+
+    activeNodesRef.current.forEach(({ oscillator, gain }) => {
+      try {
+        gain.gain.cancelScheduledValues(0);
+        gain.gain.setValueAtTime(0.0001, 0);
+        oscillator.stop(0);
+      } catch {}
+    });
+    activeNodesRef.current = [];
+
+    if (masterGainRef.current) {
+      try {
+        masterGainRef.current.gain.cancelScheduledValues(0);
+        masterGainRef.current.gain.setValueAtTime(0.0001, 0);
+      } catch {}
+    }
+  }, []);
+
+  const startPlayback = useCallback((track: MusicTrack) => {
+    if (typeof window === "undefined") return;
+
+    const AudioContextCtor = window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    if (!AudioContextCtor) return;
+
+    stopPlayback();
+
+    const context = audioContextRef.current ?? new AudioContextCtor();
+    audioContextRef.current = context;
+
+    if (context.state === "suspended") {
+      void context.resume();
+    }
+
+    if (!masterGainRef.current) {
+      const masterGain = context.createGain();
+      masterGain.gain.setValueAtTime(0.0001, context.currentTime);
+      masterGain.connect(context.destination);
+      masterGain.gain.exponentialRampToValueAtTime(0.035, context.currentTime + 0.25);
+      masterGainRef.current = masterGain;
+    }
+
+    const style = getMusicStyle(track);
+    let noteIndex = 0;
+
+    const playNote = () => {
+      const now = context.currentTime;
+      const [baseFreq, nextFreq] = style.notes[noteIndex % style.notes.length];
+      const oscillator = context.createOscillator();
+      const gain = context.createGain();
+
+      oscillator.type = style.wave;
+      oscillator.frequency.setValueAtTime(baseFreq, now);
+      oscillator.frequency.exponentialRampToValueAtTime(nextFreq, now + 0.25);
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(0.03, now + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.4);
+
+      oscillator.connect(gain);
+      gain.connect(masterGainRef.current!);
+      oscillator.start(now);
+      oscillator.stop(now + 0.42);
+
+      oscillator.onended = () => {
+        activeNodesRef.current = activeNodesRef.current.filter((item) => item.oscillator !== oscillator);
+      };
+
+      activeNodesRef.current.push({ oscillator, gain });
+      noteIndex = (noteIndex + 1) % style.notes.length;
+    };
+
+    playNote();
+    intervalRef.current = window.setInterval(playNote, 700);
+  }, [stopPlayback]);
+
+  useEffect(() => {
+    const beginPlayback = () => {
+      void startPlayback(selectedTrackRef.current);
+      window.removeEventListener("pointerdown", beginPlayback);
+      window.removeEventListener("keydown", beginPlayback);
+    };
+
+    window.addEventListener("pointerdown", beginPlayback);
+    window.addEventListener("keydown", beginPlayback);
+
+    return () => {
+      window.removeEventListener("pointerdown", beginPlayback);
+      window.removeEventListener("keydown", beginPlayback);
+    };
+  }, [startPlayback]);
+
+  useEffect(() => {
+    void startPlayback(selectedTrack);
+    return () => stopPlayback();
+  }, [selectedTrack, startPlayback, stopPlayback]);
+
+  return null;
+}
+
 // ─── App ─────────────────────────────────────────────────────────────────────
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>("welcome");
   const [gameMode, setGameMode] = useState<GameMode>("practice");
   const [selectedLang, setSelectedLang] = useState<string | null>(null);
-  const [selectedTrack, setSelectedTrack] = useState<(typeof SPOTIFY_TRACKS)[number]>(SPOTIFY_TRACKS[0]);
+  const [selectedTrack, setSelectedTrack] = useState<(typeof SPOTIFY_TRACKS)[number]>(() => {
+    try {
+      const savedId = localStorage.getItem("codequest-selected-track");
+      return SPOTIFY_TRACKS.find((track) => track.id === savedId) ?? SPOTIFY_TRACKS[0];
+    } catch { return SPOTIFY_TRACKS[0]; }
+  });
   const [musicReturn, setMusicReturn] = useState<"game" | "duel" | "home">("game");
   const [results, setResults] = useState<{ score: number; xp: number; correct: number } | null>(null);
   const [lifetimeXP, setLifetimeXP] = useState(() => Number(localStorage.getItem("codequest-total-xp") || 0));
@@ -2041,7 +2228,7 @@ export default function App() {
   const [friendPhoto, setFriendPhoto] = useState("");
   const [duelCharacterId, setDuelCharacterId] = useState(ANIME_CHARACTERS[0].id);
   const [darkMode, setDarkMode] = useState(() => {
-    const saved = localStorage.getItem("codequest-theme");
+    const saved = localStorage.getItem("codequest-theme-mode");
     return saved !== "light";
   });
   const [profile, setProfile] = useState<StudentProfile>(() => {
@@ -2055,7 +2242,11 @@ export default function App() {
   const totalQs = selectedLang ? (QUESTIONS[selectedLang]?.length ?? 0) : 0;
 
   useEffect(() => {
-    localStorage.setItem("codequest-theme", darkMode ? "dark" : "light");
+    localStorage.setItem("codequest-selected-track", selectedTrack.id);
+  }, [selectedTrack]);
+
+  useEffect(() => {
+    localStorage.setItem("codequest-theme-mode", darkMode ? "dark" : "light");
     document.documentElement.style.colorScheme = darkMode ? "dark" : "light";
   }, [darkMode]);
 
@@ -2091,7 +2282,7 @@ export default function App() {
   };
 
   return (
-    <div className={`${darkMode ? "dark-mode" : "light-mode"} min-h-screen text-foreground overflow-x-hidden`}
+    <div className={`cq-shell ${darkMode ? "dark-mode" : "light-mode"} min-h-screen text-foreground overflow-x-hidden`}
       style={{ fontFamily: "'JetBrains Mono', 'Inter', monospace" }}>
       <style>{`
         html, body, #root { width: 100%; min-height: 100%; margin: 0; }
@@ -2132,8 +2323,53 @@ export default function App() {
         .light-mode input::placeholder { color: #9ca3af !important; }
         .light-mode .text-white\/10 { color: rgba(17,24,39,.15) !important; }
         .light-mode iframe { filter: none; }
+        .light-mode { text-shadow: none; }
+        .light-mode button, .light-mode input, .light-mode select, .light-mode textarea { filter: contrast(1.05) saturate(1.05); }
         button { -webkit-tap-highlight-color: transparent; }
-        @media (max-width: 640px) { body { min-width: 0; } }
+        .light-mode { background: #f4f7fb !important; color: #111827 !important; }
+        .light-mode .bg-black\/35, .light-mode .bg-black\/30, .light-mode .bg-black\/25, .light-mode .bg-black\/20, .light-mode .bg-black\/15 { background-color: rgba(255,255,255,.96) !important; }
+        .light-mode .text-white { color: #111827 !important; }
+        .light-mode .text-white\/75 { color: #334155 !important; }
+        .light-mode .text-white\/55 { color: #475569 !important; }
+        .light-mode .text-white\/50, .light-mode .text-white\/45, .light-mode .text-white\/40 { color: #64748b !important; }
+        .light-mode .text-white\/35, .light-mode .text-white\/30, .light-mode .text-white\/25 { color: #64748b !important; }
+        .light-mode .border-white\/10 { border-color: rgba(15,23,42,.16) !important; }
+        .light-mode .border-white\/20 { border-color: rgba(15,23,42,.22) !important; }
+        .light-mode .bg-white\/5 { background-color: rgba(15,23,42,.045) !important; }
+        .light-mode .bg-white\/10 { background-color: rgba(15,23,42,.075) !important; }
+        .light-mode input, .light-mode textarea, .light-mode select { background-color: #ffffff !important; color: #111827 !important; border-color: rgba(15,23,42,.2) !important; }
+        .light-mode input::placeholder, .light-mode textarea::placeholder { color: #64748b !important; }
+        .cq-shell { width: 100%; max-width: 100vw; overflow-x: clip; }
+        .cq-touch { min-height: 44px; }
+        .light-mode .text-purple-200 { color: #6d28d9 !important; }
+        .light-mode .text-cyan-200 { color: #0e7490 !important; }
+        .light-mode .text-pink-200 { color: #be185d !important; }
+        .light-mode .text-green-200 { color: #166534 !important; }
+        .light-mode .text-yellow-200 { color: #92400e !important; }
+        .light-mode .text-white\/15 { color: rgba(15,23,42,.28) !important; }
+        .light-mode .bg-purple-500\/10 { background-color: rgba(124,58,237,.10) !important; }
+        .light-mode .bg-cyan-500\/10 { background-color: rgba(8,145,178,.10) !important; }
+        .light-mode .bg-pink-500\/10 { background-color: rgba(219,39,119,.10) !important; }
+        .light-mode .bg-green-500\/10 { background-color: rgba(22,163,74,.10) !important; }
+        .light-mode .bg-yellow-500\/10 { background-color: rgba(217,119,6,.10) !important; }
+        .light-mode .bg-purple-500\/15 { background-color: rgba(124,58,237,.14) !important; }
+        .light-mode .bg-cyan-500\/15 { background-color: rgba(8,145,178,.14) !important; }
+        .light-mode .bg-pink-500\/15 { background-color: rgba(219,39,119,.14) !important; }
+        .light-mode .bg-green-500\/15 { background-color: rgba(22,163,74,.14) !important; }
+        .light-mode .bg-black\/35 { background-color: rgba(255,255,255,.98) !important; }
+        .light-mode .bg-black\/25 { background-color: rgba(255,255,255,.98) !important; }
+        .light-mode .bg-black\/15 { background-color: rgba(255,255,255,.96) !important; }
+        .light-mode .bg-black\/10 { background-color: rgba(255,255,255,.94) !important; }
+        .light-mode [class*="shadow-purple"] { box-shadow: 0 12px 35px rgba(99,102,241,.12) !important; }
+        .light-mode button:hover { filter: brightness(1.02) saturate(1.08); }
+        @media (max-width: 768px) {
+          body { min-width: 0; overflow-x: hidden; }
+          .cq-shell { padding-left: max(.75rem, env(safe-area-inset-left)); padding-right: max(.75rem, env(safe-area-inset-right)); }
+        }
+        @media (max-width: 480px) {
+          .cq-shell { padding-top: .75rem; padding-bottom: 1rem; }
+          button, input, select, textarea { max-width: 100%; }
+        }
       `}</style>
 
       <div className="fixed inset-0 pointer-events-none"
@@ -2145,11 +2381,15 @@ export default function App() {
         }}
       />
 
+      <>
+        <GlobalMusicController selectedTrack={selectedTrack} />
+      </>
+
       <AnimatePresence mode="wait">
 
         {screen === "welcome" && (
           <motion.div key="welcome" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <WelcomeScreen darkMode={darkMode} onToggleTheme={() => setDarkMode((v) => !v)} onContinue={continueFromWelcome} />
+            <WelcomeScreen onContinue={continueFromWelcome} />
           </motion.div>
         )}
 
@@ -2172,7 +2412,14 @@ export default function App() {
 
         {screen === "profile" && (
           <motion.div key="profile" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <ProfileScreen profile={profile} totalXP={lifetimeXP} onSave={saveProfile} onBack={() => setScreen("home")} />
+            <ProfileScreen
+              profile={profile}
+              totalXP={lifetimeXP}
+              onSave={saveProfile}
+              onBack={() => setScreen("home")}
+              darkMode={darkMode}
+              onToggleTheme={() => setDarkMode((v) => !v)}
+            />
           </motion.div>
         )}
 
@@ -2195,8 +2442,7 @@ export default function App() {
               onSelect={(lang) => {
                 setSelectedLang(lang);
                 setResults(null);
-                setMusicReturn("game");
-                setScreen("music");
+                setScreen("game");
               }}
             />
           </motion.div>
@@ -2206,25 +2452,28 @@ export default function App() {
           <motion.div key="music" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
             <MusicSelectionScreen
               selectedTrack={selectedTrack}
-              onSelect={setSelectedTrack}
+              onSelect={(track) => {
+                setSelectedTrack(track);
+                try { localStorage.setItem("codequest-selected-track", track.id); } catch {}
+                // The global music controller restarts the current soundtrack and the menu disappears immediately.
+                setScreen(musicReturn);
+              }}
               onBack={() => setScreen(musicReturn === "duel" ? "duel-setup" : musicReturn === "home" ? "home" : "language")}
-              onContinue={() => setScreen(musicReturn)}
             />
           </motion.div>
         )}
 
         {screen === "game" && selectedLang && (
           <motion.div key={`game-${selectedLang}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <GameScreen
-              langId={selectedLang}
-              mode={gameMode}
-              selectedTrack={selectedTrack}
-              onFinish={(score, xp, correct) => {
-                setResults({ score, xp, correct });
-                addLifetimeXP(xp);
-                setScreen("results");
-              }}
-            />
+            {gameMode === "compiler" ? (
+              <CompilerGameScreen langId={selectedLang} onFinish={(score, xp, correct) => { setResults({ score, xp, correct }); addLifetimeXP(xp); setScreen("results"); }} />
+            ) : gameMode === "debug" ? (
+              <BugHunterGameScreen langId={selectedLang} onFinish={(score, xp, correct) => { setResults({ score, xp, correct }); addLifetimeXP(xp); setScreen("results"); }} />
+            ) : gameMode === "survival" ? (
+              <SurvivalGameScreen langId={selectedLang} onFinish={(score, xp, correct) => { setResults({ score, xp, correct }); addLifetimeXP(xp); setScreen("results"); }} />
+            ) : (
+              <GameScreen langId={selectedLang} mode={gameMode} onFinish={(score, xp, correct) => { setResults({ score, xp, correct }); addLifetimeXP(xp); setScreen("results"); }} />
+            )}
           </motion.div>
         )}
 
@@ -2241,8 +2490,7 @@ export default function App() {
                 setFriendRankName(rank);
                 setFriendPhoto(photo);
                 setDuelCharacterId(characterId);
-                setMusicReturn("duel");
-                setScreen("music");
+                setScreen("duel");
               }}
             />
           </motion.div>
@@ -2258,7 +2506,6 @@ export default function App() {
               friendRankName={friendRankName}
               friendPhoto={friendPhoto}
               characterId={duelCharacterId}
-              selectedTrack={selectedTrack}
               onFinish={() => setScreen("home")}
             />
           </motion.div>
@@ -2271,14 +2518,13 @@ export default function App() {
               score={results.score}
               xp={results.xp}
               correct={results.correct}
-              total={gameMode === "debug" ? DEBUG_QUESTIONS.length : gameMode === "speed" ? Math.min(5, totalQs) : gameMode === "survival" ? 12 : totalQs}
+              total={gameMode === "debug" ? (DEBUG_QUESTIONS_BY_LANGUAGE[selectedLang]?.length ?? 0) : gameMode === "compiler" ? (COMPILER_CHALLENGES[selectedLang]?.length ?? 0) : gameMode === "speed" ? Math.min(5, totalQs) : gameMode === "survival" ? 10 : totalQs}
               profile={profile}
               totalXP={lifetimeXP}
               onPhotoUpdate={updatePhoto}
               onReplay={() => {
                 setResults(null);
-                setMusicReturn("game");
-                setScreen("music");
+                setScreen("game");
               }}
               onHome={() => {
                 setSelectedLang(null);
@@ -2288,6 +2534,7 @@ export default function App() {
           </motion.div>
         )}
       </AnimatePresence>
+
     </div>
   );
 }
