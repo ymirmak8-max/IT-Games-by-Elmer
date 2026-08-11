@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
+import type { FormEvent } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Code2, Zap, Trophy, Star, ArrowRight, RotateCcw, CheckCircle2, XCircle, Flame, Target, BookOpen, ChevronRight } from "lucide-react";
+import { Code2, Zap, Trophy, Star, ArrowRight, RotateCcw, CheckCircle2, XCircle, Flame, Target, BookOpen, ChevronRight, User, GraduationCap, School, BookOpenCheck, Moon, Sun, Music, ArrowLeft, PlayCircle } from "lucide-react";
 
 // ─── Data ───────────────────────────────────────────────────────────────────
 
@@ -10,6 +11,7 @@ const LANGUAGES = [
   { id: "html", name: "HTML & CSS", icon: "🎨", color: "#f97316", bg: "#3d1f00", desc: "Build and style beautiful websites" },
   { id: "java", name: "Java", icon: "☕", color: "#ef4444", bg: "#3d1010", desc: "Object-oriented powerhouse for apps & Android" },
   { id: "cpp", name: "C++", icon: "⚙️", color: "#8b5cf6", bg: "#2d1f4a", desc: "High-performance systems & game development" },
+  { id: "c", name: "C", icon: "🔧", color: "#60a5fa", bg: "#102a43", desc: "Learn the fundamentals of procedural programming" },
   { id: "typescript", name: "TypeScript", icon: "🔷", color: "#06b6d4", bg: "#003d4a", desc: "JavaScript with types — safer, scalable code" },
 ];
 
@@ -328,6 +330,67 @@ const QUESTIONS: Record<string, Question[]> = {
       xp: 15,
     },
   ],
+
+  c: [
+    {
+      id: 1, type: "multiple",
+      question: "Which function is the starting point of a C program?",
+      options: ["start()", "main()", "begin()", "run()"],
+      answer: 1,
+      explanation: "Every standard C program starts execution from the main() function.",
+      xp: 10,
+    },
+    {
+      id: 2, type: "code",
+      question: "What does this code print?",
+      code: `#include <stdio.h>\nint main() {\n  printf("Hello");\n  return 0;\n}`,
+      options: ["Hello", "printf", "Error", "Nothing"],
+      answer: 0,
+      explanation: "printf() displays text on the screen, so this program prints Hello.",
+      xp: 10,
+    },
+    {
+      id: 3, type: "multiple",
+      question: "Which header file is commonly used for printf() and scanf()?",
+      options: ["<string.h>", "<math.h>", "<stdio.h>", "<stdlib.h>"],
+      answer: 2,
+      explanation: "<stdio.h> provides standard input and output functions such as printf() and scanf().",
+      xp: 15,
+    },
+    {
+      id: 4, type: "truefalse",
+      question: "In C, array indexing starts at 0.",
+      options: ["True", "False"],
+      answer: 0,
+      explanation: "TRUE! The first element of a C array is at index 0.",
+      xp: 10,
+    },
+    {
+      id: 5, type: "code",
+      question: "What is the output?",
+      code: `int x = 5;\nint y = 3;\nprintf("%d", x + y);`,
+      options: ["2", "8", "15", "53"],
+      answer: 1,
+      explanation: "The + operator adds 5 and 3, so printf() outputs 8.",
+      xp: 15,
+    },
+    {
+      id: 6, type: "multiple",
+      question: "Which symbol is used to get the address of a variable in C?",
+      options: ["*", "&", "#", "@"],
+      answer: 1,
+      explanation: "The & operator is the address-of operator. For example, &x gives the memory address of x.",
+      xp: 20,
+    },
+    {
+      id: 7, type: "multiple",
+      question: "Which format specifier is commonly used to print an integer with printf()?",
+      options: ["%s", "%f", "%d", "%c"],
+      answer: 2,
+      explanation: "%d is commonly used for signed integer values with printf().",
+      xp: 15,
+    },
+  ],
   typescript: [
     {
       id: 1, type: "multiple",
@@ -393,7 +456,7 @@ const QUESTIONS: Record<string, Question[]> = {
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-type Screen = "home" | "language" | "game" | "results";
+type Screen = "home" | "profile" | "guidelines" | "language" | "game" | "results";
 type AnswerState = "idle" | "correct" | "wrong";
 
 // ─── Components ──────────────────────────────────────────────────────────────
@@ -462,9 +525,38 @@ function ParticleEffect({ active, correct }: { active: boolean; correct: boolean
 
 // ─── Screens ─────────────────────────────────────────────────────────────────
 
-function HomeScreen({ onStart }: { onStart: () => void }) {
+function HomeScreen({
+  onStart,
+  onProfile,
+  onGuidelines,
+  onToggleTheme,
+  darkMode,
+  profile,
+}: {
+  onStart: () => void;
+  onProfile: () => void;
+  onGuidelines: () => void;
+  onToggleTheme: () => void;
+  darkMode: boolean;
+  profile: StudentProfile;
+}) {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-6 py-12 relative overflow-hidden">
+      <div className="absolute top-5 right-5 z-10 flex flex-wrap justify-end gap-2">
+        <button onClick={onProfile} className="flex items-center gap-2 px-3 py-2 rounded-xl border border-white/10 bg-white/5 text-white/70 font-mono text-xs">
+          <User size={14} /> {profile.username ? "Profile" : "Student Profile"}
+        </button>
+        <button onClick={onGuidelines} className="flex items-center gap-2 px-3 py-2 rounded-xl border border-white/10 bg-white/5 text-white/70 font-mono text-xs">
+          <BookOpenCheck size={14} /> Guidelines
+        </button>
+        <button onClick={onToggleTheme} className="flex items-center gap-2 px-3 py-2 rounded-xl border border-white/10 bg-white/5 text-white/70 font-mono text-xs">
+          {darkMode ? <Sun size={14} /> : <Moon size={14} />} {darkMode ? "Light" : "Dark"}
+        </button>
+        <button onClick={() => window.open("https://open.spotify.com/", "_blank", "noopener,noreferrer")}
+          className="flex items-center gap-2 px-3 py-2 rounded-xl border border-green-500/20 bg-green-500/10 text-green-400 font-mono text-xs">
+          <Music size={14} /> Spotify
+        </button>
+      </div>
       {/* background glows */}
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -519,6 +611,169 @@ function HomeScreen({ onStart }: { onStart: () => void }) {
           <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
         </motion.button>
       </motion.div>
+    </div>
+  );
+}
+
+
+type StudentProfile = {
+  username: string;
+  yearLevel: string;
+  course: string;
+  school: string;
+};
+
+function ProfileScreen({
+  profile,
+  onSave,
+  onBack,
+}: {
+  profile: StudentProfile;
+  onSave: (profile: StudentProfile) => void;
+  onBack: () => void;
+}) {
+  const [form, setForm] = useState<StudentProfile>(profile);
+
+  const update = (key: keyof StudentProfile, value: string) =>
+    setForm((prev) => ({ ...prev, [key]: value }));
+
+  const submit = (e: FormEvent) => {
+    e.preventDefault();
+    if (!form.username.trim() || !form.yearLevel || !form.course.trim() || !form.school.trim()) {
+      alert("Please complete all student profile fields.");
+      return;
+    }
+    onSave({
+      username: form.username.trim(),
+      yearLevel: form.yearLevel,
+      course: form.course.trim(),
+      school: form.school.trim(),
+    });
+  };
+
+  return (
+    <div className="min-h-screen px-6 py-10">
+      <div className="max-w-xl mx-auto">
+        <button onClick={onBack} className="flex items-center gap-2 text-white/50 hover:text-white font-mono text-sm mb-8">
+          <ArrowLeft size={16} /> Back
+        </button>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="rounded-2xl border border-white/10 bg-white/5 p-6 md:p-8"
+        >
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center">
+              <User className="text-purple-400" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-mono font-black text-white">Student Profile</h2>
+              <p className="text-white/40 text-sm font-mono">Enter your information before starting.</p>
+            </div>
+          </div>
+
+          <form onSubmit={submit} className="space-y-4 mt-7">
+            <label className="block">
+              <span className="text-xs font-mono text-white/50">Username</span>
+              <div className="relative mt-2">
+                <User size={16} className="absolute left-3 top-3.5 text-white/30" />
+                <input value={form.username} onChange={(e) => update("username", e.target.value)}
+                  placeholder="e.g. ElmerMak"
+                  className="w-full rounded-xl border border-white/10 bg-black/20 text-white placeholder:text-white/25 pl-10 pr-4 py-3 outline-none focus:border-purple-500/60" />
+              </div>
+            </label>
+
+            <label className="block">
+              <span className="text-xs font-mono text-white/50">Year Level</span>
+              <div className="relative mt-2">
+                <GraduationCap size={16} className="absolute left-3 top-3.5 text-white/30" />
+                <select value={form.yearLevel} onChange={(e) => update("yearLevel", e.target.value)}
+                  className="w-full rounded-xl border border-white/10 bg-[#11111f] text-white pl-10 pr-4 py-3 outline-none focus:border-purple-500/60">
+                  <option value="">Select year level</option>
+                  <option>1st Year</option>
+                  <option>2nd Year</option>
+                  <option>3rd Year</option>
+                  <option>4th Year</option>
+                  <option>5th Year</option>
+                  <option>Graduate / Other</option>
+                </select>
+              </div>
+            </label>
+
+            <label className="block">
+              <span className="text-xs font-mono text-white/50">Course</span>
+              <div className="relative mt-2">
+                <BookOpenCheck size={16} className="absolute left-3 top-3.5 text-white/30" />
+                <input value={form.course} onChange={(e) => update("course", e.target.value)}
+                  placeholder="e.g. BS Information Technology"
+                  className="w-full rounded-xl border border-white/10 bg-black/20 text-white placeholder:text-white/25 pl-10 pr-4 py-3 outline-none focus:border-purple-500/60" />
+              </div>
+            </label>
+
+            <label className="block">
+              <span className="text-xs font-mono text-white/50">School</span>
+              <div className="relative mt-2">
+                <School size={16} className="absolute left-3 top-3.5 text-white/30" />
+                <input value={form.school} onChange={(e) => update("school", e.target.value)}
+                  placeholder="e.g. Your University"
+                  className="w-full rounded-xl border border-white/10 bg-black/20 text-white placeholder:text-white/25 pl-10 pr-4 py-3 outline-none focus:border-purple-500/60" />
+              </div>
+            </label>
+
+            <button type="submit"
+              className="w-full mt-3 py-4 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-600 text-white font-mono font-bold">
+              Save Profile & Continue <ArrowRight size={17} className="inline ml-2" />
+            </button>
+          </form>
+        </motion.div>
+      </div>
+    </div>
+  );
+}
+
+function GuidelinesScreen({ onContinue, onBack }: { onContinue: () => void; onBack: () => void }) {
+  const guidelines = [
+    "Read each question carefully before selecting an answer.",
+    "Each language has 7 challenges with different XP values.",
+    "After answering, review the explanation to learn from mistakes.",
+    "Correct answers increase your XP and can build your streak.",
+    "Do not refresh the page while answering if you want to keep your current quiz.",
+    "You can listen to Spotify while answering by using the Music button.",
+    "Use the profile section to update your student information anytime.",
+  ];
+
+  return (
+    <div className="min-h-screen px-6 py-10">
+      <div className="max-w-2xl mx-auto">
+        <button onClick={onBack} className="flex items-center gap-2 text-white/50 hover:text-white font-mono text-sm mb-8">
+          <ArrowLeft size={16} /> Back
+        </button>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+          className="rounded-2xl border border-white/10 bg-white/5 p-7">
+          <div className="flex items-center gap-3 mb-7">
+            <BookOpenCheck className="text-cyan-400" />
+            <div>
+              <h2 className="text-2xl font-mono font-black text-white">Quiz Guidelines</h2>
+              <p className="text-white/40 text-sm font-mono">Follow these rules for a better learning experience.</p>
+            </div>
+          </div>
+
+          <div className="space-y-3 mb-8">
+            {guidelines.map((item, i) => (
+              <div key={item} className="flex gap-3 rounded-xl border border-white/10 bg-white/5 p-4">
+                <span className="w-6 h-6 shrink-0 rounded-full bg-purple-500/20 text-purple-300 flex items-center justify-center text-xs font-mono font-bold">{i + 1}</span>
+                <p className="text-white/70 text-sm font-mono leading-relaxed">{item}</p>
+              </div>
+            ))}
+          </div>
+
+          <button onClick={onContinue}
+            className="w-full py-4 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-600 text-white font-mono font-bold">
+            Choose a Language <ArrowRight size={17} className="inline ml-2" />
+          </button>
+        </motion.div>
+      </div>
     </div>
   );
 }
@@ -669,6 +924,16 @@ function GameScreen({
               {qIndex + 1} / {questions.length}
             </span>
           </div>
+        </div>
+
+        <div className="flex gap-2">
+          <button
+            onClick={() => window.open("https://open.spotify.com/", "_blank", "noopener,noreferrer")}
+            className="flex items-center gap-2 px-3 py-2 rounded-xl border border-green-500/20 bg-green-500/10 text-green-400 font-mono text-xs hover:bg-green-500/20"
+            title="Open Spotify"
+          >
+            <Music size={14} /> Spotify Music
+          </button>
         </div>
 
         <XPBar current={totalXP} max={(xpLevel) * 50} level={xpLevel} />
@@ -930,22 +1195,66 @@ export default function App() {
   const [screen, setScreen] = useState<Screen>("home");
   const [selectedLang, setSelectedLang] = useState<string | null>(null);
   const [results, setResults] = useState<{ score: number; xp: number; correct: number } | null>(null);
+  const [darkMode, setDarkMode] = useState(() => {
+    const saved = localStorage.getItem("codequest-theme");
+    return saved !== "light";
+  });
+  const [profile, setProfile] = useState<StudentProfile>(() => {
+    try {
+      return JSON.parse(localStorage.getItem("codequest-profile") || '{"username":"","yearLevel":"","course":"","school":""}');
+    } catch {
+      return { username: "", yearLevel: "", course: "", school: "" };
+    }
+  });
 
   const totalQs = selectedLang ? (QUESTIONS[selectedLang]?.length ?? 0) : 0;
 
+  useEffect(() => {
+    localStorage.setItem("codequest-theme", darkMode ? "dark" : "light");
+    document.documentElement.style.colorScheme = darkMode ? "dark" : "light";
+  }, [darkMode]);
+
+  const saveProfile = (next: StudentProfile) => {
+    setProfile(next);
+    localStorage.setItem("codequest-profile", JSON.stringify(next));
+    setScreen("guidelines");
+  };
+
+  const startQuest = () => {
+    if (!profile.username || !profile.yearLevel || !profile.course || !profile.school) {
+      setScreen("profile");
+      return;
+    }
+    setScreen("language");
+  };
+
   return (
-    <div
-      className="min-h-screen text-foreground overflow-x-hidden"
-      style={{ fontFamily: "'JetBrains Mono', 'Inter', monospace" }}
-    >
-      {/* Subtle grid background */}
-      <div
-        className="fixed inset-0 pointer-events-none"
+    <div className={`${darkMode ? "dark-mode" : "light-mode"} min-h-screen text-foreground overflow-x-hidden`}
+      style={{ fontFamily: "'JetBrains Mono', 'Inter', monospace" }}>
+      <style>{`
+        .light-mode { background: #f7f8fc; color: #111827; }
+        .light-mode .text-white { color: #111827 !important; }
+        .light-mode .text-white\\/80 { color: #374151 !important; }
+        .light-mode .text-white\\/70 { color: #4b5563 !important; }
+        .light-mode .text-white\\/60 { color: #6b7280 !important; }
+        .light-mode .text-white\\/50 { color: #6b7280 !important; }
+        .light-mode .text-white\\/40 { color: #6b7280 !important; }
+        .light-mode .text-white\\/30 { color: #9ca3af !important; }
+        .light-mode .text-white\\/20 { color: #9ca3af !important; }
+        .light-mode .bg-white\\/5 { background-color: rgba(17,24,39,.045) !important; }
+        .light-mode .bg-white\\/10 { background-color: rgba(17,24,39,.08) !important; }
+        .light-mode .border-white\\/10 { border-color: rgba(17,24,39,.12) !important; }
+        .light-mode .border-white\\/20 { border-color: rgba(17,24,39,.18) !important; }
+        .light-mode .bg-black\\/20 { background-color: rgba(255,255,255,.85) !important; }
+        .light-mode input, .light-mode select { color: #111827 !important; }
+        .light-mode input::placeholder { color: #9ca3af !important; }
+      `}</style>
+
+      <div className="fixed inset-0 pointer-events-none"
         style={{
-          backgroundImage: `
-            linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)
-          `,
+          backgroundImage: darkMode
+            ? `linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)`
+            : `linear-gradient(rgba(17,24,39,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(17,24,39,0.04) 1px, transparent 1px)`,
           backgroundSize: "40px 40px",
         }}
       />
@@ -953,7 +1262,26 @@ export default function App() {
       <AnimatePresence mode="wait">
         {screen === "home" && (
           <motion.div key="home" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <HomeScreen onStart={() => setScreen("language")} />
+            <HomeScreen
+              profile={profile}
+              darkMode={darkMode}
+              onToggleTheme={() => setDarkMode((v) => !v)}
+              onProfile={() => setScreen("profile")}
+              onGuidelines={() => setScreen("guidelines")}
+              onStart={startQuest}
+            />
+          </motion.div>
+        )}
+
+        {screen === "profile" && (
+          <motion.div key="profile" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <ProfileScreen profile={profile} onSave={saveProfile} onBack={() => setScreen("home")} />
+          </motion.div>
+        )}
+
+        {screen === "guidelines" && (
+          <motion.div key="guidelines" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <GuidelinesScreen onBack={() => setScreen("home")} onContinue={() => setScreen("language")} />
           </motion.div>
         )}
 
