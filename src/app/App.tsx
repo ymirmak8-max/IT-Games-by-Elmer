@@ -760,12 +760,10 @@ function WelcomeScreen({ onContinue, darkMode, onToggleTheme }: { onContinue: ()
 function MusicSelectionScreen({
   selectedTrack,
   onSelect,
-  onContinue,
   onBack,
 }: {
   selectedTrack: (typeof SPOTIFY_TRACKS)[number];
   onSelect: (track: (typeof SPOTIFY_TRACKS)[number]) => void;
-  onContinue: () => void;
   onBack: () => void;
 }) {
   const [category, setCategory] = useState("All");
@@ -826,11 +824,11 @@ function MusicSelectionScreen({
             <p className="text-green-300 font-mono font-black text-sm">GLOBAL SOUNDTRACK ARMED</p>
             <p className="text-white/35 font-mono text-[10px] mt-1">Your selected track plays from the beginning and stays with you across the whole website.</p>
           </div>
-          <button onClick={onContinue}
-            className="w-full mt-5 py-4 rounded-2xl bg-gradient-to-r from-green-500 via-cyan-500 to-purple-600 text-white font-mono font-black text-lg shadow-xl shadow-green-500/15">
-            Select Track & Return <ArrowRight size={19} className="inline ml-2" />
-          </button>
-          <p className="text-center text-white/25 text-[10px] font-mono mt-3">Your soundtrack is global across the website. Spotify/Chrome may require one Play tap because of browser autoplay rules.</p>
+          <div className="mt-5 rounded-2xl border border-cyan-400/15 bg-cyan-500/5 px-4 py-3 text-center">
+            <p className="text-cyan-300 font-mono font-black text-xs">SELECT = PLAY NOW</p>
+            <p className="text-white/35 font-mono text-[10px] mt-1">Tap any song and this menu closes immediately. Your selected soundtrack remains global while you use CodeQuest.</p>
+          </div>
+          <p className="text-center text-white/25 text-[10px] font-mono mt-3">Spotify/Chrome may require one Play tap because browsers can block autoplay.</p>
         </div>
       </div>
     </div>
@@ -1071,17 +1069,16 @@ function HomeScreen({
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-3xl mx-auto mt-7">
-          {([
-            { icon: BookOpen, title: `${questionCount} Questions`, sub: "Challenge yourself" },
-            { icon: Zap, title: "Earn XP", sub: "Build your rank" },
-            { icon: Trophy, title: rank.name, sub: "Level up your skills" },
-          ] as Array<{ icon: typeof BookOpen; title: string; sub: string }>).map(({ icon: Icon, title, sub }, i) => (
-            <motion.div key={String(title)} whileHover={{ y: -3 }} className={`rounded-2xl border p-4 text-center ${i === 0 ? "border-purple-400/20 bg-purple-500/10" : i === 1 ? "border-yellow-400/20 bg-yellow-500/10" : "border-cyan-400/20 bg-cyan-500/10"}`}>
-              <Icon size={22} className="mx-auto mb-2" />
-              <p className="font-mono font-black text-sm text-white">{title}</p>
-              <p className="font-mono text-[9px] text-white/35 mt-1">{sub}</p>
-            </motion.div>
-          ))}
+          {(
+            [
+              [BookOpen, `${questionCount} Questions`, "Challenge yourself"],
+              [Zap, "Earn XP", "Build your rank"],
+              [Trophy, rank.name, "Level up your skills"],
+            ] as Array<[typeof BookOpen, string, string]>
+          ).map(([Icon, title, sub], i) => {
+            const C = Icon;
+            return <motion.div key={String(title)} whileHover={{ y: -3 }} className={`rounded-2xl border p-4 text-center ${i === 0 ? "border-purple-400/20 bg-purple-500/10" : i === 1 ? "border-yellow-400/20 bg-yellow-500/10" : "border-cyan-400/20 bg-cyan-500/10"}`}><C size={22} className="mx-auto mb-2" /><p className="font-mono font-black text-sm text-white">{title}</p><p className="font-mono text-[9px] text-white/35 mt-1">{sub}</p></motion.div>;
+          })}
         </div>
 
         <div className="rounded-[28px] border border-purple-400/20 bg-gradient-to-br from-purple-500/10 via-black/10 to-cyan-500/10 p-4 sm:p-5 mt-5 max-w-4xl mx-auto">
@@ -1096,9 +1093,12 @@ function HomeScreen({
         </div>
 
         <div className="mt-8 flex justify-center">
-          <div className="flex items-center gap-3 px-4 py-3 rounded-2xl border border-white/10 bg-black/15 backdrop-blur-xl">
-            <img src="/developer-photo.png" alt="Elmer Makig-angay" className="w-10 h-10 rounded-xl object-cover border border-cyan-400/30" />
-            <div className="text-left"><p className="text-[8px] font-mono tracking-[.22em] text-cyan-300">CODEQUEST CREATOR</p><p className="text-xs sm:text-sm font-mono font-black text-white">Made by Elmer Makig-angay</p><p className="text-[9px] font-mono text-white/35">An aspiring web developer turning code into adventures.</p></div>
+          <div className="w-full max-w-xl flex items-center justify-center px-4 py-3 rounded-2xl border border-white/10 bg-black/15 backdrop-blur-xl text-center">
+            <div>
+              <p className="text-[8px] font-mono tracking-[.22em] text-cyan-300">CODEQUEST CREATOR</p>
+              <p className="text-xs sm:text-sm font-mono font-black text-white mt-1">Made by Elmer Makig-angay</p>
+              <p className="text-[9px] sm:text-[10px] font-mono text-white/35 mt-1">An aspiring web developer turning code into interactive adventures.</p>
+            </div>
           </div>
         </div>
       </motion.main>
@@ -2054,22 +2054,30 @@ function ResultsScreen({
   );
 }
 
-function GlobalMusicDock({ selectedTrack, onChange }: { selectedTrack: (typeof SPOTIFY_TRACKS)[number]; onChange: (track: (typeof SPOTIFY_TRACKS)[number]) => void }) {
-  const nextTrack = () => {
-    const i = SPOTIFY_TRACKS.findIndex(t => t.id === selectedTrack.id);
-    onChange(SPOTIFY_TRACKS[(i + 1) % SPOTIFY_TRACKS.length]);
-  };
+
+function GlobalSpotifyController({
+  selectedTrack,
+}: {
+  selectedTrack: (typeof SPOTIFY_TRACKS)[number];
+}) {
+  // Keep one Spotify embed mounted for the entire app so changing screens does not
+  // recreate the soundtrack. The player is visually hidden; the menu controls selection.
   return (
-    <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} className="fixed top-3 left-3 z-[80] w-[250px] max-w-[calc(100vw-5.5rem)] rounded-2xl border border-green-400/20 bg-[#07110e]/95 backdrop-blur-2xl shadow-[0_0_45px_rgba(34,197,94,.14)] overflow-hidden">
-      <div className="h-[78px] overflow-hidden">
-        <iframe key={`global-${selectedTrack.id}`} src={`https://open.spotify.com/embed/track/${selectedTrack.id}?utm_source=generator&theme=0&autoplay=1&start=0`} width="100%" height="80" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="eager" title={`Global CodeQuest soundtrack: ${selectedTrack.title}`} className="block w-full h-[80px]" />
-      </div>
-      <div className="flex items-center gap-2 px-3 py-2 border-t border-green-400/10">
-        <Music size={12} className="text-green-300 shrink-0" />
-        <div className="min-w-0 flex-1"><p className="text-[8px] tracking-[.18em] font-mono font-black text-green-300">GLOBAL SOUNDTRACK</p><p className="text-[9px] font-mono text-white/45 truncate">{selectedTrack.title} · {selectedTrack.artist}</p></div>
-        <button onClick={nextTrack} className="shrink-0 px-2 py-1 rounded-lg border border-white/10 bg-white/5 text-white/45 text-[8px] font-mono hover:text-white">NEXT</button>
-      </div>
-    </motion.div>
+    <div
+      aria-hidden="true"
+      className="fixed -left-[2px] -top-[2px] w-px h-px overflow-hidden opacity-0 pointer-events-none"
+    >
+      <iframe
+        key={`global-spotify-${selectedTrack.id}`}
+        src={`https://open.spotify.com/embed/track/${selectedTrack.id}?utm_source=generator&theme=0&autoplay=1&start=0`}
+        width="1"
+        height="1"
+        frameBorder="0"
+        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+        loading="eager"
+        title={`CodeQuest global soundtrack ${selectedTrack.title}`}
+      />
+    </div>
   );
 }
 
@@ -2081,7 +2089,7 @@ function GlobalMenu({ onGuidelines, onToggleTheme, darkMode, onMusic }: { onGuid
         {open ? <X size={20}/> : <span className="flex flex-col gap-1.5"><span className="block w-5 h-0.5 bg-current rounded"/><span className="block w-5 h-0.5 bg-current rounded"/><span className="block w-5 h-0.5 bg-current rounded"/></span>}
       </button>
       <AnimatePresence>
-        {open && <motion.div initial={{ opacity: 0, y: -8, scale: .96 }} animate={{ opacity: 1, y: 6, scale: 1 }} exit={{ opacity: 0, y: -8, scale: .96 }} className="absolute right-0 mt-2 w-56 rounded-2xl border border-white/10 bg-[#0b0b14]/95 backdrop-blur-2xl p-2 shadow-2xl">
+        {open && <motion.div initial={{ opacity: 0, y: -8, scale: .96 }} animate={{ opacity: 1, y: 6, scale: 1 }} exit={{ opacity: 0, y: -8, scale: .96 }} className="absolute right-0 mt-2 w-[min(14rem,calc(100vw-1.5rem))] max-w-[calc(100vw-1.5rem)] rounded-2xl border border-white/10 bg-[#0b0b14]/95 backdrop-blur-2xl p-2 shadow-2xl">
           <button onClick={() => { setOpen(false); onGuidelines(); }} className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-white/75 hover:bg-white/10 font-mono text-xs"><BookOpenCheck size={16}/> Guidelines</button>
           <button onClick={() => { setOpen(false); onToggleTheme(); }} className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-white/75 hover:bg-white/10 font-mono text-xs">{darkMode ? <Sun size={16}/> : <Moon size={16}/>} {darkMode ? "Light Mode" : "Dark Mode"}</button>
           <button onClick={() => { setOpen(false); onMusic(); }} className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-green-300 hover:bg-green-500/10 font-mono text-xs"><Music size={16}/> Music Selection</button>
@@ -2166,7 +2174,7 @@ export default function App() {
   };
 
   return (
-    <div className={`${darkMode ? "dark-mode" : "light-mode"} min-h-screen text-foreground overflow-x-hidden`}
+    <div className={`cq-shell ${darkMode ? "dark-mode" : "light-mode"} min-h-screen text-foreground overflow-x-hidden`}
       style={{ fontFamily: "'JetBrains Mono', 'Inter', monospace" }}>
       <style>{`
         html, body, #root { width: 100%; min-height: 100%; margin: 0; }
@@ -2223,7 +2231,37 @@ export default function App() {
         .light-mode .bg-white\/10 { background-color: rgba(15,23,42,.075) !important; }
         .light-mode input, .light-mode textarea, .light-mode select { background-color: #ffffff !important; color: #111827 !important; border-color: rgba(15,23,42,.2) !important; }
         .light-mode input::placeholder, .light-mode textarea::placeholder { color: #64748b !important; }
-        @media (max-width: 640px) { body { min-width: 0; } }
+        .cq-shell { width: 100%; max-width: 100vw; overflow-x: clip; }
+        .cq-touch { min-height: 44px; }
+        .light-mode .text-purple-200 { color: #6d28d9 !important; }
+        .light-mode .text-cyan-200 { color: #0e7490 !important; }
+        .light-mode .text-pink-200 { color: #be185d !important; }
+        .light-mode .text-green-200 { color: #166534 !important; }
+        .light-mode .text-yellow-200 { color: #92400e !important; }
+        .light-mode .text-white\/15 { color: rgba(15,23,42,.28) !important; }
+        .light-mode .bg-purple-500\/10 { background-color: rgba(124,58,237,.10) !important; }
+        .light-mode .bg-cyan-500\/10 { background-color: rgba(8,145,178,.10) !important; }
+        .light-mode .bg-pink-500\/10 { background-color: rgba(219,39,119,.10) !important; }
+        .light-mode .bg-green-500\/10 { background-color: rgba(22,163,74,.10) !important; }
+        .light-mode .bg-yellow-500\/10 { background-color: rgba(217,119,6,.10) !important; }
+        .light-mode .bg-purple-500\/15 { background-color: rgba(124,58,237,.14) !important; }
+        .light-mode .bg-cyan-500\/15 { background-color: rgba(8,145,178,.14) !important; }
+        .light-mode .bg-pink-500\/15 { background-color: rgba(219,39,119,.14) !important; }
+        .light-mode .bg-green-500\/15 { background-color: rgba(22,163,74,.14) !important; }
+        .light-mode .bg-black\/35 { background-color: rgba(255,255,255,.98) !important; }
+        .light-mode .bg-black\/25 { background-color: rgba(255,255,255,.98) !important; }
+        .light-mode .bg-black\/15 { background-color: rgba(255,255,255,.96) !important; }
+        .light-mode .bg-black\/10 { background-color: rgba(255,255,255,.94) !important; }
+        .light-mode [class*="shadow-purple"] { box-shadow: 0 12px 35px rgba(99,102,241,.12) !important; }
+        .light-mode button:hover { filter: brightness(1.02) saturate(1.08); }
+        @media (max-width: 768px) {
+          body { min-width: 0; overflow-x: hidden; }
+          .cq-shell { padding-left: max(.75rem, env(safe-area-inset-left)); padding-right: max(.75rem, env(safe-area-inset-right)); }
+        }
+        @media (max-width: 480px) {
+          .cq-shell { padding-top: .75rem; padding-bottom: 1rem; }
+          button, input, select, textarea { max-width: 100%; }
+        }
       `}</style>
 
       <div className="fixed inset-0 pointer-events-none"
@@ -2235,17 +2273,19 @@ export default function App() {
         }}
       />
 
-      {screen !== "welcome" && (
-        <>
-          <GlobalMusicDock selectedTrack={selectedTrack} onChange={(track) => setSelectedTrack(track)} />
+      <>
+        <GlobalSpotifyController selectedTrack={selectedTrack} />
+        {screen !== "welcome" && (
+          <>
           <GlobalMenu
             darkMode={darkMode}
             onGuidelines={() => setScreen("guidelines")}
             onToggleTheme={() => setDarkMode((v) => !v)}
             onMusic={() => { setMusicReturn(screen === "duel" ? "duel" : screen === "game" ? "game" : "home"); setScreen("music"); }}
           />
-        </>
-      )}
+          </>
+        )}
+      </>
 
       <AnimatePresence mode="wait">
 
@@ -2307,9 +2347,13 @@ export default function App() {
           <motion.div key="music" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
             <MusicSelectionScreen
               selectedTrack={selectedTrack}
-              onSelect={(track) => { setSelectedTrack(track); setScreen(musicReturn); }}
+              onSelect={(track) => {
+                setSelectedTrack(track);
+                try { localStorage.setItem("codequest-selected-track", track.id); } catch {}
+                // The global Spotify controller remounts the track from 0:00 and the menu disappears immediately.
+                setScreen(musicReturn);
+              }}
               onBack={() => setScreen(musicReturn === "duel" ? "duel-setup" : musicReturn === "home" ? "home" : "language")}
-              onContinue={() => setScreen(musicReturn)}
             />
           </motion.div>
         )}
