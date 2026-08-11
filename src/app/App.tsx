@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import type { FormEvent } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Code2, Zap, Trophy, Star, ArrowRight, RotateCcw, CheckCircle2, XCircle, Flame, Target, BookOpen, ChevronRight, User, GraduationCap, School, BookOpenCheck, Moon, Sun, Music, ArrowLeft, Swords, Shield, Pencil, Camera, Gamepad2 } from "lucide-react";
+import { Code2, Zap, Trophy, Star, ArrowRight, RotateCcw, CheckCircle2, XCircle, Flame, Target, BookOpen, ChevronRight, User, GraduationCap, School, BookOpenCheck, Moon, Sun, Music, ArrowLeft, Swords, Shield, Camera, Gamepad2, Crown, Medal, Users, Sparkles, Heart, Volume2 } from "lucide-react";
 
 // ─── Data ───────────────────────────────────────────────────────────────────
 
@@ -495,7 +495,7 @@ const QUESTIONS: Record<string, Question[]> = {
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-type Screen = "welcome" | "home" | "profile" | "guidelines" | "modes" | "language" | "game" | "results";
+type Screen = "welcome" | "home" | "profile" | "guidelines" | "modes" | "language" | "game" | "results" | "duel-setup" | "duel";
 type AnswerState = "idle" | "correct" | "wrong";
 
 // ─── Components ──────────────────────────────────────────────────────────────
@@ -562,15 +562,35 @@ function ParticleEffect({ active, correct }: { active: boolean; correct: boolean
   );
 }
 
+
+const RANKS = [
+  { name: "Beginner Programmer", minXP: 0, icon: "🌱", color: "#94a3b8" },
+  { name: "Novice Programmer", minXP: 100, icon: "🛡️", color: "#60a5fa" },
+  { name: "Junior Programmer", minXP: 250, icon: "⚔️", color: "#a78bfa" },
+  { name: "Intermediate Programmer", minXP: 500, icon: "🔥", color: "#f59e0b" },
+  { name: "Advanced Programmer", minXP: 900, icon: "💎", color: "#22d3ee" },
+  { name: "Senior Programmer", minXP: 1500, icon: "👑", color: "#fbbf24" },
+];
+
+function getRank(totalXP: number) {
+  return [...RANKS].reverse().find((rank) => totalXP >= rank.minXP) ?? RANKS[0];
+}
+
 // ─── Screens ─────────────────────────────────────────────────────────────────
 
 
 type GameMode = "practice" | "battle" | "speed";
 
 const SPOTIFY_TRACKS = [
-  { id: "0VjIjW4GlUZAMYd2vXMi3b", title: "Blinding Lights", artist: "The Weeknd" },
-  { id: "7qiZfU4dY1lWllzX7mPBI3", title: "Shape of You", artist: "Ed Sheeran" },
-  { id: "0pqnGHJpmpxLKifKRmU6WP", title: "Believer", artist: "Imagine Dragons" },
+  { id: "4rwsFa82o2Bqo5DEj0wUKr", title: "Palagi", artist: "TJ Monterde", category: "TJ Monterde" },
+  { id: "78uCp7K1jgwSYTtgv9iPpg", title: "Dating Tayo", artist: "TJ Monterde", category: "TJ Monterde" },
+  { id: "69WYSAYNAvHrzN4c1Tba0y", title: "Tahanan", artist: "TJ Monterde", category: "TJ Monterde" },
+  { id: "6E5ZMVdTXnppL2xEUA9pdq", title: "Plano", artist: "TJ Monterde", category: "TJ Monterde" },
+  { id: "5zkqGMHs0EGafwqutNd7Gu", title: "teka lang", artist: "TJ Monterde", category: "TJ Monterde" },
+  { id: "5auxnE3JORe3WXdDAE2kAN", title: "Hanggang Dito Na Lang", artist: "TJ Monterde", category: "TJ Monterde" },
+  { id: "6mPNCrmCQgV4ZIRwNFW9w8", title: "Code", artist: "Programming and Coding Music Club", category: "Focus" },
+  { id: "6zcjD7iRPz5fgOFAFtQqEJ", title: "Coding Focus, Pt. 10", artist: "Programming Coding Ambient Chill", category: "Focus" },
+  { id: "0p20HotsDDhhAUtJ2KOAg9", title: "Relaxing Beats for Late Night Coding", artist: "Lo Fi Hip Hop", category: "Relaxing" },
 ];
 
 function WelcomeScreen({ onContinue, darkMode, onToggleTheme }: { onContinue: () => void; darkMode: boolean; onToggleTheme: () => void }) {
@@ -580,7 +600,7 @@ function WelcomeScreen({ onContinue, darkMode, onToggleTheme }: { onContinue: ()
     "In Battle Mode, every correct answer is a skill attack against the Code Beast.",
     "Your profile appears on your results card; add a photo to complete your winning profile.",
     "You can edit your student profile anytime from the dashboard.",
-    "Use the built-in Spotify player to listen to one of the three saved tracks while playing.",
+    "Choose from a larger Spotify soundtrack list, including TJ Monterde and relaxing coding music, while playing.",
   ];
   return (
     <div className="min-h-screen px-6 py-10 relative overflow-hidden">
@@ -638,30 +658,58 @@ function WelcomeScreen({ onContinue, darkMode, onToggleTheme }: { onContinue: ()
 
 function MusicPlayer() {
   const [track, setTrack] = useState(SPOTIFY_TRACKS[0]);
+  const [category, setCategory] = useState("All");
+  const categories = ["All", "TJ Monterde", "Focus", "Relaxing"];
+  const visibleTracks = category === "All" ? SPOTIFY_TRACKS : SPOTIFY_TRACKS.filter((item) => item.category === category);
+
   return (
-    <div className="rounded-2xl border border-green-500/20 bg-green-500/5 p-3">
-      <div className="flex items-center gap-2 mb-3">
-        <Music size={16} className="text-green-400" />
-        <span className="font-mono text-xs font-bold text-green-300">CodeQuest Music</span>
-        <span className="text-white/30 text-xs font-mono ml-auto">3 saved tracks</span>
+    <div className="rounded-3xl border border-green-500/20 bg-gradient-to-br from-green-500/10 via-white/5 to-cyan-500/5 p-4 shadow-2xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-xl bg-green-500/15 border border-green-500/20 flex items-center justify-center">
+          <Music size={18} className="text-green-400" />
+        </div>
+        <div>
+          <p className="font-mono text-sm font-black text-green-300">CODEQUEST MUSIC</p>
+          <p className="text-white/30 text-[10px] font-mono">Pick a soundtrack and keep coding.</p>
+        </div>
+        <span className="ml-auto text-[10px] font-mono text-white/30">{SPOTIFY_TRACKS.length} saved tracks</span>
       </div>
+
       <div className="flex flex-wrap gap-2 mb-3">
-        {SPOTIFY_TRACKS.map((item) => (
-          <button key={item.id} onClick={() => setTrack(item)}
-            className={`px-3 py-2 rounded-lg text-xs font-mono border ${track.id === item.id ? "bg-green-500/20 border-green-500/40 text-green-300" : "bg-white/5 border-white/10 text-white/50"}`}>
-            {item.title}
+        {categories.map((item) => (
+          <button key={item} onClick={() => setCategory(item)}
+            className={`px-3 py-1.5 rounded-full text-[10px] font-mono border transition-all ${
+              category === item ? "bg-green-500/20 border-green-500/40 text-green-300" : "bg-white/5 border-white/10 text-white/40 hover:text-white/70"
+            }`}>
+            {item}
           </button>
         ))}
       </div>
+
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-4 max-h-32 overflow-y-auto pr-1">
+        {visibleTracks.map((item) => (
+          <button key={item.id} onClick={() => setTrack(item)}
+            className={`text-left p-2.5 rounded-xl border transition-all ${
+              track.id === item.id ? "bg-green-500/15 border-green-500/40" : "bg-white/5 border-white/10 hover:bg-white/10"
+            }`}>
+            <p className="text-xs font-mono font-bold text-white truncate">{item.title}</p>
+            <p className="text-[9px] font-mono text-white/35 truncate">{item.artist}</p>
+          </button>
+        ))}
+      </div>
+
       <iframe
         key={track.id}
         src={`https://open.spotify.com/embed/track/${track.id}?utm_source=generator`}
         width="100%" height="152" frameBorder="0"
         allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-        loading="lazy"
-        title={`Spotify player for ${track.title}`}
-        className="rounded-xl"
+        loading="lazy" title={`Spotify player for ${track.title}`} className="rounded-2xl"
       />
+
+      <div className="flex items-center gap-2 mt-3 text-[10px] font-mono text-white/30">
+        <Volume2 size={12} />
+        <span>Press play to start from the beginning. Spotify controls whether full playback is available.</span>
+      </div>
     </div>
   );
 }
@@ -694,6 +742,8 @@ function HomeScreen({
   onToggleTheme,
   darkMode,
   profile,
+  totalXP,
+  onDuel,
 }: {
   onStart: () => void;
   onProfile: () => void;
@@ -701,6 +751,8 @@ function HomeScreen({
   onToggleTheme: () => void;
   darkMode: boolean;
   profile: StudentProfile;
+  totalXP: number;
+  onDuel: () => void;
 }) {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-6 py-12 relative overflow-hidden">
@@ -733,7 +785,7 @@ function HomeScreen({
               <p className="text-white/40 text-xs font-mono">{profile.yearLevel} · {profile.course}</p>
               <p className="text-white/30 text-xs font-mono truncate">{profile.school}</p>
             </div>
-            <button onClick={onProfile} className="px-3 py-2 rounded-lg border border-white/10 bg-white/5 text-white/60 text-xs font-mono"><Pencil size={13} className="inline mr-1"/>Edit</button>
+            <RankBadge totalXP={totalXP} compact />
           </div>
         )}
 
@@ -786,11 +838,36 @@ function HomeScreen({
           Start Playing
           <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
         </motion.button>
+
+        <div className="flex flex-wrap items-center justify-center gap-3 mt-4">
+          <button onClick={onDuel}
+            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl border border-pink-500/30 bg-pink-500/10 text-pink-300 font-mono font-bold text-sm hover:bg-pink-500/20 transition-all">
+            <Users size={16} /> 1v1 Friend Arena
+          </button>
+          <button onClick={onProfile}
+            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl border border-white/10 bg-white/5 text-white/60 font-mono font-bold text-sm hover:bg-white/10 transition-all">
+            <User size={16} /> Student Profile
+          </button>
+        </div>
       </motion.div>
     </div>
   );
 }
 
+
+function RankBadge({ totalXP, compact = false }: { totalXP: number; compact?: boolean }) {
+  const rank = getRank(totalXP);
+  return (
+    <div className={`flex items-center gap-2 rounded-xl border bg-black/10 ${compact ? "px-2.5 py-1.5" : "px-3 py-2"}`} style={{ borderColor: `${rank.color}55` }}>
+      <span className={compact ? "text-base" : "text-xl"}>{rank.icon}</span>
+      <div className="min-w-0">
+        <p className="font-mono font-black truncate" style={{ color: rank.color, fontSize: compact ? 10 : 12 }}>{rank.name}</p>
+        <p className="text-white/30 font-mono" style={{ fontSize: compact ? 8 : 9 }}>{totalXP} XP</p>
+      </div>
+      <Trophy size={compact ? 12 : 15} style={{ color: rank.color }} className="ml-auto shrink-0" />
+    </div>
+  );
+}
 
 type StudentProfile = {
   username: string;
@@ -802,10 +879,12 @@ type StudentProfile = {
 
 function ProfileScreen({
   profile,
+  totalXP,
   onSave,
   onBack,
 }: {
   profile: StudentProfile;
+  totalXP: number;
   onSave: (profile: StudentProfile) => void;
   onBack: () => void;
 }) {
@@ -849,6 +928,10 @@ function ProfileScreen({
               <h2 className="text-2xl font-mono font-black text-white">Student Profile</h2>
               <p className="text-white/40 text-sm font-mono">Enter your information before starting.</p>
             </div>
+          </div>
+
+          <div className="mb-5">
+            <RankBadge totalXP={totalXP} />
           </div>
 
           <form onSubmit={submit} className="space-y-4 mt-7">
@@ -1058,6 +1141,7 @@ function GameScreen({
   const [xpLevel, setXpLevel] = useState(1);
   const [enemyHP, setEnemyHP] = useState(100);
   const [playerHP, setPlayerHP] = useState(100);
+  const [battleMessage, setBattleMessage] = useState("Choose your attack.");
   const battleSkills = ["Code Slash", "Logic Strike", "Debug Blast", "Syntax Smash", "Algorithm Beam"];
 
   const currentQ = questions[qIndex];
@@ -1091,8 +1175,10 @@ function GameScreen({
       if (mode === "battle") {
         if (correct) {
           setEnemyHP((hp) => Math.max(0, hp - 20));
+          setBattleMessage(`⚡ ${battleSkills[qIndex % battleSkills.length]}! -20 HP`);
         } else {
           setPlayerHP((hp) => Math.max(0, hp - 15));
+          setBattleMessage("💥 Code Beast counterattacks! -15 HP");
         }
       }
     },
@@ -1163,13 +1249,39 @@ function GameScreen({
           />
         </div>
         {mode === "battle" && (
-          <div className="rounded-2xl border border-red-500/20 bg-red-500/5 p-4">
-            <div className="flex items-center justify-between mb-3"><div className="flex items-center gap-2 text-red-300 font-mono text-xs font-bold"><Swords size={15}/> CODE BEAST</div><span className="text-red-300 font-mono text-xs">{enemyHP} HP</span></div>
-            <div className="h-2 bg-white/10 rounded-full overflow-hidden mb-4"><div className="h-full bg-red-500 transition-all" style={{width:`${enemyHP}%`}}/></div>
-            <div className="flex items-center justify-between mb-2"><div className="flex items-center gap-2 text-cyan-300 font-mono text-xs font-bold"><Shield size={15}/> YOU</div><span className="text-cyan-300 font-mono text-xs">{playerHP} HP</span></div>
-            <div className="h-2 bg-white/10 rounded-full overflow-hidden"><div className="h-full bg-cyan-500 transition-all" style={{width:`${playerHP}%`}}/></div>
-            <p className="text-white/30 font-mono text-xs mt-3">Your answer is your skill. Correct = attack. Wrong = enemy attack.</p>
-          </div>
+          <motion.div
+            animate={{ boxShadow: ["0 0 0 rgba(239,68,68,0)", "0 0 35px rgba(168,85,247,.16)", "0 0 0 rgba(239,68,68,0)"] }}
+            transition={{ repeat: Infinity, duration: 2.5 }}
+            className="rounded-3xl border border-purple-500/20 bg-gradient-to-br from-red-500/10 via-purple-500/10 to-cyan-500/10 p-4 overflow-hidden relative"
+          >
+            <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-44 h-44 rounded-full border border-purple-400/10 animate-pulse pointer-events-none" />
+            <div className="flex items-center justify-center gap-5 mb-4 relative">
+              <motion.div animate={{ y: [0, -4, 0] }} transition={{ repeat: Infinity, duration: 2 }} className="text-4xl">👾</motion.div>
+              <div className="text-center">
+                <p className="text-[10px] font-mono text-white/30 tracking-[0.3em]">CODE BATTLE</p>
+                <p className="text-sm font-mono font-black text-purple-300">YOUR SKILL IS YOUR WEAPON</p>
+              </div>
+              <motion.div animate={{ y: [0, 4, 0] }} transition={{ repeat: Infinity, duration: 2 }} className="text-4xl">🧑‍💻</motion.div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 relative">
+              <div>
+                <div className="flex justify-between mb-1"><span className="text-[10px] font-mono text-red-300">CODE BEAST</span><span className="text-[10px] font-mono text-red-300">{enemyHP} HP</span></div>
+                <div className="h-3 bg-black/20 rounded-full overflow-hidden border border-red-500/10"><motion.div className="h-full bg-gradient-to-r from-red-600 to-pink-500 rounded-full" animate={{ width: `${enemyHP}%` }} /></div>
+              </div>
+              <div>
+                <div className="flex justify-between mb-1"><span className="text-[10px] font-mono text-cyan-300">YOU</span><span className="text-[10px] font-mono text-cyan-300">{playerHP} HP</span></div>
+                <div className="h-3 bg-black/20 rounded-full overflow-hidden border border-cyan-500/10"><motion.div className="h-full bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full" animate={{ width: `${playerHP}%` }} /></div>
+              </div>
+            </div>
+
+            <AnimatePresence mode="wait">
+              <motion.div key={battleMessage} initial={{ opacity: 0, scale: .9, y: 5 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, y: -5 }}
+                className="mt-4 text-center rounded-xl border border-white/10 bg-black/15 py-2.5">
+                <span className="text-xs font-mono font-black text-white/70">{battleMessage}</span>
+              </motion.div>
+            </AnimatePresence>
+          </motion.div>
         )}
       </div>
 
@@ -1313,6 +1425,204 @@ function GameScreen({
   );
 }
 
+
+function DuelSetupScreen({
+  profile,
+  totalXP,
+  selectedLang,
+  onSelectLanguage,
+  onStart,
+  onBack,
+}: {
+  profile: StudentProfile;
+  totalXP: number;
+  selectedLang: string | null;
+  onSelectLanguage: (lang: string) => void;
+  onStart: (friendName: string, friendRank: string, friendPhoto: string) => void;
+  onBack: () => void;
+}) {
+  const [friendName, setFriendName] = useState("");
+  const [friendRank, setFriendRank] = useState(RANKS[2].name);
+  const [friendPhoto, setFriendPhoto] = useState("");
+
+  return (
+    <div className="min-h-screen px-5 py-10">
+      <div className="max-w-5xl mx-auto">
+        <button onClick={onBack} className="flex items-center gap-2 text-white/40 hover:text-white font-mono text-sm mb-7"><ArrowLeft size={16}/> Back</button>
+        <div className="text-center mb-9">
+          <motion.div animate={{ scale: [1, 1.06, 1] }} transition={{ repeat: Infinity, duration: 2 }}
+            className="inline-flex w-16 h-16 rounded-2xl bg-gradient-to-br from-pink-600 to-purple-600 items-center justify-center shadow-2xl shadow-pink-500/20 mb-4">
+            <Swords size={30} className="text-white"/>
+          </motion.div>
+          <p className="text-pink-300 text-xs font-mono font-bold tracking-[0.3em]">DUEL ARENA</p>
+          <h2 className="text-4xl md:text-6xl font-mono font-black text-white mt-2">1V1 FRIEND BATTLE</h2>
+          <p className="text-white/35 font-mono text-sm mt-3">Two players. One question. Your coding skill decides the winner.</p>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-5 mb-7">
+          <div className="rounded-3xl border border-cyan-500/20 bg-gradient-to-br from-cyan-500/10 to-white/5 p-6">
+            <p className="text-cyan-300 text-[10px] font-mono font-black tracking-widest mb-4">YOUR PROFILE</p>
+            <div className="flex items-center gap-4">
+              {profile.photo ? <img src={profile.photo} className="w-20 h-20 rounded-2xl object-cover border border-cyan-400/30" alt="Your profile"/> :
+                <div className="w-20 h-20 rounded-2xl bg-cyan-500/10 border border-cyan-400/20 flex items-center justify-center text-3xl">👨‍💻</div>}
+              <div className="min-w-0">
+                <h3 className="text-white font-mono font-black text-xl truncate">{profile.username}</h3>
+                <p className="text-white/40 font-mono text-xs">{profile.yearLevel} · {profile.course}</p>
+                <div className="mt-2"><RankBadge totalXP={totalXP} compact /></div>
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-3xl border border-pink-500/20 bg-gradient-to-br from-pink-500/10 to-white/5 p-6">
+            <p className="text-pink-300 text-[10px] font-mono font-black tracking-widest mb-4">FRIEND PROFILE</p>
+            <input value={friendName} onChange={(e) => setFriendName(e.target.value)} placeholder="Enter friend's username"
+              className="w-full rounded-xl border border-white/10 bg-black/20 text-white placeholder:text-white/25 px-4 py-3 outline-none focus:border-pink-500/50 mb-3"/>
+            <select value={friendRank} onChange={(e) => setFriendRank(e.target.value)}
+              className="w-full rounded-xl border border-white/10 bg-[#11111f] text-white px-4 py-3 outline-none focus:border-pink-500/50">
+              {RANKS.map((r) => <option key={r.name}>{r.name}</option>)}
+            </select>
+            <label className="mt-3 cursor-pointer flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-white/10 bg-white/5 text-white/60 text-xs font-mono">
+              <Camera size={14}/> {friendPhoto ? "Friend Photo Added" : "Add Friend Photo"}
+              <input type="file" accept="image/*" className="hidden" onChange={(e) => {
+                const file = e.target.files?.[0]; if (!file) return;
+                if (file.size > 2 * 1024 * 1024) { alert("Please choose an image smaller than 2MB."); return; }
+                const reader = new FileReader(); reader.onload = () => setFriendPhoto(String(reader.result)); reader.readAsDataURL(file);
+              }} />
+            </label>
+            <p className="text-white/25 font-mono text-[10px] mt-3">This version is local/pass-and-play. Connect it to Supabase Realtime later for true online 1v1.</p>
+          </div>
+        </div>
+
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 mb-7">
+          <div className="flex items-center gap-3 mb-5"><Code2 className="text-purple-400"/><div><h3 className="text-white font-mono font-black text-lg">Choose the Duel Language</h3><p className="text-white/30 text-xs font-mono">Five questions per duel.</p></div></div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {LANGUAGES.map((lang) => (
+              <button key={lang.id} onClick={() => onSelectLanguage(lang.id)}
+                className={`text-left rounded-2xl border p-4 transition-all ${selectedLang === lang.id ? "border-purple-400/60 bg-purple-500/15 shadow-lg shadow-purple-500/10" : "border-white/10 bg-white/5 hover:bg-white/10"}`}>
+                <div className="text-2xl mb-2">{lang.icon}</div><p className="text-white font-mono font-bold text-sm">{lang.name}</p>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <button disabled={!selectedLang || !friendName.trim()} onClick={() => onStart(friendName.trim(), friendRank, friendPhoto)}
+          className="w-full py-4 rounded-2xl bg-gradient-to-r from-pink-600 via-purple-600 to-cyan-600 text-white font-mono font-black text-lg disabled:opacity-30 disabled:cursor-not-allowed shadow-xl shadow-purple-500/20">
+          Enter the Arena <Swords size={19} className="inline ml-2"/>
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function DuelScreen({
+  langId,
+  profile,
+  totalXP,
+  friendName,
+  friendRankName,
+  friendPhoto,
+  onFinish,
+}: {
+  langId: string;
+  profile: StudentProfile;
+  totalXP: number;
+  friendName: string;
+  friendRankName: string;
+  friendPhoto: string;
+  onFinish: () => void;
+}) {
+  const questions = (QUESTIONS[langId] ?? []).slice(0, 5);
+  const lang = LANGUAGES.find((l) => l.id === langId)!;
+  const [qIndex, setQIndex] = useState(0);
+  const [turn, setTurn] = useState<"you" | "friend">("you");
+  const [selected, setSelected] = useState<number | null>(null);
+  const [youScore, setYouScore] = useState(0);
+  const [friendScore, setFriendScore] = useState(0);
+  const [locked, setLocked] = useState(false);
+  const currentQ = questions[qIndex];
+
+  const answer = (index: number) => {
+    if (locked) return;
+    setSelected(index);
+    const correct = index === currentQ.answer;
+    setLocked(true);
+
+    if (turn === "you" && correct) setYouScore((s) => s + 1);
+    if (turn === "friend" && correct) setFriendScore((s) => s + 1);
+
+    setTimeout(() => {
+      setSelected(null);
+      setLocked(false);
+      if (turn === "you") setTurn("friend");
+      else if (qIndex < questions.length - 1) {
+        setQIndex((i) => i + 1);
+        setTurn("you");
+      } else onFinish();
+    }, 700);
+  };
+
+  const friendRank = RANKS.find((r) => r.name === friendRankName) ?? RANKS[2];
+
+  return (
+    <div className="min-h-screen px-4 py-6 relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-cyan-950/20 via-purple-950/20 to-pink-950/20 pointer-events-none"/>
+      <div className="max-w-6xl mx-auto relative">
+        <div className="flex items-center justify-between mb-5">
+          <div><p className="text-purple-300 text-xs font-mono font-black">1V1 CODE ARENA</p><p className="text-white/30 text-xs font-mono mt-1">{lang.icon} {lang.name} · Round {qIndex + 1}/5</p></div>
+          <button onClick={onFinish} className="text-white/30 hover:text-white text-xs font-mono">Leave Arena</button>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-4 mb-5">
+          <motion.div animate={{ scale: turn === "you" ? 1.02 : 1 }} className={`rounded-3xl border p-4 ${turn === "you" ? "border-cyan-400/60 bg-cyan-500/10 shadow-lg shadow-cyan-500/10" : "border-white/10 bg-white/5"}`}>
+            <div className="flex items-center gap-3">
+              {profile.photo ? <img src={profile.photo} className="w-14 h-14 rounded-2xl object-cover" alt="You"/> : <div className="w-14 h-14 rounded-2xl bg-cyan-500/10 flex items-center justify-center text-2xl">👨‍💻</div>}
+              <div className="min-w-0 flex-1"><p className="text-white font-mono font-black truncate">{profile.username} <span className="text-cyan-300 text-[10px]">YOU</span></p><RankBadge totalXP={totalXP} compact/></div>
+              <div className="text-3xl font-mono font-black text-cyan-300">{youScore}</div>
+            </div>
+          </motion.div>
+
+          <motion.div animate={{ scale: turn === "friend" ? 1.02 : 1 }} className={`rounded-3xl border p-4 ${turn === "friend" ? "border-pink-400/60 bg-pink-500/10 shadow-lg shadow-pink-500/10" : "border-white/10 bg-white/5"}`}>
+            <div className="flex items-center gap-3">
+              <div className="w-14 h-14 rounded-2xl bg-pink-500/10 flex items-center justify-center text-2xl overflow-hidden">{friendPhoto ? <img src={friendPhoto} className="w-full h-full object-cover" alt="Friend"/> : "🧑‍💻"}</div>
+              <div className="min-w-0 flex-1">
+                <p className="text-white font-mono font-black truncate">{friendName} <span className="text-pink-300 text-[10px]">FRIEND</span></p>
+                <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl border bg-black/10" style={{borderColor: `${friendRank.color}55`}}>
+                  <span>{friendRank.icon}</span><div><p className="font-mono font-black text-[10px]" style={{color: friendRank.color}}>{friendRank.name}</p><p className="text-white/30 font-mono text-[8px]">RANK</p></div><Trophy size={12} style={{color: friendRank.color}}/>
+                </div>
+              </div>
+              <div className="text-3xl font-mono font-black text-pink-300">{friendScore}</div>
+            </div>
+          </motion.div>
+        </div>
+
+        <div className="text-center mb-5">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-purple-500/20 bg-purple-500/10 text-purple-300 font-mono text-xs font-bold">
+            {turn === "you" ? <><Sparkles size={13}/> {profile.username}'s turn — your answer is your weapon.</> : <><Heart size={13}/> Pass the device to {friendName}</>}
+          </div>
+        </div>
+
+        <div className="max-w-3xl mx-auto rounded-3xl border border-white/10 bg-white/5 p-5 md:p-7 shadow-2xl">
+          <div className="flex items-center justify-between mb-4"><span className="text-xs font-mono text-white/35">Question {qIndex + 1}</span><span className="text-xs font-mono text-yellow-300">+{currentQ.xp} XP</span></div>
+          <h2 className="text-xl md:text-2xl font-mono font-black text-white leading-relaxed mb-5">{currentQ.question}</h2>
+          {currentQ.code && <div className="mb-5"><CodeBlock code={currentQ.code}/></div>}
+          <div className="grid md:grid-cols-2 gap-3">
+            {currentQ.options.map((option, index) => (
+              <button key={option} disabled={locked} onClick={() => answer(index)}
+                className={`text-left p-4 rounded-2xl border font-mono text-sm transition-all ${
+                  selected === index
+                    ? index === currentQ.answer ? "border-green-400/60 bg-green-500/10 text-green-300" : "border-red-400/60 bg-red-500/10 text-red-300"
+                    : "border-white/10 bg-black/10 text-white/70 hover:bg-white/10"
+                }`}>
+                <span className="inline-flex w-7 h-7 rounded-lg bg-white/5 items-center justify-center mr-2 text-xs">{String.fromCharCode(65 + index)}</span>{option}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ResultsScreen({
   langId,
   score,
@@ -1320,8 +1630,8 @@ function ResultsScreen({
   correct,
   total,
   profile,
+  totalXP,
   onPhotoUpdate,
-  onEditProfile,
   onReplay,
   onHome,
 }: {
@@ -1331,8 +1641,8 @@ function ResultsScreen({
   correct: number;
   total: number;
   profile: StudentProfile;
+  totalXP: number;
   onPhotoUpdate: (photo: string) => void;
-  onEditProfile: () => void;
   onReplay: () => void;
   onHome: () => void;
 }) {
@@ -1392,9 +1702,11 @@ function ResultsScreen({
               <p className="text-white/40 text-xs font-mono truncate">{profile.school}</p>
               {score >= 70 && !profile.photo && <p className="text-purple-300 text-xs font-mono mt-2">🏆 Add your photo to complete your winning profile.</p>}
             </div>
-            <button onClick={onEditProfile} className="px-3 py-2 rounded-lg border border-white/10 bg-white/5 text-white/60 text-xs font-mono"><Pencil size={13} className="inline mr-1"/>Edit</button>
+            <RankBadge totalXP={totalXP} compact />
           </div>
         </div>
+
+        <div className="mb-6"><RankBadge totalXP={totalXP} /></div>
 
         {/* Stat cards */}
         <div className="grid grid-cols-3 gap-3 mb-8">
@@ -1450,6 +1762,11 @@ export default function App() {
   const [gameMode, setGameMode] = useState<GameMode>("practice");
   const [selectedLang, setSelectedLang] = useState<string | null>(null);
   const [results, setResults] = useState<{ score: number; xp: number; correct: number } | null>(null);
+  const [lifetimeXP, setLifetimeXP] = useState(() => Number(localStorage.getItem("codequest-total-xp") || 0));
+  const [duelLang, setDuelLang] = useState<string | null>(null);
+  const [friendName, setFriendName] = useState("");
+  const [friendRankName, setFriendRankName] = useState(RANKS[2].name);
+  const [friendPhoto, setFriendPhoto] = useState("");
   const [darkMode, setDarkMode] = useState(() => {
     const saved = localStorage.getItem("codequest-theme");
     return saved !== "light";
@@ -1485,6 +1802,14 @@ export default function App() {
   };
 
   const startQuest = () => setScreen("modes");
+
+  const addLifetimeXP = (earned: number) => {
+    setLifetimeXP((prev) => {
+      const next = prev + earned;
+      localStorage.setItem("codequest-total-xp", String(next));
+      return next;
+    });
+  };
 
   const updatePhoto = (photo: string) => {
     const next = { ...profile, photo };
@@ -1540,13 +1865,15 @@ export default function App() {
               onProfile={() => setScreen("profile")}
               onGuidelines={() => setScreen("guidelines")}
               onStart={startQuest}
+              totalXP={lifetimeXP}
+              onDuel={() => setScreen("duel-setup")}
             />
           </motion.div>
         )}
 
         {screen === "profile" && (
           <motion.div key="profile" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <ProfileScreen profile={profile} onSave={saveProfile} onBack={() => setScreen("home")} />
+            <ProfileScreen profile={profile} totalXP={lifetimeXP} onSave={saveProfile} onBack={() => setScreen("home")} />
           </motion.div>
         )}
 
@@ -1582,8 +1909,41 @@ export default function App() {
               mode={gameMode}
               onFinish={(score, xp, correct) => {
                 setResults({ score, xp, correct });
+                addLifetimeXP(xp);
                 setScreen("results");
               }}
+            />
+          </motion.div>
+        )}
+
+        {screen === "duel-setup" && (
+          <motion.div key="duel-setup" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <DuelSetupScreen
+              profile={profile}
+              totalXP={lifetimeXP}
+              selectedLang={duelLang}
+              onSelectLanguage={setDuelLang}
+              onBack={() => setScreen("home")}
+              onStart={(name, rank, photo) => {
+                setFriendName(name);
+                setFriendRankName(rank);
+                setFriendPhoto(photo);
+                setScreen("duel");
+              }}
+            />
+          </motion.div>
+        )}
+
+        {screen === "duel" && duelLang && (
+          <motion.div key={`duel-${duelLang}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <DuelScreen
+              langId={duelLang}
+              profile={profile}
+              totalXP={lifetimeXP}
+              friendName={friendName}
+              friendRankName={friendRankName}
+              friendPhoto={friendPhoto}
+              onFinish={() => setScreen("home")}
             />
           </motion.div>
         )}
@@ -1597,8 +1957,8 @@ export default function App() {
               correct={results.correct}
               total={gameMode === "speed" ? Math.min(5, totalQs) : totalQs}
               profile={profile}
+              totalXP={lifetimeXP}
               onPhotoUpdate={updatePhoto}
-              onEditProfile={() => setScreen("profile")}
               onReplay={() => {
                 setResults(null);
                 setScreen("game");
