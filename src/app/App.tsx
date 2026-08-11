@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import type { FormEvent } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Code2, Zap, Trophy, Star, ArrowRight, RotateCcw, CheckCircle2, XCircle, Flame, Target, BookOpen, ChevronRight, User, GraduationCap, School, BookOpenCheck, Moon, Sun, Music, ArrowLeft, Swords, Shield, Camera, Gamepad2, Crown, Medal, Users, Sparkles, Heart, Volume2 } from "lucide-react";
@@ -495,7 +495,7 @@ const QUESTIONS: Record<string, Question[]> = {
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-type Screen = "welcome" | "home" | "profile" | "guidelines" | "achievements" | "modes" | "battle-setup" | "language" | "game" | "results" | "duel-setup" | "duel";
+type Screen = "welcome" | "home" | "profile" | "guidelines" | "modes" | "language" | "game" | "results" | "duel-setup" | "duel";
 type AnswerState = "idle" | "correct" | "wrong";
 
 // ─── Components ──────────────────────────────────────────────────────────────
@@ -572,59 +572,8 @@ const RANKS = [
   { name: "Senior Programmer", minXP: 1500, icon: "👑", color: "#fbbf24" },
 ];
 
-
 function getRank(totalXP: number) {
   return [...RANKS].reverse().find((rank) => totalXP >= rank.minXP) ?? RANKS[0];
-}
-
-type Character = {
-  id: string;
-  name: string;
-  icon: string;
-  color: string;
-  title: string;
-};
-
-const CHARACTERS: Character[] = [
-  { id: "byte", name: "Byte", icon: "🤖", color: "#22d3ee", title: "Cyber Coder" },
-  { id: "nova", name: "Nova", icon: "🧙‍♀️", color: "#a78bfa", title: "Logic Mage" },
-  { id: "rex", name: "Rex", icon: "🦾", color: "#f97316", title: "Debug Titan" },
-  { id: "pixel", name: "Pixel", icon: "🧑‍🚀", color: "#ec4899", title: "Code Ranger" },
-  { id: "kai", name: "Kai", icon: "🥷", color: "#22c55e", title: "Syntax Ninja" },
-  { id: "luna", name: "Luna", icon: "🧚‍♀️", color: "#f59e0b", title: "Algorithm Ace" },
-];
-
-const AI_DIFFICULTIES = [
-  { id: "easy", name: "Easy", desc: "AI makes more mistakes.", accuracy: 0.45 },
-  { id: "normal", name: "Normal", desc: "A balanced coding opponent.", accuracy: 0.65 },
-  { id: "hard", name: "Hard", desc: "AI is fast and accurate.", accuracy: 0.82 },
-  { id: "expert", name: "Expert", desc: "The AI rarely misses.", accuracy: 0.94 },
-] as const;
-
-type AIDifficulty = typeof AI_DIFFICULTIES[number]["id"];
-
-type Achievement = {
-  id: string;
-  title: string;
-  description: string;
-  icon: string;
-  unlocked: boolean;
-};
-
-const ACHIEVEMENT_DEFS = [
-  { id: "first-win", title: "First Victory", description: "Win your first 1v1 Friend Arena match.", icon: "🏆" },
-  { id: "duel-master", title: "Duel Master", description: "Win 5 Friend Arena matches.", icon: "⚔️" },
-  { id: "speed-demon", title: "Speed Demon", description: "Finish a Speed Mode run with at least 80% accuracy.", icon: "⚡" },
-  { id: "battle-victor", title: "Battle Victor", description: "Defeat the AI in Battle Mode.", icon: "👑" },
-  { id: "perfect-code", title: "Perfect Code", description: "Answer every question correctly in a run.", icon: "💎" },
-  { id: "streak-5", title: "Hot Streak", description: "Reach a 5x answer streak.", icon: "🔥" },
-];
-
-function buildAchievements(unlocked: string[] = [], duelWins = 0): Achievement[] {
-  return ACHIEVEMENT_DEFS.map((a) => ({
-    ...a,
-    unlocked: unlocked.includes(a.id) || (a.id === "duel-master" && duelWins >= 5),
-  }));
 }
 
 // ─── Screens ─────────────────────────────────────────────────────────────────
@@ -633,15 +582,18 @@ function buildAchievements(unlocked: string[] = [], duelWins = 0): Achievement[]
 type GameMode = "practice" | "battle" | "speed";
 
 const SPOTIFY_TRACKS = [
-  { id: "4rwsFa82o2Bqo5DEj0wUKr", title: "Palagi", artist: "TJ Monterde", category: "TJ Monterde" },
-  { id: "78uCp7K1jgwSYTtgv9iPpg", title: "Dating Tayo", artist: "TJ Monterde", category: "TJ Monterde" },
-  { id: "69WYSAYNAvHrzN4c1Tba0y", title: "Tahanan", artist: "TJ Monterde", category: "TJ Monterde" },
-  { id: "6E5ZMVdTXnppL2xEUA9pdq", title: "Plano", artist: "TJ Monterde", category: "TJ Monterde" },
-  { id: "5zkqGMHs0EGafwqutNd7Gu", title: "teka lang", artist: "TJ Monterde", category: "TJ Monterde" },
-  { id: "5auxnE3JORe3WXdDAE2kAN", title: "Hanggang Dito Na Lang", artist: "TJ Monterde", category: "TJ Monterde" },
+  { id: "2nbotE8GMs2IYte7WgtZBa", title: "Multo", artist: "Cup of Joe", category: "OPM" },
+  { id: "61vyXXtY7OSYFRtSzv5ehw", title: "Mundo", artist: "IV OF SPADES", category: "OPM" },
+  { id: "4rwsFa82o2Bqo5DEj0wUKr", title: "Palagi", artist: "TJ Monterde", category: "OPM" },
+  { id: "73yag1G1OoegdWZAtMxY5D", title: "Blinding Lights", artist: "The Weeknd", category: "The Weeknd" },
+  { id: "38JOdzBE9kPj5UhKtqIIqQ", title: "Starboy", artist: "The Weeknd", category: "The Weeknd" },
+  { id: "4m0q0xQ2BNl9SCAGKyfiGZ", title: "Somebody Else", artist: "The 1975", category: "Rock / Alt" },
+  { id: "74ntRTkfvBFTqC6RMcZnrA", title: "Lips Of An Angel", artist: "Hinder", category: "Rock / Alt" },
+  { id: "0V3wPSX9ygBnCm8psDIegu", title: "Anti-Hero", artist: "Taylor Swift", category: "Pop" },
+  { id: "2plbrEY59IikOBgBGLjaoe", title: "Die With A Smile", artist: "Lady Gaga, Bruno Mars", category: "Pop" },
   { id: "6mPNCrmCQgV4ZIRwNFW9w8", title: "Code", artist: "Programming and Coding Music Club", category: "Focus" },
   { id: "6zcjD7iRPz5fgOFAFtQqEJ", title: "Coding Focus, Pt. 10", artist: "Programming Coding Ambient Chill", category: "Focus" },
-  { id: "0p20HotsDDhhAUtJ2KOAg9", title: "Relaxing Beats for Late Night Coding", artist: "Lo Fi Hip Hop", category: "Relaxing" },
+  { id: "0p20HotsDDhhAUtJ2KOAg9", title: "Relaxing Beats for Late Night Coding", artist: "Lo Fi Hip Hop", category: "Focus" },
 ];
 
 function WelcomeScreen({ onContinue, darkMode, onToggleTheme }: { onContinue: () => void; darkMode: boolean; onToggleTheme: () => void }) {
@@ -650,6 +602,7 @@ function WelcomeScreen({ onContinue, darkMode, onToggleTheme }: { onContinue: ()
     "Answer each coding challenge to earn XP and build your streak.",
     "In Battle Mode, every correct answer is a skill attack against the Code Beast.",
     "Your profile appears on your results card; add a photo to complete your winning profile.",
+    "You can edit your student profile anytime from the dashboard.",
     "Choose from a larger Spotify soundtrack list, including TJ Monterde and relaxing coding music, while playing.",
   ];
   return (
@@ -706,44 +659,44 @@ function WelcomeScreen({ onContinue, darkMode, onToggleTheme }: { onContinue: ()
   );
 }
 
-function MusicPlayer() {
+function MusicPlayer({ compact = false }: { compact?: boolean }) {
   const [track, setTrack] = useState(SPOTIFY_TRACKS[0]);
   const [category, setCategory] = useState("All");
-  const categories = ["All", "TJ Monterde", "Focus", "Relaxing"];
+  const categories = ["All", "OPM", "The Weeknd", "Pop", "Rock / Alt", "Focus"];
   const visibleTracks = category === "All" ? SPOTIFY_TRACKS : SPOTIFY_TRACKS.filter((item) => item.category === category);
 
   return (
-    <div className="rounded-3xl border border-green-500/20 bg-gradient-to-br from-green-500/10 via-white/5 to-cyan-500/5 p-4 shadow-2xl">
-      <div className="flex items-center gap-3 mb-4">
-        <div className="w-10 h-10 rounded-xl bg-green-500/15 border border-green-500/20 flex items-center justify-center">
+    <div className={`rounded-3xl border border-green-500/20 bg-gradient-to-br from-green-500/10 via-white/5 to-cyan-500/5 shadow-2xl ${compact ? "p-3" : "p-4"}`}>
+      <div className="flex items-center gap-3 mb-3">
+        <div className="w-10 h-10 shrink-0 rounded-xl bg-green-500/15 border border-green-500/20 flex items-center justify-center">
           <Music size={18} className="text-green-400" />
         </div>
-        <div>
+        <div className="min-w-0">
           <p className="font-mono text-sm font-black text-green-300">CODEQUEST MUSIC</p>
-          <p className="text-white/30 text-[10px] font-mono">Pick a soundtrack and keep coding.</p>
+          <p className="text-white/40 text-[10px] font-mono truncate">Spotify soundtrack for your quest.</p>
         </div>
-        <span className="ml-auto text-[10px] font-mono text-white/30">{SPOTIFY_TRACKS.length} saved tracks</span>
+        <span className="ml-auto shrink-0 text-[10px] font-mono text-white/30">{SPOTIFY_TRACKS.length} tracks</span>
       </div>
 
-      <div className="flex flex-wrap gap-2 mb-3">
+      <div className="flex gap-1.5 overflow-x-auto pb-1 mb-3 scrollbar-thin">
         {categories.map((item) => (
           <button key={item} onClick={() => setCategory(item)}
-            className={`px-3 py-1.5 rounded-full text-[10px] font-mono border transition-all ${
-              category === item ? "bg-green-500/20 border-green-500/40 text-green-300" : "bg-white/5 border-white/10 text-white/40 hover:text-white/70"
+            className={`shrink-0 px-2.5 py-1.5 rounded-full text-[9px] font-mono border transition-all ${
+              category === item ? "bg-green-500/20 border-green-500/40 text-green-300" : "bg-white/5 border-white/10 text-white/50 hover:text-white"
             }`}>
             {item}
           </button>
         ))}
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-4 max-h-32 overflow-y-auto pr-1">
+      <div className="grid grid-cols-2 gap-2 mb-3 max-h-36 overflow-y-auto pr-1">
         {visibleTracks.map((item) => (
           <button key={item.id} onClick={() => setTrack(item)}
-            className={`text-left p-2.5 rounded-xl border transition-all ${
+            className={`min-w-0 text-left p-2.5 rounded-xl border transition-all ${
               track.id === item.id ? "bg-green-500/15 border-green-500/40" : "bg-white/5 border-white/10 hover:bg-white/10"
             }`}>
-            <p className="text-xs font-mono font-bold text-white truncate">{item.title}</p>
-            <p className="text-[9px] font-mono text-white/35 truncate">{item.artist}</p>
+            <p className="text-[11px] font-mono font-bold text-white truncate">{item.title}</p>
+            <p className="text-[9px] font-mono text-white/40 truncate">{item.artist}</p>
           </button>
         ))}
       </div>
@@ -751,134 +704,59 @@ function MusicPlayer() {
       <iframe
         key={track.id}
         src={`https://open.spotify.com/embed/track/${track.id}?utm_source=generator`}
-        width="100%" height="152" frameBorder="0"
+        width="100%" height={compact ? "152" : "152"} frameBorder="0"
         allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-        loading="lazy" title={`Spotify player for ${track.title}`} className="rounded-2xl"
+        loading="lazy" title={`Spotify player for ${track.title}`} className="w-full rounded-2xl"
       />
 
-      <div className="flex items-center gap-2 mt-3 text-[10px] font-mono text-white/30">
-        <Volume2 size={12} />
-        <span>Press play to start from the beginning. Spotify controls whether full playback is available.</span>
+      <div className="flex items-center gap-2 mt-2 text-[9px] font-mono text-white/35">
+        <Volume2 size={11} />
+        <span>Spotify controls playback. Press play to start.</span>
       </div>
     </div>
+  );
+}
+
+function AnimeCoderAvatar({ side = "player", large = false }: { side?: "player" | "enemy"; large?: boolean }) {
+  const player = side === "player";
+  return (
+    <motion.div
+      animate={{ y: [0, -4, 0], rotate: player ? [0, 1, 0] : [0, -1, 0] }}
+      transition={{ repeat: Infinity, duration: 2.4, ease: "easeInOut" }}
+      className={`${large ? "w-28 h-36" : "w-20 h-24"} relative shrink-0`}
+      aria-label={player ? "Anime coding hero" : "Anime code beast"}
+    >
+      <div className={`absolute left-1/2 -translate-x-1/2 top-0 ${large ? "w-16 h-16" : "w-12 h-12"} rounded-full border-2 ${player ? "border-cyan-300 bg-cyan-500/20" : "border-pink-300 bg-pink-500/20"} shadow-lg`}>
+        <div className="absolute top-2 left-1/2 -translate-x-1/2 w-3/4 h-5 rounded-t-full bg-black/60" />
+        <div className="absolute top-7 left-2 flex gap-2">
+          <span className="w-2 h-1.5 rounded-full bg-white" />
+          <span className="w-2 h-1.5 rounded-full bg-white" />
+        </div>
+        <div className={`absolute bottom-2 left-1/2 -translate-x-1/2 w-5 h-1 rounded-full ${player ? "bg-cyan-300" : "bg-pink-300"}`} />
+      </div>
+      <div className={`absolute ${large ? "top-14" : "top-11"} left-1/2 -translate-x-1/2 ${large ? "w-24 h-20" : "w-16 h-14"} rounded-2xl border ${player ? "border-cyan-400/50 bg-cyan-500/15" : "border-pink-400/50 bg-pink-500/15"} flex items-center justify-center`}>
+        <Code2 size={large ? 30 : 22} className={player ? "text-cyan-300" : "text-pink-300"} />
+      </div>
+      <div className={`absolute ${large ? "bottom-0" : "bottom-0"} left-1/2 -translate-x-1/2 w-1/2 h-2 rounded-full ${player ? "bg-cyan-400/30" : "bg-pink-400/30"} blur-md`} />
+    </motion.div>
   );
 }
 
 function ModesScreen({ onSelect, onBack }: { onSelect: (mode: GameMode) => void; onBack: () => void }) {
   const modes = [
     { id: "practice" as GameMode, icon: "🧠", title: "Practice Mode", desc: "Relaxed learning with explanations after every answer.", color: "#8b5cf6", questions: "7 questions" },
-    { id: "battle" as GameMode, icon: "⚔️", title: "Battle Mode", desc: "Fight an AI coding opponent with your chosen character and difficulty.", color: "#ef4444", questions: "7 questions" },
-    { id: "speed" as GameMode, icon: "⚡", title: "Speed Mode", desc: "Beat the clock. Every question has a countdown timer.", color: "#f59e0b", questions: "5 questions" },
+    { id: "battle" as GameMode, icon: "⚔️", title: "Battle Mode", desc: "Your answers become skills. Correct answers attack the Code Beast.", color: "#ef4444", questions: "7 questions" },
+    { id: "speed" as GameMode, icon: "⚡", title: "Speed Mode", desc: "Fast-paced challenge. Try to finish all questions quickly.", color: "#f59e0b", questions: "5 questions" },
   ];
   return (
     <div className="min-h-screen px-6 py-12">
       <div className="max-w-4xl mx-auto">
         <button onClick={onBack} className="flex items-center gap-2 text-white/50 hover:text-white font-mono text-sm mb-8"><ArrowLeft size={16}/> Back</button>
-        <div className="text-center mb-10"><Gamepad2 className="mx-auto text-purple-400 mb-3" size={36}/><h2 className="text-4xl font-mono font-black text-white">Choose Your Mode</h2><p className="text-white/40 font-mono text-sm mt-2">Pick how you want to test your coding skills.</p></div>
+        <div className="text-center mb-10"><Gamepad2 className="mx-auto text-purple-400 mb-3" size={36}/><h2 className="text-4xl font-mono font-black text-white">Choose Your Mode</h2><p className="text-white/40 font-mono text-sm mt-2">How do you want to test your skills?</p></div>
         <div className="grid md:grid-cols-3 gap-4">
-          {modes.map((mode) => <motion.button key={mode.id} onClick={() => onSelect(mode.id)} whileHover={{ y: -5, scale: 1.02 }} whileTap={{ scale: .98 }} className="text-left rounded-2xl border border-white/10 bg-white/5 p-6 hover:bg-white/10 transition-all">
+          {modes.map((mode) => <button key={mode.id} onClick={() => onSelect(mode.id)} className="text-left rounded-2xl border border-white/10 bg-white/5 p-6 hover:bg-white/10 transition-all">
             <div className="text-5xl mb-5">{mode.icon}</div><h3 className="text-xl font-mono font-black text-white mb-2">{mode.title}</h3><p className="text-white/50 text-sm font-mono leading-relaxed mb-5">{mode.desc}</p><div className="flex items-center justify-between"><span className="text-xs font-mono" style={{color:mode.color}}>{mode.questions}</span><ArrowRight size={17} className="text-white/30"/></div>
-          </motion.button>)}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function BattleSetupScreen({
-  selectedLang,
-  onSelectLanguage,
-  playerCharacter,
-  aiCharacter,
-  difficulty,
-  onSelectPlayer,
-  onSelectAI,
-  onSelectDifficulty,
-  onStart,
-  onBack,
-}: {
-  selectedLang: string | null;
-  onSelectLanguage: (lang: string) => void;
-  playerCharacter: string;
-  aiCharacter: string;
-  difficulty: AIDifficulty;
-  onSelectPlayer: (id: string) => void;
-  onSelectAI: (id: string) => void;
-  onSelectDifficulty: (d: AIDifficulty) => void;
-  onStart: () => void;
-  onBack: () => void;
-}) {
-  const player = CHARACTERS.find((c) => c.id === playerCharacter)!;
-  const ai = CHARACTERS.find((c) => c.id === aiCharacter)!;
-  return (
-    <div className="min-h-screen px-5 py-10">
-      <div className="max-w-6xl mx-auto">
-        <button onClick={onBack} className="flex items-center gap-2 text-white/50 hover:text-white font-mono text-sm mb-7"><ArrowLeft size={16}/> Back</button>
-        <div className="text-center mb-8">
-          <motion.div animate={{ scale: [1, 1.08, 1], rotate: [0, -3, 3, 0] }} transition={{ repeat: Infinity, duration: 2.2 }}
-            className="inline-flex w-16 h-16 rounded-2xl bg-gradient-to-br from-red-600 to-purple-600 items-center justify-center shadow-2xl shadow-red-500/20 mb-4"><Swords size={30} className="text-white"/></motion.div>
-          <p className="text-red-300 text-xs font-mono font-bold tracking-[0.3em]">AI BATTLE ARENA</p>
-          <h2 className="text-4xl md:text-6xl font-mono font-black text-white mt-2">CHOOSE YOUR FIGHT</h2>
-          <p className="text-white/40 font-mono text-sm mt-3">Pick two fighters, set the AI difficulty, then choose your language.</p>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-5 mb-6">
-          {[{label:"YOUR CHARACTER", value:playerCharacter, set:onSelectPlayer, accent:"cyan"}, {label:"AI OPPONENT", value:aiCharacter, set:onSelectAI, accent:"red"}].map((side) => (
-            <div key={side.label} className="rounded-3xl border border-white/10 bg-white/5 p-5">
-              <div className="flex items-center justify-between mb-4"><p className={`text-${side.accent}-300 text-[10px] font-mono font-black tracking-widest`}>{side.label}</p><span className="text-2xl">{CHARACTERS.find(c => c.id === side.value)?.icon}</span></div>
-              <div className="grid grid-cols-3 gap-2">
-                {CHARACTERS.map((c) => (
-                  <button key={c.id} onClick={() => side.set(c.id)} className={`rounded-2xl border p-3 text-center transition-all ${side.value === c.id ? "border-purple-400/70 bg-purple-500/15 scale-[1.02]" : "border-white/10 bg-black/10 hover:bg-white/10"}`}>
-                    <div className="text-3xl">{c.icon}</div><p className="text-white font-mono font-bold text-xs mt-2">{c.name}</p><p className="text-white/35 font-mono text-[9px]">{c.title}</p>
-                  </button>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="rounded-3xl border border-white/10 bg-white/5 p-5 mb-6">
-          <div className="flex items-center justify-between mb-4"><div><h3 className="text-white font-mono font-black">AI DIFFICULTY</h3><p className="text-white/35 text-xs font-mono mt-1">Higher difficulty means a smarter opponent.</p></div><span className="text-3xl">🤖</span></div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {AI_DIFFICULTIES.map((d) => (
-              <button key={d.id} onClick={() => onSelectDifficulty(d.id)} className={`text-left rounded-2xl border p-4 transition-all ${difficulty === d.id ? "border-red-400/60 bg-red-500/10" : "border-white/10 bg-black/10 hover:bg-white/10"}`}>
-                <p className="text-white font-mono font-black text-sm">{d.name}</p><p className="text-white/40 font-mono text-[10px] mt-1">{d.desc}</p>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="rounded-3xl border border-white/10 bg-white/5 p-5 mb-6">
-          <div className="flex items-center gap-3 mb-4"><Code2 className="text-purple-400"/><div><h3 className="text-white font-mono font-black">BATTLE LANGUAGE</h3><p className="text-white/35 text-xs font-mono">Choose the questions for this fight.</p></div></div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {LANGUAGES.map((lang) => (
-              <button key={lang.id} onClick={() => onSelectLanguage(lang.id)} className={`text-left rounded-2xl border p-4 transition-all ${selectedLang === lang.id ? "border-purple-400/60 bg-purple-500/15" : "border-white/10 bg-white/5 hover:bg-white/10"}`}>
-                <div className="text-2xl">{lang.icon}</div><p className="text-white font-mono font-bold text-sm mt-2">{lang.name}</p>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <button disabled={!selectedLang} onClick={onStart} className="w-full py-4 rounded-2xl bg-gradient-to-r from-red-600 via-purple-600 to-cyan-600 text-white font-mono font-black text-lg disabled:opacity-30 shadow-xl shadow-purple-500/20">
-          Start Battle <Swords size={19} className="inline ml-2"/>
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function AchievementsScreen({ achievements, duelWins, onBack }: { achievements: Achievement[]; duelWins: number; onBack: () => void }) {
-  const unlocked = achievements.filter(a => a.unlocked).length;
-  return (
-    <div className="min-h-screen px-5 py-10">
-      <div className="max-w-5xl mx-auto">
-        <button onClick={onBack} className="flex items-center gap-2 text-white/50 hover:text-white font-mono text-sm mb-7"><ArrowLeft size={16}/> Back</button>
-        <div className="text-center mb-8"><Medal className="mx-auto text-yellow-400 mb-3" size={40}/><h2 className="text-4xl md:text-5xl font-mono font-black text-white">ACHIEVEMENTS</h2><p className="text-white/40 font-mono text-sm mt-2">{unlocked} / {achievements.length} unlocked · {duelWins} Friend Arena wins</p></div>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {achievements.map(a => <motion.div key={a.id} whileHover={{y:-4}} className={`rounded-2xl border p-5 ${a.unlocked ? "border-yellow-400/40 bg-yellow-500/10" : "border-white/10 bg-white/5 opacity-60"}`}>
-            <div className="flex items-start justify-between"><span className="text-4xl">{a.icon}</span>{a.unlocked ? <span className="text-[9px] font-mono font-black text-yellow-300 border border-yellow-400/30 rounded-full px-2 py-1">UNLOCKED</span> : <span className="text-xl">🔒</span>}</div>
-            <h3 className="text-white font-mono font-black text-lg mt-4">{a.title}</h3><p className="text-white/40 text-xs font-mono leading-relaxed mt-2">{a.description}</p>
-          </motion.div>)}
+          </button>)}
         </div>
       </div>
     </div>
@@ -894,7 +772,6 @@ function HomeScreen({
   profile,
   totalXP,
   onDuel,
-  onAchievements,
 }: {
   onStart: () => void;
   onProfile: () => void;
@@ -904,7 +781,6 @@ function HomeScreen({
   profile: StudentProfile;
   totalXP: number;
   onDuel: () => void;
-  onAchievements: () => void;
 }) {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-6 py-12 relative overflow-hidden">
@@ -914,9 +790,6 @@ function HomeScreen({
         </button>
         <button onClick={onGuidelines} className="flex items-center gap-2 px-3 py-2 rounded-xl border border-white/10 bg-white/5 text-white/70 font-mono text-xs">
           <BookOpenCheck size={14} /> Guidelines
-        </button>
-        <button onClick={onAchievements} className="flex items-center gap-2 px-3 py-2 rounded-xl border border-yellow-500/20 bg-yellow-500/10 text-yellow-300 font-mono text-xs">
-          <Medal size={14} /> Achievements
         </button>
         <button onClick={onToggleTheme} className="flex items-center gap-2 px-3 py-2 rounded-xl border border-white/10 bg-white/5 text-white/70 font-mono text-xs">
           {darkMode ? <Sun size={14} /> : <Moon size={14} />} {darkMode ? "Light" : "Dark"}
@@ -999,7 +872,10 @@ function HomeScreen({
             className="inline-flex items-center gap-2 px-5 py-3 rounded-xl border border-pink-500/30 bg-pink-500/10 text-pink-300 font-mono font-bold text-sm hover:bg-pink-500/20 transition-all">
             <Users size={16} /> 1v1 Friend Arena
           </button>
-
+          <button onClick={onProfile}
+            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl border border-white/10 bg-white/5 text-white/60 font-mono font-bold text-sm hover:bg-white/10 transition-all">
+            <User size={16} /> Student Profile
+          </button>
         </div>
       </motion.div>
     </div>
@@ -1271,24 +1147,15 @@ function LanguageScreen({ onSelect }: { onSelect: (lang: string) => void }) {
 function GameScreen({
   langId,
   mode,
-  battlePlayerCharacterId = "byte",
-  battleAICharacterId = "rex",
-  battleDifficulty = "normal",
   onFinish,
 }: {
   langId: string;
   mode: GameMode;
-  battlePlayerCharacterId?: string;
-  battleAICharacterId?: string;
-  battleDifficulty?: AIDifficulty;
   onFinish: (score: number, xp: number, correct: number) => void;
 }) {
   const allQuestions = QUESTIONS[langId] ?? [];
   const questions = mode === "speed" ? allQuestions.slice(0, Math.min(5, allQuestions.length)) : allQuestions;
   const lang = LANGUAGES.find((l) => l.id === langId)!;
-  const playerCharacter = CHARACTERS.find(c => c.id === battlePlayerCharacterId) ?? CHARACTERS[0];
-  const aiCharacter = CHARACTERS.find(c => c.id === battleAICharacterId) ?? CHARACTERS[1];
-  const aiLevel = AI_DIFFICULTIES.find(d => d.id === battleDifficulty) ?? AI_DIFFICULTIES[1];
   const [qIndex, setQIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [answerState, setAnswerState] = useState<AnswerState>("idle");
@@ -1302,63 +1169,58 @@ function GameScreen({
   const [enemyHP, setEnemyHP] = useState(100);
   const [playerHP, setPlayerHP] = useState(100);
   const [battleMessage, setBattleMessage] = useState("Choose your attack.");
-  const [battlePulse, setBattlePulse] = useState<"player" | "ai" | null>(null);
-  const [speedTime, setSpeedTime] = useState(mode === "speed" ? 15 : 0);
-  const [speedExpired, setSpeedExpired] = useState(false);
-  const [aiCorrect, setAiCorrect] = useState(0);
-  const [finished, setFinished] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(mode === "speed" ? 60 : 0);
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const finishedRef = useRef(false);
   const battleSkills = ["Code Slash", "Logic Strike", "Debug Blast", "Syntax Smash", "Algorithm Beam"];
+
+  const playSfx = useCallback((kind: "correct" | "wrong" | "click" | "timer" | "finish") => {
+    if (!soundEnabled || typeof window === "undefined") return;
+    try {
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const frequencies = {
+        correct: [660, 880], wrong: [220, 160], click: [420], timer: [740, 520], finish: [523, 659, 784],
+      }[kind];
+      osc.type = kind === "wrong" ? "sawtooth" : "sine";
+      osc.frequency.setValueAtTime(frequencies[0], ctx.currentTime);
+      frequencies.slice(1).forEach((f, i) => osc.frequency.setValueAtTime(f, ctx.currentTime + (i + 1) * 0.08));
+      gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(kind === "wrong" ? 0.05 : 0.08, ctx.currentTime + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.25);
+      osc.connect(gain); gain.connect(ctx.destination); osc.start(); osc.stop(ctx.currentTime + 0.27);
+      setTimeout(() => ctx.close(), 350);
+    } catch {}
+  }, [soundEnabled]);
+
   const currentQ = questions[qIndex];
   const isLast = qIndex === questions.length - 1;
 
-  const finish = useCallback(() => {
-    if (finished) return;
-    setFinished(true);
+  const finishGame = useCallback(() => {
+    if (finishedRef.current) return;
+    finishedRef.current = true;
+    playSfx("finish");
     onFinish(Math.round((correctCount / questions.length) * 100), totalXP, correctCount);
-  }, [finished, correctCount, questions.length, totalXP, onFinish]);
+  }, [correctCount, onFinish, playSfx, questions.length, totalXP]);
 
   useEffect(() => {
-    if (mode !== "speed" || answerState !== "idle" || finished) return;
-    setSpeedTime(15);
-    setSpeedExpired(false);
-    const timer = window.setInterval(() => {
-      setSpeedTime(t => {
-        if (t <= 1) {
-          window.clearInterval(timer);
-          setSpeedExpired(true);
-          return 0;
-        }
-        return t - 1;
-      });
-    }, 1000);
+    if (mode !== "speed") return;
+    if (timeLeft <= 0) {
+      finishGame();
+      return;
+    }
+    const timer = window.setInterval(() => setTimeLeft((t) => t - 1), 1000);
     return () => window.clearInterval(timer);
-  }, [qIndex, mode, answerState, finished]);
-
-  const advanceAfterAnswer = useCallback(() => {
-    if (isLast) {
-      window.setTimeout(finish, 450);
-    } else {
-      setQIndex(i => i + 1);
-      setSelected(null);
-      setAnswerState("idle");
-      setShowExplanation(false);
-      setSpeedExpired(false);
-    }
-  }, [isLast, finish]);
+  }, [mode, timeLeft, finishGame]);
 
   useEffect(() => {
-    if (mode === "speed" && speedExpired && answerState === "idle") {
-      setAnswerState("wrong");
-      setSelected(null);
-      setShowExplanation(true);
-      setStreak(0);
-      setBattleMessage("⏱ Time's up! The clock wins this round.");
-      window.setTimeout(advanceAfterAnswer, 800);
-    }
-  }, [speedExpired, mode, answerState, advanceAfterAnswer]);
+    if (mode === "speed" && timeLeft > 0 && timeLeft <= 10) playSfx("timer");
+  }, [timeLeft, mode, playSfx]);
 
   const handleSelect = useCallback((idx: number) => {
-    if (answerState !== "idle" || finished || speedExpired) return;
+    if (answerState !== "idle" || finishedRef.current) return;
     setSelected(idx);
     const correct = idx === currentQ.answer;
     setAnswerState(correct ? "correct" : "wrong");
@@ -1366,112 +1228,169 @@ function GameScreen({
     setParticleCorrect(correct);
     setShowParticles(true);
     setTimeout(() => setShowParticles(false), 900);
+    playSfx(correct ? "correct" : "wrong");
 
     if (correct) {
       const bonus = streak >= 2 ? Math.round(currentQ.xp * 0.5) : 0;
       const earned = currentQ.xp + bonus;
-      setTotalXP(prev => {
+      setTotalXP((prev) => {
         const next = prev + earned;
         setXpLevel(Math.floor(next / 50) + 1);
         return next;
       });
-      setCorrectCount(c => c + 1);
-      setStreak(s => s + 1);
-    } else setStreak(0);
+      setCorrectCount((c) => c + 1);
+      setStreak((s) => s + 1);
+    } else {
+      setStreak(0);
+    }
 
     if (mode === "battle") {
-      const aiWillBeCorrect = Math.random() < aiLevel.accuracy;
       if (correct) {
-        setEnemyHP(hp => Math.max(0, hp - 20));
-        setBattlePulse("player");
-        setBattleMessage(`⚡ ${battleSkills[qIndex % battleSkills.length]}! ${playerCharacter.name} hits for 20 HP`);
+        setEnemyHP((hp) => Math.max(0, hp - 20));
+        setBattleMessage(`⚡ ${battleSkills[qIndex % battleSkills.length]}! -20 HP`);
       } else {
-        setBattlePulse("ai");
-        if (aiWillBeCorrect) {
-          setAiCorrect(c => c + 1);
-          setPlayerHP(hp => Math.max(0, hp - 15));
-          setBattleMessage(`💥 ${aiCharacter.name} counterattacks! -15 HP`);
-        } else {
-          setBattleMessage(`🛡️ ${aiCharacter.name} missed! You block the attack.`);
-        }
+        setPlayerHP((hp) => Math.max(0, hp - 15));
+        setBattleMessage("💥 Code Beast counterattacks! -15 HP");
       }
-      window.setTimeout(() => setBattlePulse(null), 550);
     }
-  }, [answerState, finished, speedExpired, currentQ, streak, mode, qIndex, playerCharacter, aiCharacter]);
+  }, [answerState, currentQ, mode, playSfx, qIndex, streak, battleSkills]);
 
-  const handleNext = () => advanceAfterAnswer();
+  const handleNext = () => {
+    if (isLast) { finishGame(); return; }
+    playSfx("click");
+    setQIndex((i) => i + 1);
+    setSelected(null);
+    setAnswerState("idle");
+    setShowExplanation(false);
+  };
 
-  if (!currentQ) return null;
-  const progress = (qIndex / questions.length) * 100;
+  const progress = ((qIndex) / questions.length) * 100;
 
   return (
-    <div className="min-h-screen px-4 py-6 flex flex-col max-w-2xl mx-auto">
+    <div className="w-full min-h-screen px-3 sm:px-5 lg:px-7 py-4 sm:py-6 overflow-x-hidden">
       <ParticleEffect active={showParticles} correct={particleCorrect} />
-      <div className="mb-6 space-y-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2"><span className="text-2xl">{lang.icon}</span><span className="font-mono font-bold text-white">{lang.name}</span></div>
-          <div className="flex items-center gap-3">
-            {mode === "speed" && (
-              <motion.div animate={{scale: speedTime <= 5 ? [1,1.08,1] : 1}} transition={{repeat:speedTime<=5?Infinity:0,duration:.55}}
-                className={`flex items-center gap-2 rounded-full px-4 py-2 border font-mono font-black text-sm ${speedTime <= 5 ? "bg-red-500/15 border-red-500/40 text-red-300" : "bg-yellow-500/10 border-yellow-500/30 text-yellow-300"}`}>
-                ⏱ {speedTime}s
-              </motion.div>
-            )}
-            {streak >= 2 && <motion.div initial={{scale:0}} animate={{scale:1}} className="flex items-center gap-1 bg-orange-500/20 border border-orange-500/30 rounded-full px-3 py-1"><Flame size={12} className="text-orange-400"/><span className="text-orange-400 font-mono font-bold text-xs">{streak}x streak!</span></motion.div>}
-            <span className="text-sm font-mono text-white/40">{qIndex + 1} / {questions.length}</span>
+      <div className={`w-full mx-auto ${mode === "battle" ? "max-w-[1500px]" : "max-w-5xl"}`}>
+        <div className="mb-4 sm:mb-6">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="text-2xl">{lang.icon}</span>
+              <span className="font-mono font-bold text-white truncate">{lang.name}</span>
+              <span className="hidden sm:inline text-xs font-mono text-white/30">· {mode.toUpperCase()}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              {mode === "speed" && (
+                <motion.div animate={{ scale: timeLeft <= 10 ? [1, 1.08, 1] : 1 }} className={`flex items-center gap-2 px-3 py-1.5 rounded-full border font-mono font-black text-xs ${timeLeft <= 10 ? "border-red-500/60 bg-red-500/15 text-red-300" : "border-amber-400/30 bg-amber-400/10 text-amber-300"}`}>
+                  <span>⏱</span> {timeLeft}s
+                </motion.div>
+              )}
+              {streak >= 2 && <div className="flex items-center gap-1 bg-orange-500/20 border border-orange-500/30 rounded-full px-3 py-1"><Flame size={12} className="text-orange-400" /><span className="text-orange-400 font-mono font-bold text-xs">{streak}x</span></div>}
+              <span className="text-xs sm:text-sm font-mono text-white/40">{qIndex + 1}/{questions.length}</span>
+              <button onClick={() => setSoundEnabled((v) => !v)} className="p-2 rounded-xl border border-white/10 bg-white/5 text-white/60 hover:text-white" title="Toggle sound effects">
+                <Volume2 size={15} className={soundEnabled ? "text-cyan-300" : "text-white/30"} />
+              </button>
+            </div>
+          </div>
+          <div className="mt-3"><XPBar current={totalXP} max={xpLevel * 50} level={xpLevel} /></div>
+          <div className="mt-3 h-1 bg-white/10 rounded-full overflow-hidden">
+            <motion.div className="h-full rounded-full" style={{ background: lang.color }} animate={{ width: `${progress}%` }} transition={{ duration: 0.4 }} />
           </div>
         </div>
 
-        <div className="flex gap-2"><button onClick={() => window.open("https://open.spotify.com/", "_blank", "noopener,noreferrer")} className="flex items-center gap-2 px-3 py-2 rounded-xl border border-green-500/20 bg-green-500/10 text-green-400 font-mono text-xs"><Music size={14}/> Spotify Music</button></div>
-        <MusicPlayer />
-        <XPBar current={totalXP} max={xpLevel * 50} level={xpLevel} />
-        <div className="h-1 bg-white/10 rounded-full overflow-hidden"><motion.div className="h-full rounded-full" style={{background:lang.color}} animate={{width:`${progress}%`}} /></div>
+        <div className={`${mode === "battle" ? "grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_330px] gap-5 lg:items-start" : ""}`}>
+          <main className="min-w-0">
+            {mode === "battle" && (
+              <motion.div animate={{ boxShadow: ["0 0 0 rgba(239,68,68,0)", "0 0 35px rgba(168,85,247,.16)", "0 0 0 rgba(239,68,68,0)"] }} transition={{ repeat: Infinity, duration: 2.5 }}
+                className="rounded-3xl border border-purple-500/20 bg-gradient-to-br from-red-500/10 via-purple-500/10 to-cyan-500/10 p-3 sm:p-4 mb-5 overflow-hidden relative">
+                <div className="flex items-center justify-center gap-3 sm:gap-8 relative">
+                  <AnimeCoderAvatar side="enemy" large />
+                  <div className="text-center min-w-0">
+                    <p className="text-[10px] font-mono text-white/30 tracking-[0.25em]">CODE BATTLE</p>
+                    <p className="text-xs sm:text-sm font-mono font-black text-purple-300">YOUR SKILL IS YOUR WEAPON</p>
+                    <div className="mt-3 text-xs font-mono font-black text-white/70">{battleMessage}</div>
+                  </div>
+                  <AnimeCoderAvatar side="player" large />
+                </div>
+                <div className="grid grid-cols-2 gap-3 sm:gap-5 mt-3">
+                  <div><div className="flex justify-between mb-1"><span className="text-[10px] font-mono text-red-300">CODE BEAST</span><span className="text-[10px] font-mono text-red-300">{enemyHP} HP</span></div><div className="h-3 bg-black/20 rounded-full overflow-hidden"><motion.div className="h-full bg-gradient-to-r from-red-600 to-pink-500" animate={{ width: `${enemyHP}%` }} /></div></div>
+                  <div><div className="flex justify-between mb-1"><span className="text-[10px] font-mono text-cyan-300">YOU</span><span className="text-[10px] font-mono text-cyan-300">{playerHP} HP</span></div><div className="h-3 bg-black/20 rounded-full overflow-hidden"><motion.div className="h-full bg-gradient-to-r from-cyan-500 to-blue-500" animate={{ width: `${playerHP}%` }} /></div></div>
+                </div>
+              </motion.div>
+            )}
 
-        {mode === "battle" && (
-          <motion.div animate={{boxShadow:["0 0 0 rgba(239,68,68,0)","0 0 35px rgba(168,85,247,.16)","0 0 0 rgba(239,68,68,0)"]}} transition={{repeat:Infinity,duration:2.5}} className="rounded-3xl border border-purple-500/20 bg-gradient-to-br from-red-500/10 via-purple-500/10 to-cyan-500/10 p-4 overflow-hidden relative">
-            <div className="flex items-center justify-center gap-8 mb-4">
-              <motion.div animate={battlePulse === "ai" ? {x:[0,-10,10,0],scale:[1,1.2,1]} : {y:[0,-4,0]}} transition={{repeat:battlePulse==="ai"?0:Infinity,duration:battlePulse==="ai"?.4:2}} className="text-5xl">{aiCharacter.icon}</motion.div>
-              <div className="text-center"><p className="text-[10px] font-mono text-white/40 tracking-[0.3em]">AI BATTLE</p><p className="text-sm font-mono font-black text-purple-300">{aiCharacter.name} VS {playerCharacter.name}</p><p className="text-[10px] text-red-300 font-mono mt-1">{aiLevel.name} AI</p></div>
-              <motion.div animate={battlePulse === "player" ? {x:[0,10,-10,0],scale:[1,1.2,1]} : {y:[0,4,0]}} transition={{repeat:battlePulse==="player"?0:Infinity,duration:battlePulse==="player"?.4:2}} className="text-5xl">{playerCharacter.icon}</motion.div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div><div className="flex justify-between mb-1"><span className="text-[10px] font-mono text-red-300">{aiCharacter.name} · AI</span><span className="text-[10px] font-mono text-red-300">{enemyHP} HP</span></div><div className="h-3 bg-black/20 rounded-full overflow-hidden border border-red-500/10"><motion.div className="h-full bg-gradient-to-r from-red-600 to-pink-500 rounded-full" animate={{width:`${enemyHP}%`}} /></div></div>
-              <div><div className="flex justify-between mb-1"><span className="text-[10px] font-mono text-cyan-300">{playerCharacter.name} · YOU</span><span className="text-[10px] font-mono text-cyan-300">{playerHP} HP</span></div><div className="h-3 bg-black/20 rounded-full overflow-hidden border border-cyan-500/10"><motion.div className="h-full bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full" animate={{width:`${playerHP}%`}} /></div></div>
-            </div>
-            <div className="mt-3 flex justify-center gap-5 text-[10px] font-mono text-white/40"><span>AI correct: {aiCorrect}</span><span>Difficulty: {aiLevel.name}</span></div>
-            <AnimatePresence mode="wait"><motion.div key={battleMessage} initial={{opacity:0,scale:.9,y:5}} animate={{opacity:1,scale:1,y:0}} exit={{opacity:0,y:-5}} className="mt-3 text-center rounded-xl border border-white/10 bg-black/15 py-2.5"><span className="text-xs font-mono font-black text-white/70">{battleMessage}</span></motion.div></AnimatePresence>
-          </motion.div>
+            <AnimatePresence mode="wait">
+              <motion.div key={qIndex} initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} transition={{ duration: 0.25 }} className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2 mb-3">
+                  <div className="flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-mono font-bold border" style={{ color: lang.color, borderColor: `${lang.color}40`, backgroundColor: `${lang.color}15` }}>
+                    <Target size={11} /> {currentQ.type === "multiple" ? "Multiple Choice" : currentQ.type === "code" ? "Code Challenge" : "True or False"}
+                  </div>
+                  <span className="text-xs font-mono text-yellow-400/70">+{currentQ.xp} XP</span>
+                  {mode === "battle" && <span className="text-xs font-mono text-red-300/70">⚔ {battleSkills[qIndex % battleSkills.length]}</span>}
+                </div>
+
+                <h3 className="text-lg sm:text-xl md:text-2xl font-mono font-bold text-white mb-4 leading-snug">{currentQ.question}</h3>
+                {currentQ.code && <div className="mb-4"><CodeBlock code={currentQ.code} /></div>}
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-4">
+                  {currentQ.options.map((opt, i) => {
+                    const isCorrect = i === currentQ.answer;
+                    const isSelected = i === selected;
+                    let borderColor = "border-white/10"; let bg = "bg-white/5 hover:bg-white/10"; let textColor = "text-white/80"; let icon = null;
+                    if (answerState !== "idle") {
+                      if (isCorrect) { borderColor = "border-green-500/60"; bg = "bg-green-500/15"; textColor = "text-green-300"; icon = <CheckCircle2 size={18} className="text-green-400 shrink-0" />; }
+                      else if (isSelected) { borderColor = "border-red-500/60"; bg = "bg-red-500/15"; textColor = "text-red-300"; icon = <XCircle size={18} className="text-red-400 shrink-0" />; }
+                      else { bg = "bg-white/3"; textColor = "text-white/30"; }
+                    }
+                    return (
+                      <motion.button key={i} onClick={() => handleSelect(i)} disabled={answerState !== "idle"}
+                        className={`w-full min-w-0 text-left flex items-center gap-3 p-3.5 sm:p-4 rounded-2xl border transition-all ${borderColor} ${bg} ${textColor} disabled:cursor-default`}
+                        whileHover={answerState === "idle" ? { scale: 1.01 } : {}} whileTap={answerState === "idle" ? { scale: .99 } : {}}>
+                        <span className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center text-xs font-mono font-bold shrink-0">{String.fromCharCode(65 + i)}</span>
+                        <span className="font-mono text-sm break-words flex-1">{opt}</span>{icon}
+                      </motion.button>
+                    );
+                  })}
+                </div>
+
+                <AnimatePresence>
+                  {showExplanation && (
+                    <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
+                      <div className={`rounded-2xl p-4 border mb-4 ${answerState === "correct" ? "bg-green-500/10 border-green-500/30" : "bg-red-500/10 border-red-500/30"}`}>
+                        <div className="flex items-start gap-3">
+                          {answerState === "correct" ? <CheckCircle2 size={18} className="text-green-400 shrink-0" /> : <XCircle size={18} className="text-red-400 shrink-0" />}
+                          <div><p className={`font-mono font-bold text-sm mb-1 ${answerState === "correct" ? "text-green-300" : "text-red-300"}`}>{answerState === "correct" ? "Correct!" : "Not quite!"}</p><p className="text-white/60 text-sm font-mono leading-relaxed">{currentQ.explanation}</p></div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {answerState !== "idle" && (
+                  <motion.button initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} onClick={handleNext}
+                    className="w-full py-3.5 rounded-2xl font-mono font-bold text-white flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-cyan-600 shadow-lg shadow-purple-500/20">
+                    {isLast ? "See Results" : "Next Question"} <ArrowRight size={18} />
+                  </motion.button>
+                )}
+              </motion.div>
+            </AnimatePresence>
+          </main>
+
+          {mode === "battle" && (
+            <aside className="min-w-0 lg:sticky lg:top-4">
+              <div className="mb-2 flex items-center justify-between">
+                <p className="text-[10px] font-mono font-black text-green-300 tracking-widest">BATTLE SOUNDTRACK</p>
+                <span className="text-[9px] font-mono text-white/30">Desktop side panel · Mobile below battle</span>
+              </div>
+              <MusicPlayer compact />
+            </aside>
+          )}
+        </div>
+
+        {mode !== "battle" && (
+          <div className="mt-5 max-w-2xl mx-auto">
+            <MusicPlayer compact />
+          </div>
         )}
       </div>
-
-      <AnimatePresence mode="wait">
-        <motion.div key={qIndex} initial={{opacity:0,x:40}} animate={{opacity:1,x:0}} exit={{opacity:0,x:-40}} transition={{duration:.3}} className="flex-1">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-mono font-bold border" style={{color:lang.color,borderColor:`${lang.color}40`,backgroundColor:`${lang.color}15`}}><Target size={11}/>{currentQ.type === "multiple" ? "Multiple Choice" : currentQ.type === "code" ? "Code Challenge" : "True or False"}</div>
-            <span className="text-xs font-mono text-yellow-400/60">+{currentQ.xp} XP</span>
-            {mode === "speed" && <span className="text-xs font-mono text-yellow-300/70">⏱ 15 SEC</span>}
-            {mode === "battle" && <span className="text-xs font-mono text-red-300/70">⚔ {battleSkills[qIndex % battleSkills.length]}</span>}
-          </div>
-          <h3 className="text-xl md:text-2xl font-mono font-bold text-white mb-5 leading-snug">{currentQ.question}</h3>
-          {currentQ.code && <div className="mb-5"><CodeBlock code={currentQ.code}/></div>}
-          <div className="space-y-3 mb-5">
-            {currentQ.options.map((opt,i) => {
-              const isCorrect=i===currentQ.answer, isSelected=i===selected;
-              let borderColor="border-white/10", bg="bg-white/5 hover:bg-white/10", textColor="text-white/80", icon=null;
-              if(answerState!=="idle"){
-                if(isCorrect){borderColor="border-green-500/60";bg="bg-green-500/15";textColor="text-green-300";icon=<CheckCircle2 size={18} className="text-green-400 flex-shrink-0"/>;}
-                else if(isSelected&&!isCorrect){borderColor="border-red-500/60";bg="bg-red-500/15";textColor="text-red-300";icon=<XCircle size={18} className="text-red-400 flex-shrink-0"/>;}
-                else {bg="bg-white/3";textColor="text-white/30";}
-              }
-              return <motion.button key={i} onClick={()=>handleSelect(i)} disabled={answerState!=="idle"} className={`w-full text-left flex items-center gap-3 p-4 rounded-xl border transition-all ${borderColor} ${bg} ${textColor}`} whileHover={answerState==="idle"?{scale:1.01}:{}} whileTap={answerState==="idle"?{scale:.99}:{}}>
-                <span className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center text-xs font-mono font-bold flex-shrink-0">{String.fromCharCode(65+i)}</span><span className="font-mono text-sm flex-1">{opt}</span>{icon}
-              </motion.button>
-            })}
-          </div>
-          <AnimatePresence>{showExplanation && <motion.div initial={{opacity:0,height:0}} animate={{opacity:1,height:"auto"}} exit={{opacity:0,height:0}} className="overflow-hidden"><div className={`rounded-xl p-4 border mb-5 ${answerState==="correct"?"bg-green-500/10 border-green-500/30":"bg-red-500/10 border-red-500/30"}`}><div className="flex items-start gap-3">{answerState==="correct"?<CheckCircle2 size={18} className="text-green-400 mt-0.5"/>:<XCircle size={18} className="text-red-400 mt-0.5"/>}<div><p className="font-mono font-bold text-sm mb-1" style={{color:answerState==="correct"?"#4ade80":"#f87171"}}>{answerState==="correct"?"Correct!":"Not quite!"}</p><p className="text-white/60 text-sm font-mono leading-relaxed">{speedExpired ? "Time ran out. Move quickly on the next question!" : currentQ.explanation}</p></div></div></div></motion.div>}</AnimatePresence>
-          {answerState !== "idle" && <motion.button initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} onClick={handleNext} className="w-full py-4 rounded-xl font-mono font-bold text-white flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-cyan-600" whileHover={{scale:1.02}} whileTap={{scale:.98}}>{isLast?"See Results":"Next Question"}<ArrowRight size={18}/></motion.button>}
-        </motion.div>
-      </AnimatePresence>
     </div>
   );
 }
@@ -1488,55 +1407,47 @@ function DuelSetupScreen({
   totalXP: number;
   selectedLang: string | null;
   onSelectLanguage: (lang: string) => void;
-  onStart: (friendName: string, friendRank: string, friendPhoto: string, yourCharacter: string, friendCharacter: string) => void;
+  onStart: (friendName: string, friendRank: string, friendPhoto: string) => void;
   onBack: () => void;
 }) {
   const [friendName, setFriendName] = useState("");
   const [friendRank, setFriendRank] = useState(RANKS[2].name);
   const [friendPhoto, setFriendPhoto] = useState("");
-  const [yourCharacter, setYourCharacter] = useState("byte");
-  const [friendCharacter, setFriendCharacter] = useState("rex");
-  const your = CHARACTERS.find(c => c.id === yourCharacter)!;
-  const friend = CHARACTERS.find(c => c.id === friendCharacter)!;
 
   return (
     <div className="min-h-screen px-5 py-10">
-      <div className="max-w-6xl mx-auto">
-        <button onClick={onBack} className="flex items-center gap-2 text-white/50 hover:text-white font-mono text-sm mb-7"><ArrowLeft size={16}/> Back</button>
+      <div className="max-w-5xl mx-auto">
+        <button onClick={onBack} className="flex items-center gap-2 text-white/40 hover:text-white font-mono text-sm mb-7"><ArrowLeft size={16}/> Back</button>
         <div className="text-center mb-9">
-          <motion.div animate={{ scale: [1, 1.08, 1], rotate: [0, -4, 4, 0] }} transition={{ repeat: Infinity, duration: 2 }}
-            className="inline-flex w-16 h-16 rounded-2xl bg-gradient-to-br from-pink-600 to-purple-600 items-center justify-center shadow-2xl shadow-pink-500/20 mb-4"><Swords size={30} className="text-white"/></motion.div>
+          <motion.div animate={{ scale: [1, 1.06, 1] }} transition={{ repeat: Infinity, duration: 2 }}
+            className="inline-flex w-16 h-16 rounded-2xl bg-gradient-to-br from-pink-600 to-purple-600 items-center justify-center shadow-2xl shadow-pink-500/20 mb-4">
+            <Swords size={30} className="text-white"/>
+          </motion.div>
           <p className="text-pink-300 text-xs font-mono font-bold tracking-[0.3em]">DUEL ARENA</p>
           <h2 className="text-4xl md:text-6xl font-mono font-black text-white mt-2">1V1 FRIEND BATTLE</h2>
-          <p className="text-white/40 font-mono text-sm mt-3">Choose a fighter for each player. Then pass the device when your turn ends.</p>
+          <p className="text-white/35 font-mono text-sm mt-3">Two players. One question. Your coding skill decides the winner.</p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-5 mb-6">
+        <div className="grid md:grid-cols-2 gap-5 mb-7">
           <div className="rounded-3xl border border-cyan-500/20 bg-gradient-to-br from-cyan-500/10 to-white/5 p-6">
-            <div className="flex items-center justify-between mb-4"><p className="text-cyan-300 text-[10px] font-mono font-black tracking-widest">YOUR CHARACTER</p><span className="text-4xl">{your.icon}</span></div>
-            <div className="grid grid-cols-3 gap-2">
-              {CHARACTERS.map(c => <button key={c.id} onClick={() => setYourCharacter(c.id)} className={`rounded-2xl border p-3 text-center ${yourCharacter === c.id ? "border-cyan-400/70 bg-cyan-500/10" : "border-white/10 bg-white/5 hover:bg-white/10"}`}>
-                <div className="text-3xl">{c.icon}</div><p className="text-white font-mono font-bold text-xs mt-1">{c.name}</p><p className="text-white/35 text-[9px] font-mono">{c.title}</p>
-              </button>)}
+            <p className="text-cyan-300 text-[10px] font-mono font-black tracking-widest mb-4">YOUR PROFILE</p>
+            <div className="flex items-center gap-4">
+              {profile.photo ? <img src={profile.photo} className="w-20 h-20 rounded-2xl object-cover border border-cyan-400/30" alt="Your profile"/> :
+                <div className="w-20 h-20 rounded-2xl bg-cyan-500/10 border border-cyan-400/20 flex items-center justify-center text-3xl">👨‍💻</div>}
+              <div className="min-w-0">
+                <h3 className="text-white font-mono font-black text-xl truncate">{profile.username}</h3>
+                <p className="text-white/40 font-mono text-xs">{profile.yearLevel} · {profile.course}</p>
+                <div className="mt-2"><RankBadge totalXP={totalXP} compact /></div>
+              </div>
             </div>
           </div>
 
           <div className="rounded-3xl border border-pink-500/20 bg-gradient-to-br from-pink-500/10 to-white/5 p-6">
-            <div className="flex items-center justify-between mb-4"><p className="text-pink-300 text-[10px] font-mono font-black tracking-widest">FRIEND CHARACTER</p><span className="text-4xl">{friend.icon}</span></div>
-            <div className="grid grid-cols-3 gap-2">
-              {CHARACTERS.map(c => <button key={c.id} onClick={() => setFriendCharacter(c.id)} className={`rounded-2xl border p-3 text-center ${friendCharacter === c.id ? "border-pink-400/70 bg-pink-500/10" : "border-white/10 bg-white/5 hover:bg-white/10"}`}>
-                <div className="text-3xl">{c.icon}</div><p className="text-white font-mono font-bold text-xs mt-1">{c.name}</p><p className="text-white/35 text-[9px] font-mono">{c.title}</p>
-              </button>)}
-            </div>
-          </div>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-5 mb-6">
-          <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
-            <p className="text-pink-300 text-[10px] font-mono font-black tracking-widest mb-3">FRIEND DETAILS</p>
+            <p className="text-pink-300 text-[10px] font-mono font-black tracking-widest mb-4">FRIEND PROFILE</p>
             <input value={friendName} onChange={(e) => setFriendName(e.target.value)} placeholder="Enter friend's username"
               className="w-full rounded-xl border border-white/10 bg-black/20 text-white placeholder:text-white/25 px-4 py-3 outline-none focus:border-pink-500/50 mb-3"/>
-            <select value={friendRank} onChange={(e) => setFriendRank(e.target.value)} className="w-full rounded-xl border border-white/10 bg-[#11111f] text-white px-4 py-3 outline-none focus:border-pink-500/50">
+            <select value={friendRank} onChange={(e) => setFriendRank(e.target.value)}
+              className="w-full rounded-xl border border-white/10 bg-[#11111f] text-white px-4 py-3 outline-none focus:border-pink-500/50">
               {RANKS.map((r) => <option key={r.name}>{r.name}</option>)}
             </select>
             <label className="mt-3 cursor-pointer flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-white/10 bg-white/5 text-white/60 text-xs font-mono">
@@ -1547,19 +1458,23 @@ function DuelSetupScreen({
                 const reader = new FileReader(); reader.onload = () => setFriendPhoto(String(reader.result)); reader.readAsDataURL(file);
               }} />
             </label>
-          </div>
-
-          <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
-            <div className="flex items-center gap-3 mb-4"><Code2 className="text-purple-400"/><div><h3 className="text-white font-mono font-black">DUEL LANGUAGE</h3><p className="text-white/35 text-xs font-mono">Five questions per duel.</p></div></div>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-              {LANGUAGES.map((lang) => <button key={lang.id} onClick={() => onSelectLanguage(lang.id)} className={`text-left rounded-xl border p-3 ${selectedLang === lang.id ? "border-purple-400/60 bg-purple-500/15" : "border-white/10 bg-white/5 hover:bg-white/10"}`}>
-                <span className="text-xl">{lang.icon}</span><p className="text-white font-mono font-bold text-xs mt-1">{lang.name}</p>
-              </button>)}
-            </div>
+            <p className="text-white/25 font-mono text-[10px] mt-3">This version is local/pass-and-play. Connect it to Supabase Realtime later for true online 1v1.</p>
           </div>
         </div>
 
-        <button disabled={!selectedLang || !friendName.trim()} onClick={() => onStart(friendName.trim(), friendRank, friendPhoto, yourCharacter, friendCharacter)}
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 mb-7">
+          <div className="flex items-center gap-3 mb-5"><Code2 className="text-purple-400"/><div><h3 className="text-white font-mono font-black text-lg">Choose the Duel Language</h3><p className="text-white/30 text-xs font-mono">Five questions per duel.</p></div></div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {LANGUAGES.map((lang) => (
+              <button key={lang.id} onClick={() => onSelectLanguage(lang.id)}
+                className={`text-left rounded-2xl border p-4 transition-all ${selectedLang === lang.id ? "border-purple-400/60 bg-purple-500/15 shadow-lg shadow-purple-500/10" : "border-white/10 bg-white/5 hover:bg-white/10"}`}>
+                <div className="text-2xl mb-2">{lang.icon}</div><p className="text-white font-mono font-bold text-sm">{lang.name}</p>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <button disabled={!selectedLang || !friendName.trim()} onClick={() => onStart(friendName.trim(), friendRank, friendPhoto)}
           className="w-full py-4 rounded-2xl bg-gradient-to-r from-pink-600 via-purple-600 to-cyan-600 text-white font-mono font-black text-lg disabled:opacity-30 disabled:cursor-not-allowed shadow-xl shadow-purple-500/20">
           Enter the Arena <Swords size={19} className="inline ml-2"/>
         </button>
@@ -1569,121 +1484,119 @@ function DuelSetupScreen({
 }
 
 function DuelScreen({
-  langId, profile, totalXP, friendName, friendRankName, friendPhoto, yourCharacterId, friendCharacterId, onFinish,
+  langId,
+  profile,
+  totalXP,
+  friendName,
+  friendRankName,
+  friendPhoto,
+  onFinish,
 }: {
-  langId: string; profile: StudentProfile; totalXP: number; friendName: string; friendRankName: string; friendPhoto: string;
-  yourCharacterId: string; friendCharacterId: string; onFinish: (winner: "you" | "friend" | "draw") => void;
+  langId: string;
+  profile: StudentProfile;
+  totalXP: number;
+  friendName: string;
+  friendRankName: string;
+  friendPhoto: string;
+  onFinish: () => void;
 }) {
   const questions = (QUESTIONS[langId] ?? []).slice(0, 5);
   const lang = LANGUAGES.find((l) => l.id === langId)!;
-  const yourCharacter = CHARACTERS.find(c => c.id === yourCharacterId) ?? CHARACTERS[0];
-  const friendCharacter = CHARACTERS.find(c => c.id === friendCharacterId) ?? CHARACTERS[1];
-  const friendRank = RANKS.find((r) => r.name === friendRankName) ?? RANKS[2];
   const [qIndex, setQIndex] = useState(0);
   const [turn, setTurn] = useState<"you" | "friend">("you");
   const [selected, setSelected] = useState<number | null>(null);
   const [youScore, setYouScore] = useState(0);
   const [friendScore, setFriendScore] = useState(0);
   const [locked, setLocked] = useState(false);
-  const [winner, setWinner] = useState<"you" | "friend" | "draw" | null>(null);
-  const [showWinFx, setShowWinFx] = useState(false);
   const currentQ = questions[qIndex];
 
   const answer = (index: number) => {
-    if (locked || winner) return;
+    if (locked) return;
     setSelected(index);
     const correct = index === currentQ.answer;
     setLocked(true);
-    const nextYou = youScore + (turn === "you" && correct ? 1 : 0);
-    const nextFriend = friendScore + (turn === "friend" && correct ? 1 : 0);
-    if (turn === "you" && correct) setYouScore(nextYou);
-    if (turn === "friend" && correct) setFriendScore(nextFriend);
+
+    if (turn === "you" && correct) setYouScore((s) => s + 1);
+    if (turn === "friend" && correct) setFriendScore((s) => s + 1);
 
     setTimeout(() => {
       setSelected(null);
       setLocked(false);
-      if (turn === "you") {
-        setTurn("friend");
-      } else if (qIndex < questions.length - 1) {
+      if (turn === "you") setTurn("friend");
+      else if (qIndex < questions.length - 1) {
         setQIndex((i) => i + 1);
         setTurn("you");
-      } else {
-        const result = nextYou > nextFriend ? "you" : nextFriend > nextYou ? "friend" : "draw";
-        setWinner(result);
-        setShowWinFx(true);
-        setTimeout(() => onFinish(result), 2600);
-      }
-    }, 650);
+      } else onFinish();
+    }, 700);
   };
 
-  const particles = Array.from({length: 26}, (_, i) => i);
-  const winnerCharacter = winner === "friend" ? friendCharacter : yourCharacter;
+  const friendRank = RANKS.find((r) => r.name === friendRankName) ?? RANKS[2];
 
   return (
     <div className="min-h-screen px-4 py-6 relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-cyan-950/20 via-purple-950/20 to-pink-950/20 pointer-events-none"/>
       <div className="max-w-6xl mx-auto relative">
         <div className="flex items-center justify-between mb-5">
-          <div><p className="text-purple-300 text-xs font-mono font-black">1V1 CODE ARENA</p><p className="text-white/40 text-xs font-mono mt-1">{lang.icon} {lang.name} · Round {qIndex + 1}/5</p></div>
-          <button onClick={() => onFinish("draw")} className="text-white/40 hover:text-white text-xs font-mono">Leave Arena</button>
+          <div><p className="text-purple-300 text-xs font-mono font-black">1V1 CODE ARENA</p><p className="text-white/30 text-xs font-mono mt-1">{lang.icon} {lang.name} · Round {qIndex + 1}/5</p></div>
+          <button onClick={onFinish} className="text-white/30 hover:text-white text-xs font-mono">Leave Arena</button>
         </div>
 
         <div className="grid md:grid-cols-2 gap-4 mb-5">
-          <motion.div animate={{ scale: turn === "you" && !winner ? [1, 1.035, 1] : 1, boxShadow: turn === "you" && !winner ? ["0 0 0 rgba(34,211,238,0)", "0 0 30px rgba(34,211,238,.22)", "0 0 0 rgba(34,211,238,0)"] : "0 0 0 rgba(0,0,0,0)" }} transition={{ repeat: turn === "you" && !winner ? Infinity : 0, duration: 1.5 }}
-            className={`rounded-3xl border p-4 ${turn === "you" ? "border-cyan-400/70 bg-cyan-500/10" : "border-white/10 bg-white/5"}`}>
+          <motion.div animate={{ scale: turn === "you" ? 1.02 : 1 }} className={`rounded-3xl border p-4 ${turn === "you" ? "border-cyan-400/60 bg-cyan-500/10 shadow-lg shadow-cyan-500/10" : "border-white/10 bg-white/5"}`}>
             <div className="flex items-center gap-3">
-              <motion.div animate={turn === "you" && !winner ? { y: [0,-7,0], rotate: [0,-4,4,0] } : {}} transition={{ repeat: Infinity, duration: 1.4 }} className="w-16 h-16 rounded-2xl flex items-center justify-center text-4xl" style={{backgroundColor:`${yourCharacter.color}18`}}>{yourCharacter.icon}</motion.div>
-              <div className="min-w-0 flex-1"><p className="text-white font-mono font-black truncate">{profile.username || "You"} <span className="text-cyan-300 text-[10px]">YOU</span></p><p className="text-white/40 text-[10px] font-mono">{yourCharacter.title}</p><RankBadge totalXP={totalXP} compact/></div>
+              {profile.photo ? <img src={profile.photo} className="w-14 h-14 rounded-2xl object-cover" alt="You"/> : <div className="w-14 h-14 rounded-2xl bg-cyan-500/10 flex items-center justify-center"><AnimeCoderAvatar side="player" /></div>}
+              <div className="min-w-0 flex-1"><p className="text-white font-mono font-black truncate">{profile.username} <span className="text-cyan-300 text-[10px]">YOU</span></p><RankBadge totalXP={totalXP} compact/></div>
               <div className="text-3xl font-mono font-black text-cyan-300">{youScore}</div>
             </div>
-            {turn === "you" && !winner && <motion.div initial={{opacity:0,y:8}} animate={{opacity:1,y:0}} className="mt-3 flex items-center justify-center gap-2 text-cyan-300 text-xs font-mono font-black"><Sparkles size={13}/> YOUR TURN <Sparkles size={13}/></motion.div>}
           </motion.div>
 
-          <motion.div animate={{ scale: turn === "friend" && !winner ? [1, 1.035, 1] : 1, boxShadow: turn === "friend" && !winner ? ["0 0 0 rgba(236,72,153,0)", "0 0 30px rgba(236,72,153,.22)", "0 0 0 rgba(236,72,153,0)"] : "0 0 0 rgba(0,0,0,0)" }} transition={{ repeat: turn === "friend" && !winner ? Infinity : 0, duration: 1.5 }}
-            className={`rounded-3xl border p-4 ${turn === "friend" ? "border-pink-400/70 bg-pink-500/10" : "border-white/10 bg-white/5"}`}>
+          <motion.div animate={{ scale: turn === "friend" ? 1.02 : 1 }} className={`rounded-3xl border p-4 ${turn === "friend" ? "border-pink-400/60 bg-pink-500/10 shadow-lg shadow-pink-500/10" : "border-white/10 bg-white/5"}`}>
             <div className="flex items-center gap-3">
-              <motion.div animate={turn === "friend" && !winner ? { y: [0,-7,0], rotate: [0,4,-4,0] } : {}} transition={{ repeat: Infinity, duration: 1.4 }} className="w-16 h-16 rounded-2xl flex items-center justify-center text-4xl overflow-hidden" style={{backgroundColor:`${friendCharacter.color}18`}}>{friendPhoto ? <img src={friendPhoto} className="w-full h-full object-cover" alt="Friend"/> : friendCharacter.icon}</motion.div>
-              <div className="min-w-0 flex-1"><p className="text-white font-mono font-black truncate">{friendName} <span className="text-pink-300 text-[10px]">FRIEND</span></p><p className="text-white/40 text-[10px] font-mono">{friendCharacter.title}</p><div className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl border bg-black/10" style={{borderColor:`${friendRank.color}55`}}><span>{friendRank.icon}</span><span className="font-mono font-black text-[9px]" style={{color:friendRank.color}}>{friendRank.name}</span></div></div>
+              <div className="w-14 h-14 rounded-2xl bg-pink-500/10 flex items-center justify-center overflow-hidden">{friendPhoto ? <img src={friendPhoto} className="w-full h-full object-cover" alt="Friend"/> : <AnimeCoderAvatar side="enemy" />}</div>
+              <div className="min-w-0 flex-1">
+                <p className="text-white font-mono font-black truncate">{friendName} <span className="text-pink-300 text-[10px]">FRIEND</span></p>
+                <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl border bg-black/10" style={{borderColor: `${friendRank.color}55`}}>
+                  <span>{friendRank.icon}</span><div><p className="font-mono font-black text-[10px]" style={{color: friendRank.color}}>{friendRank.name}</p><p className="text-white/30 font-mono text-[8px]">RANK</p></div><Trophy size={12} style={{color: friendRank.color}}/>
+                </div>
+              </div>
               <div className="text-3xl font-mono font-black text-pink-300">{friendScore}</div>
             </div>
-            {turn === "friend" && !winner && <motion.div initial={{opacity:0,y:8}} animate={{opacity:1,y:0}} className="mt-3 flex items-center justify-center gap-2 text-pink-300 text-xs font-mono font-black"><Sparkles size={13}/> FRIEND'S TURN — PASS DEVICE <Sparkles size={13}/></motion.div>}
           </motion.div>
         </div>
 
         <div className="text-center mb-5">
-          <motion.div animate={!winner ? {scale:[1,1.03,1]} : {}} transition={{repeat:Infinity,duration:1.7}} className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-purple-500/20 bg-purple-500/10 text-purple-300 font-mono text-xs font-bold">
-            {turn === "you" ? "⚡ Answer correctly to strike!" : "💗 Your friend is attacking!"}
-          </motion.div>
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-purple-500/20 bg-purple-500/10 text-purple-300 font-mono text-xs font-bold">
+            {turn === "you" ? <><Sparkles size={13}/> {profile.username}'s turn — your answer is your weapon.</> : <><Heart size={13}/> Pass the device to {friendName}</>}
+          </div>
         </div>
 
-        <motion.div key={qIndex} initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: .3 }} className="max-w-3xl mx-auto rounded-3xl border border-white/10 bg-white/5 p-5 md:p-7 shadow-2xl">
-          <div className="flex items-center justify-between mb-4"><span className="text-xs font-mono text-white/40">Question {qIndex + 1} / 5</span><span className="text-xs font-mono text-yellow-300">+{currentQ.xp} XP</span></div>
+        <div className="flex items-center justify-center gap-4 sm:gap-10 mb-5">
+          <AnimeCoderAvatar side="player" large />
+          <div className="text-center">
+            <div className="text-3xl sm:text-5xl font-mono font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-white to-pink-300">VS</div>
+            <p className="text-[9px] sm:text-[10px] font-mono text-white/35 tracking-[0.25em] mt-1">CODE WARRIORS</p>
+          </div>
+          <AnimeCoderAvatar side="enemy" large />
+        </div>
+
+        <div className="max-w-3xl mx-auto rounded-3xl border border-white/10 bg-white/5 p-5 md:p-7 shadow-2xl">
+          <div className="flex items-center justify-between mb-4"><span className="text-xs font-mono text-white/35">Question {qIndex + 1}</span><span className="text-xs font-mono text-yellow-300">+{currentQ.xp} XP</span></div>
           <h2 className="text-xl md:text-2xl font-mono font-black text-white leading-relaxed mb-5">{currentQ.question}</h2>
           {currentQ.code && <div className="mb-5"><CodeBlock code={currentQ.code}/></div>}
           <div className="grid md:grid-cols-2 gap-3">
-            {currentQ.options.map((option,index) => <motion.button key={option} disabled={locked || !!winner} onClick={() => answer(index)} whileHover={!locked && !winner ? {scale:1.01} : {}} whileTap={!locked && !winner ? {scale:.99} : {}}
-              className={`text-left p-4 rounded-2xl border font-mono text-sm ${selected === index ? (index === currentQ.answer ? "border-green-400/60 bg-green-500/10 text-green-300" : "border-red-400/60 bg-red-500/10 text-red-300") : "border-white/10 bg-black/10 text-white/80 hover:bg-white/10"}`}>
-              <span className="inline-flex w-7 h-7 rounded-lg bg-white/5 items-center justify-center mr-2 text-xs">{String.fromCharCode(65 + index)}</span>{option}
-            </motion.button>)}
+            {currentQ.options.map((option, index) => (
+              <button key={option} disabled={locked} onClick={() => answer(index)}
+                className={`text-left p-4 rounded-2xl border font-mono text-sm transition-all ${
+                  selected === index
+                    ? index === currentQ.answer ? "border-green-400/60 bg-green-500/10 text-green-300" : "border-red-400/60 bg-red-500/10 text-red-300"
+                    : "border-white/10 bg-black/10 text-white/70 hover:bg-white/10"
+                }`}>
+                <span className="inline-flex w-7 h-7 rounded-lg bg-white/5 items-center justify-center mr-2 text-xs">{String.fromCharCode(65 + index)}</span>{option}
+              </button>
+            ))}
           </div>
-        </motion.div>
+        </div>
       </div>
-
-      <AnimatePresence>
-        {showWinFx && winner && (
-          <motion.div initial={{opacity:0}} animate={{opacity:1}} className="fixed inset-0 z-[100] flex items-center justify-center bg-black/55 backdrop-blur-sm pointer-events-none">
-            {particles.map(i => <motion.div key={i} className="absolute w-3 h-3 rounded-full" style={{backgroundColor:[yourCharacter.color,friendCharacter.color,"#facc15","#22d3ee","#ec4899"][i%5]}}
-              initial={{x:0,y:0,scale:0}} animate={{x:(Math.random()-.5)*900,y:(Math.random()-.5)*700,scale:[0,1.5,0],rotate:Math.random()*720}} transition={{duration:1.8,delay:Math.random()*.15}} />)}
-            <motion.div initial={{scale:.5,opacity:0,y:30}} animate={{scale:[.8,1.08,1],opacity:1,y:0}} transition={{duration:.65,type:"spring"}} className="relative text-center rounded-[2rem] border border-yellow-300/30 bg-gradient-to-br from-purple-900/95 via-slate-950/95 to-pink-900/95 px-10 py-10 shadow-2xl shadow-purple-500/30">
-              <motion.div animate={{rotate:[-8,8,-8],scale:[1,1.12,1]}} transition={{repeat:Infinity,duration:1.1}} className="text-7xl">{winner === "draw" ? "🤝" : winnerCharacter.icon}</motion.div>
-              <p className="text-yellow-300 font-mono text-xs font-black tracking-[.35em] mt-4">{winner === "draw" ? "DRAW" : winner === "you" ? "VICTORY" : "DEFEAT"}</p>
-              <h2 className="text-5xl md:text-7xl font-mono font-black text-white mt-2">{winner === "draw" ? "TIE GAME!" : winner === "you" ? "YOU WIN!" : `${friendName.toUpperCase()} WINS!`}</h2>
-              <p className="text-white/60 font-mono text-sm mt-4">{youScore} — {friendScore}</p>
-              <div className="mt-5 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-yellow-400/10 border border-yellow-300/20 text-yellow-200 font-mono text-xs"><Trophy size={14}/> Achievement progress updated</div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }
@@ -1832,16 +1745,6 @@ export default function App() {
   const [friendName, setFriendName] = useState("");
   const [friendRankName, setFriendRankName] = useState(RANKS[2].name);
   const [friendPhoto, setFriendPhoto] = useState("");
-  const [yourDuelCharacter, setYourDuelCharacter] = useState("byte");
-  const [friendDuelCharacter, setFriendDuelCharacter] = useState("rex");
-  const [battlePlayerCharacter, setBattlePlayerCharacter] = useState("byte");
-  const [battleAICharacter, setBattleAICharacter] = useState("rex");
-  const [battleDifficulty, setBattleDifficulty] = useState<AIDifficulty>("normal");
-  const [duelWins, setDuelWins] = useState(() => Number(localStorage.getItem("codequest-duel-wins") || 0));
-  const [achievements, setAchievements] = useState<Achievement[]>(() => {
-    try { return buildAchievements(JSON.parse(localStorage.getItem("codequest-achievements") || "[]"), Number(localStorage.getItem("codequest-duel-wins") || 0)); }
-    catch { return buildAchievements(); }
-  });
   const [darkMode, setDarkMode] = useState(() => {
     const saved = localStorage.getItem("codequest-theme");
     return saved !== "light";
@@ -1892,29 +1795,15 @@ export default function App() {
     localStorage.setItem("codequest-profile", JSON.stringify(next));
   };
 
-  const unlock = (ids: string[]) => {
-    setAchievements(prev => {
-      const next = prev.map(a => ids.includes(a.id) ? { ...a, unlocked: true } : a);
-      localStorage.setItem("codequest-achievements", JSON.stringify(next.filter(a => a.unlocked).map(a => a.id)));
-      return next;
-    });
-  };
-
-  const recordDuelResult = (winner: "you" | "friend" | "draw") => {
-    if (winner === "you") {
-      const nextWins = duelWins + 1;
-      setDuelWins(nextWins);
-      localStorage.setItem("codequest-duel-wins", String(nextWins));
-      unlock(["first-win", ...(nextWins >= 5 ? ["duel-master"] : [])]);
-    }
-    setScreen("home");
-  };
-
   return (
     <div className={`${darkMode ? "dark-mode" : "light-mode"} min-h-screen text-foreground overflow-x-hidden`}
       style={{ fontFamily: "'JetBrains Mono', 'Inter', monospace" }}>
       <style>{`
-        .light-mode { background: #f7f8fc; color: #111827; }
+        html, body, #root { width: 100%; min-height: 100%; margin: 0; }
+        * { box-sizing: border-box; }
+        body { overflow-x: hidden; }
+        .dark-mode { background: #070711; min-height: 100vh; }
+        .light-mode { background: #eef2ff; color: #111827; min-height: 100vh; }
         .light-mode .text-white { color: #111827 !important; }
         .light-mode .text-white\\/80 { color: #374151 !important; }
         .light-mode .text-white\\/70 { color: #4b5563 !important; }
@@ -1929,6 +1818,22 @@ export default function App() {
         .light-mode .border-white\\/20 { border-color: rgba(17,24,39,.18) !important; }
         .light-mode .bg-black\\/20 { background-color: rgba(255,255,255,.85) !important; }
         .light-mode input, .light-mode select { color: #111827 !important; }
+        .light-mode .text-white\/35 { color: #6b7280 !important; }
+        .light-mode .text-white\/25 { color: #9ca3af !important; }
+        .light-mode .bg-black\/10 { background-color: rgba(255,255,255,.72) !important; }
+        .light-mode .bg-black\/15 { background-color: rgba(255,255,255,.72) !important; }
+        .light-mode .bg-black\/20 { background-color: rgba(255,255,255,.9) !important; }
+        .light-mode .border-white\/10 { border-color: rgba(15,23,42,.14) !important; }
+        .light-mode .border-white\/20 { border-color: rgba(15,23,42,.2) !important; }
+        .light-mode .text-purple-300 { color: #7c3aed !important; }
+        .light-mode .text-cyan-300 { color: #0891b2 !important; }
+        .light-mode .text-pink-300 { color: #db2777 !important; }
+        .light-mode .text-yellow-300 { color: #b45309 !important; }
+        .light-mode .text-green-300 { color: #15803d !important; }
+        .light-mode .text-red-300 { color: #dc2626 !important; }
+        .light-mode .text-orange-400 { color: #c2410c !important; }
+        .light-mode .text-white\/40 { color: #6b7280 !important; }
+        .light-mode .text-white\/30 { color: #9ca3af !important; }
         .light-mode input::placeholder { color: #9ca3af !important; }
       `}</style>
 
@@ -1960,7 +1865,6 @@ export default function App() {
               onStart={startQuest}
               totalXP={lifetimeXP}
               onDuel={() => setScreen("duel-setup")}
-              onAchievements={() => setScreen("achievements")}
             />
           </motion.div>
         )}
@@ -1968,29 +1872,6 @@ export default function App() {
         {screen === "profile" && (
           <motion.div key="profile" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
             <ProfileScreen profile={profile} totalXP={lifetimeXP} onSave={saveProfile} onBack={() => setScreen("home")} />
-          </motion.div>
-        )}
-
-        {screen === "achievements" && (
-          <motion.div key="achievements" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <AchievementsScreen achievements={achievements} duelWins={duelWins} onBack={() => setScreen("home")} />
-          </motion.div>
-        )}
-
-        {screen === "battle-setup" && (
-          <motion.div key="battle-setup" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <BattleSetupScreen
-              selectedLang={selectedLang}
-              onSelectLanguage={setSelectedLang}
-              playerCharacter={battlePlayerCharacter}
-              aiCharacter={battleAICharacter}
-              difficulty={battleDifficulty}
-              onSelectPlayer={setBattlePlayerCharacter}
-              onSelectAI={setBattleAICharacter}
-              onSelectDifficulty={setBattleDifficulty}
-              onBack={() => setScreen("modes")}
-              onStart={() => setScreen("game")}
-            />
           </motion.div>
         )}
 
@@ -2003,7 +1884,7 @@ export default function App() {
 
         {screen === "modes" && (
           <motion.div key="modes" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <ModesScreen onBack={() => setScreen("home")} onSelect={(mode) => { setGameMode(mode); setScreen(mode === "battle" ? "battle-setup" : "language"); }} />
+            <ModesScreen onBack={() => setScreen("home")} onSelect={(mode) => { setGameMode(mode); setScreen("language"); }} />
           </motion.div>
         )}
 
@@ -2024,16 +1905,9 @@ export default function App() {
             <GameScreen
               langId={selectedLang}
               mode={gameMode}
-              battlePlayerCharacterId={battlePlayerCharacter}
-              battleAICharacterId={battleAICharacter}
-              battleDifficulty={battleDifficulty}
               onFinish={(score, xp, correct) => {
                 setResults({ score, xp, correct });
                 addLifetimeXP(xp);
-                if (correct === (gameMode === "speed" ? Math.min(5, totalQs) : totalQs)) unlock(["perfect-code"]);
-                if (correct >= 5) unlock(["streak-5"]);
-                if (gameMode === "speed" && score >= 80) unlock(["speed-demon"]);
-                if (gameMode === "battle" && score >= 50) unlock(["battle-victor"]);
                 setScreen("results");
               }}
             />
@@ -2048,12 +1922,10 @@ export default function App() {
               selectedLang={duelLang}
               onSelectLanguage={setDuelLang}
               onBack={() => setScreen("home")}
-              onStart={(name, rank, photo, yourCharacter, friendCharacter) => {
+              onStart={(name, rank, photo) => {
                 setFriendName(name);
                 setFriendRankName(rank);
                 setFriendPhoto(photo);
-                setYourDuelCharacter(yourCharacter);
-                setFriendDuelCharacter(friendCharacter);
                 setScreen("duel");
               }}
             />
@@ -2069,9 +1941,7 @@ export default function App() {
               friendName={friendName}
               friendRankName={friendRankName}
               friendPhoto={friendPhoto}
-              yourCharacterId={yourDuelCharacter}
-              friendCharacterId={friendDuelCharacter}
-              onFinish={recordDuelResult}
+              onFinish={() => setScreen("home")}
             />
           </motion.div>
         )}
