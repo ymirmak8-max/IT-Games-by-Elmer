@@ -495,7 +495,7 @@ const QUESTIONS: Record<string, Question[]> = {
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-type Screen = "welcome" | "home" | "profile" | "guidelines" | "modes" | "language" | "game" | "results" | "duel-setup" | "duel";
+type Screen = "welcome" | "home" | "profile" | "guidelines" | "modes" | "language" | "music" | "game" | "results" | "duel-setup" | "duel";
 type AnswerState = "idle" | "correct" | "wrong";
 
 // ─── Components ──────────────────────────────────────────────────────────────
@@ -579,7 +579,7 @@ function getRank(totalXP: number) {
 // ─── Screens ─────────────────────────────────────────────────────────────────
 
 
-type GameMode = "practice" | "battle" | "speed";
+type GameMode = "practice" | "battle" | "speed" | "debug" | "survival";
 
 const SPOTIFY_TRACKS = [
   { id: "2nbotE8GMs2IYte7WgtZBa", title: "Multo", artist: "Cup of Joe", category: "OPM" },
@@ -597,70 +597,155 @@ const SPOTIFY_TRACKS = [
 ];
 
 function WelcomeScreen({ onContinue, darkMode, onToggleTheme }: { onContinue: () => void; darkMode: boolean; onToggleTheme: () => void }) {
-  const guidelines = [
-    "Choose a programming language and a game mode.",
-    "Answer each coding challenge to earn XP and build your streak.",
-    "In Battle Mode, every correct answer is a skill attack against the Code Beast.",
-    "Your profile appears on your results card; add a photo to complete your winning profile.",
-    "You can edit your student profile anytime from the dashboard.",
-    "Choose from a larger Spotify soundtrack list, including TJ Monterde and relaxing coding music, while playing.",
-  ];
   return (
-    <div className="min-h-screen px-6 py-10 relative overflow-hidden">
-      <div className="absolute top-5 right-5">
-        <button onClick={onToggleTheme} className="flex items-center gap-2 px-4 py-2 rounded-xl border border-white/10 bg-white/5 text-white/70 font-mono text-xs">
-          {darkMode ? <Sun size={15} /> : <Moon size={15} />} {darkMode ? "Light Mode" : "Dark Mode"}
-        </button>
+    <div className="min-h-screen relative overflow-hidden flex items-center justify-center px-4 py-10">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_25%,rgba(124,58,237,.24),transparent_32%),radial-gradient(circle_at_20%_80%,rgba(6,182,212,.14),transparent_30%),radial-gradient(circle_at_85%_70%,rgba(236,72,153,.12),transparent_30%)]" />
+      <div className="absolute inset-0 pointer-events-none opacity-30">
+        <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 28, ease: "linear" }} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[70vw] max-w-[720px] aspect-square rounded-full border border-purple-400/10" />
+        <motion.div animate={{ rotate: -360 }} transition={{ repeat: Infinity, duration: 18, ease: "linear" }} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[48vw] max-w-[500px] aspect-square rounded-full border border-cyan-400/10 border-dashed" />
       </div>
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-transparent to-cyan-900/20 pointer-events-none" />
-      <motion.div initial={{ opacity: 0, y: 35 }} animate={{ opacity: 1, y: 0 }} className="max-w-5xl mx-auto pt-16 md:pt-24 relative">
-        <div className="text-center mb-12">
-          <motion.div animate={{ rotate: [0, -5, 5, 0] }} transition={{ repeat: Infinity, duration: 4 }}
-            className="inline-flex w-20 h-20 rounded-3xl bg-gradient-to-br from-purple-600 to-cyan-500 items-center justify-center shadow-2xl shadow-purple-500/30 mb-6">
-            <Code2 size={38} className="text-white" />
-          </motion.div>
-          <p className="text-purple-300 font-mono font-bold tracking-widest text-sm mb-3">WELCOME TO</p>
-          <h1 className="text-6xl md:text-8xl font-mono font-black tracking-tight">
-            <span className="text-white">Code</span><span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400">Quest</span>
-          </h1>
-          <p className="text-white/50 max-w-2xl mx-auto mt-5 text-base md:text-lg font-mono">
-            Turn programming questions into a game. Learn, fight, earn XP, and level up your coding skills.
-          </p>
+
+      <button onClick={onToggleTheme} className="absolute top-5 right-5 z-20 flex items-center gap-2 px-4 py-2.5 rounded-xl border border-white/10 bg-black/20 backdrop-blur-xl text-white/70 font-mono text-xs hover:bg-white/10">
+        {darkMode ? <Sun size={15} /> : <Moon size={15} />} {darkMode ? "Light Mode" : "Dark Mode"}
+      </button>
+
+      <div className="absolute hidden lg:block top-24 left-8 text-[11px] font-mono text-cyan-300/30 rotate-[-8deg]">{`while(skill){ learn(); levelUp(); }`}</div>
+      <div className="absolute hidden lg:block bottom-28 right-8 text-[11px] font-mono text-purple-300/30 rotate-[7deg]">{`if(correct) { attack(); }`}</div>
+
+      <motion.div initial={{ opacity: 0, scale: .92, y: 30 }} animate={{ opacity: 1, scale: 1, y: 0 }} transition={{ duration: .8, type: "spring" }}
+        className="relative z-10 w-full max-w-5xl text-center">
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-purple-400/30 bg-purple-500/10 backdrop-blur-xl text-purple-200 font-mono text-xs font-black tracking-wider mb-7">
+          <Sparkles size={14} className="text-yellow-300" /> THE ULTIMATE CODING ADVENTURE
         </div>
 
-        <div className="grid md:grid-cols-2 gap-5 mb-8">
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
-            <div className="flex items-center gap-3 mb-5"><BookOpenCheck className="text-cyan-400" /><h2 className="text-xl font-mono font-black text-white">Quick Guidelines</h2></div>
-            <div className="space-y-3">
-              {guidelines.map((g, i) => <div key={g} className="flex gap-3 text-sm font-mono text-white/60"><span className="text-purple-400 font-bold">{i + 1}.</span><span>{g}</span></div>)}
-            </div>
-          </div>
-          <div className="rounded-2xl border border-purple-500/20 bg-purple-500/5 p-6">
-            <div className="flex items-center gap-3 mb-5"><Swords className="text-purple-400" /><h2 className="text-xl font-mono font-black text-white">Your Mission</h2></div>
-            <div className="grid grid-cols-2 gap-3">
-              {[
-                ["⚔️", "Battle", "Attack with correct answers"],
-                ["⚡", "Speed", "Answer fast and accurately"],
-                ["🧠", "Practice", "Learn with explanations"],
-                ["🏆", "Level Up", "Earn XP and rank up"],
-              ].map(([icon, title, desc]) => <div key={title} className="rounded-xl border border-white/10 bg-white/5 p-4"><div className="text-2xl mb-2">{icon}</div><p className="font-mono font-bold text-white text-sm">{title}</p><p className="font-mono text-xs text-white/40 mt-1">{desc}</p></div>)}
-            </div>
-          </div>
+        <motion.div animate={{ y: [0, -7, 0], rotate: [0, 2, -2, 0] }} transition={{ repeat: Infinity, duration: 4 }}
+          className="mx-auto w-20 h-20 rounded-[28px] bg-gradient-to-br from-purple-600 via-fuchsia-500 to-cyan-500 flex items-center justify-center shadow-[0_0_70px_rgba(139,92,246,.45)] mb-7">
+          <Code2 size={42} className="text-white" />
+        </motion.div>
+
+        <p className="text-cyan-300 font-mono font-black tracking-[0.35em] text-xs sm:text-sm mb-3">WELCOME, CODE WARRIOR</p>
+        <h1 className="text-6xl sm:text-7xl md:text-9xl font-mono font-black leading-[.82] tracking-[-.08em]">
+          <span className="text-white">Code</span><span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 via-fuchsia-400 to-cyan-300">Quest</span>
+        </h1>
+        <p className="text-white/55 font-mono text-base sm:text-lg md:text-xl mt-7 max-w-3xl mx-auto">
+          Enter a world where <span className="text-purple-300">answers become weapons</span>, code becomes power, and every challenge makes you stronger.
+        </p>
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-3xl mx-auto mt-10 mb-9">
+          {[
+            ["⚔️", "BATTLE", "Fight with code"],
+            ["⚡", "SPEED", "Race the clock"],
+            ["🐛", "DEBUG", "Hunt the bugs"],
+            ["🎵", "MUSIC", "Choose your vibe"],
+          ].map(([icon, title, desc]) => (
+            <motion.div whileHover={{ y: -4 }} key={title} className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-4">
+              <div className="text-2xl mb-2">{icon}</div><p className="text-white font-mono font-black text-xs">{title}</p><p className="text-white/35 font-mono text-[9px] mt-1">{desc}</p>
+            </motion.div>
+          ))}
         </div>
 
-        <div className="text-center">
-          <button onClick={onContinue} className="inline-flex items-center gap-3 px-10 py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-cyan-600 text-white font-mono font-black text-lg shadow-xl shadow-purple-500/20">
-            Continue to CodeQuest <ArrowRight size={20} />
-          </button>
-          <p className="text-white/30 text-xs font-mono mt-4">Your profile and theme are saved on this device.</p>
-        </div>
+        <motion.button onClick={onContinue} whileHover={{ scale: 1.04, boxShadow: "0 0 70px rgba(139,92,246,.5)" }} whileTap={{ scale: .97 }}
+          className="group inline-flex items-center gap-3 px-9 sm:px-12 py-4 sm:py-5 rounded-2xl bg-gradient-to-r from-violet-600 via-fuchsia-500 to-cyan-500 text-white font-mono font-black text-base sm:text-lg shadow-2xl shadow-purple-500/25">
+          ENTER CODEQUEST <ArrowRight size={21} className="group-hover:translate-x-1 transition-transform"/>
+        </motion.button>
+        <p className="text-white/25 text-[10px] font-mono mt-4">Create your profile → choose your game → choose your music → PLAY.</p>
       </motion.div>
     </div>
   );
 }
 
-function MusicPlayer({ compact = false }: { compact?: boolean }) {
-  const [track, setTrack] = useState(SPOTIFY_TRACKS[0]);
+function MusicSelectionScreen({
+  selectedTrack,
+  onSelect,
+  onContinue,
+  onBack,
+}: {
+  selectedTrack: (typeof SPOTIFY_TRACKS)[number];
+  onSelect: (track: (typeof SPOTIFY_TRACKS)[number]) => void;
+  onContinue: () => void;
+  onBack: () => void;
+}) {
+  const [category, setCategory] = useState("All");
+  const categories = ["All", "OPM", "The Weeknd", "Pop", "Rock / Alt", "Focus"];
+  const visibleTracks = category === "All" ? SPOTIFY_TRACKS : SPOTIFY_TRACKS.filter((t) => t.category === category);
+
+  return (
+    <div className="min-h-screen px-4 sm:px-6 py-8 sm:py-12 relative overflow-hidden">
+      <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_20%_20%,rgba(168,85,247,.18),transparent_35%),radial-gradient(circle_at_80%_70%,rgba(6,182,212,.14),transparent_35%)]" />
+      <div className="max-w-5xl mx-auto relative">
+        <button onClick={onBack} className="flex items-center gap-2 text-white/50 hover:text-white font-mono text-sm mb-8">
+          <ArrowLeft size={16} /> Back
+        </button>
+
+        <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-8">
+          <motion.div animate={{ rotate: [0, 4, -4, 0], scale: [1, 1.06, 1] }} transition={{ repeat: Infinity, duration: 3 }}
+            className="mx-auto w-16 h-16 rounded-2xl bg-gradient-to-br from-green-500 to-cyan-500 flex items-center justify-center shadow-2xl shadow-green-500/25 mb-4">
+            <Music size={30} className="text-white" />
+          </motion.div>
+          <p className="text-green-300 text-xs font-mono font-black tracking-[0.3em]">SOUNDTRACK LOCK-IN</p>
+          <h2 className="text-4xl md:text-6xl font-mono font-black text-white mt-2">CHOOSE YOUR BATTLE MUSIC</h2>
+          <p className="text-white/40 font-mono text-sm mt-3">Pick one track before you play. Your choice follows you into the game.</p>
+        </motion.div>
+
+        <div className="rounded-3xl border border-green-500/20 bg-gradient-to-br from-green-500/10 via-white/5 to-cyan-500/10 p-4 sm:p-6 shadow-2xl">
+          <div className="flex gap-2 overflow-x-auto pb-2 mb-4">
+            {categories.map((item) => (
+              <button key={item} onClick={() => setCategory(item)}
+                className={`shrink-0 px-3 py-2 rounded-full text-[10px] font-mono border ${
+                  category === item ? "bg-green-500/20 border-green-400/50 text-green-300" : "bg-white/5 border-white/10 text-white/50"
+                }`}>
+                {item}
+              </button>
+            ))}
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[360px] overflow-y-auto pr-1">
+            {visibleTracks.map((track) => (
+              <motion.button key={track.id} whileHover={{ y: -2 }} whileTap={{ scale: .98 }} onClick={() => onSelect(track)}
+                className={`text-left p-4 rounded-2xl border transition-all ${
+                  selectedTrack.id === track.id ? "border-green-400/60 bg-green-500/15 shadow-lg shadow-green-500/10" : "border-white/10 bg-white/5 hover:bg-white/10"
+                }`}>
+                <div className="flex items-center gap-3">
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${selectedTrack.id === track.id ? "bg-green-500/20" : "bg-white/5"}`}>
+                    <Music size={17} className={selectedTrack.id === track.id ? "text-green-300" : "text-white/50"} />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-mono font-black text-sm text-white truncate">{track.title}</p>
+                    <p className="font-mono text-[10px] text-white/40 truncate">{track.artist}</p>
+                  </div>
+                </div>
+                <p className="mt-3 text-[9px] font-mono text-green-300/60">{track.category}</p>
+              </motion.button>
+            ))}
+          </div>
+
+          <div className="mt-5 rounded-2xl border border-white/10 bg-black/20 p-3">
+            <p className="text-[10px] font-mono text-white/40 mb-2">SELECTED TRACK</p>
+            <p className="font-mono font-black text-green-300">{selectedTrack.title}</p>
+            <p className="font-mono text-xs text-white/40">{selectedTrack.artist}</p>
+            <iframe
+              key={`preview-${selectedTrack.id}`}
+              src={`https://open.spotify.com/embed/track/${selectedTrack.id}?utm_source=generator&theme=0`}
+              width="100%" height="152" frameBorder="0"
+              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+              loading="lazy" title={`Spotify preview for ${selectedTrack.title}`} className="w-full rounded-2xl mt-3"
+            />
+          </div>
+
+          <button onClick={onContinue}
+            className="w-full mt-5 py-4 rounded-2xl bg-gradient-to-r from-green-500 via-cyan-500 to-purple-600 text-white font-mono font-black text-lg shadow-xl shadow-green-500/15">
+            Lock In & Start Game <ArrowRight size={19} className="inline ml-2" />
+          </button>
+          <p className="text-center text-white/25 text-[10px] font-mono mt-3">Spotify may require one play click because browsers block unsolicited audio.</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MusicPlayer({ compact = false, selectedTrack }: { compact?: boolean; selectedTrack?: (typeof SPOTIFY_TRACKS)[number] }) {
+  const [track, setTrack] = useState(selectedTrack ?? SPOTIFY_TRACKS[0]);
+  useEffect(() => { if (selectedTrack) setTrack(selectedTrack); }, [selectedTrack]);
   const [category, setCategory] = useState("All");
   const categories = ["All", "OPM", "The Weeknd", "Pop", "Rock / Alt", "Focus"];
   const visibleTracks = category === "All" ? SPOTIFY_TRACKS : SPOTIFY_TRACKS.filter((item) => item.category === category);
@@ -703,7 +788,7 @@ function MusicPlayer({ compact = false }: { compact?: boolean }) {
 
       <iframe
         key={track.id}
-        src={`https://open.spotify.com/embed/track/${track.id}?utm_source=generator`}
+        src={`https://open.spotify.com/embed/track/${track.id}?utm_source=generator&autoplay=1`}
         width="100%" height={compact ? "152" : "152"} frameBorder="0"
         allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
         loading="lazy" title={`Spotify player for ${track.title}`} className="w-full rounded-2xl"
@@ -717,27 +802,39 @@ function MusicPlayer({ compact = false }: { compact?: boolean }) {
   );
 }
 
-function AnimeCoderAvatar({ side = "player", large = false }: { side?: "player" | "enemy"; large?: boolean }) {
+function AnimeCoderAvatar({ side = "player", large = false, attacking = false, hit = false }: { side?: "player" | "enemy"; large?: boolean; attacking?: boolean; hit?: boolean }) {
   const player = side === "player";
   return (
     <motion.div
-      animate={{ y: [0, -4, 0], rotate: player ? [0, 1, 0] : [0, -1, 0] }}
-      transition={{ repeat: Infinity, duration: 2.4, ease: "easeInOut" }}
-      className={`${large ? "w-28 h-36" : "w-20 h-24"} relative shrink-0`}
+      animate={{
+        y: hit ? [0, -5, 5, -3, 0] : [0, -5, 0],
+        x: attacking ? (player ? [0, 30, 0] : [0, -30, 0]) : 0,
+        rotate: attacking ? (player ? [0, 8, -2, 0] : [0, -8, 2, 0]) : (player ? [0, 1, 0] : [0, -1, 0]),
+        scale: hit ? [1, 1.06, .96, 1] : 1,
+      }}
+      transition={{ duration: attacking || hit ? .55 : 2.4, ease: "easeInOut", repeat: attacking || hit ? 0 : Infinity }}
+      className={`${large ? "w-32 h-40 sm:w-40 sm:h-48" : "w-20 h-24"} relative shrink-0`}
       aria-label={player ? "Anime coding hero" : "Anime code beast"}
     >
-      <div className={`absolute left-1/2 -translate-x-1/2 top-0 ${large ? "w-16 h-16" : "w-12 h-12"} rounded-full border-2 ${player ? "border-cyan-300 bg-cyan-500/20" : "border-pink-300 bg-pink-500/20"} shadow-lg`}>
-        <div className="absolute top-2 left-1/2 -translate-x-1/2 w-3/4 h-5 rounded-t-full bg-black/60" />
-        <div className="absolute top-7 left-2 flex gap-2">
-          <span className="w-2 h-1.5 rounded-full bg-white" />
-          <span className="w-2 h-1.5 rounded-full bg-white" />
+      <div className={`absolute inset-x-1/2 -translate-x-1/2 bottom-0 ${large ? "w-32 h-24" : "w-16 h-14"} rounded-[45%_45%_25%_25%] border-2 ${
+        player ? "border-cyan-300/60 bg-gradient-to-b from-cyan-400/25 to-blue-600/20" : "border-pink-300/60 bg-gradient-to-b from-pink-400/25 to-purple-700/20"
+      } shadow-[0_0_35px_rgba(34,211,238,.18)]`}>
+        <div className={`absolute ${large ? "top-2" : "top-1"} left-1/2 -translate-x-1/2 ${large ? "w-20 h-9" : "w-12 h-6"} rounded-full bg-gradient-to-r from-black/80 via-white/10 to-black/80`} />
+        <div className={`absolute ${large ? "top-9" : "top-7"} left-1/2 -translate-x-1/2 ${large ? "w-24 h-24" : "w-14 h-14"} rounded-[48%] ${
+          player ? "bg-gradient-to-br from-amber-100 via-orange-100 to-amber-200" : "bg-gradient-to-br from-pink-100 via-rose-100 to-purple-100"
+        } border-2 ${player ? "border-cyan-200/60" : "border-pink-200/60"} shadow-xl`}>
+          <div className={`absolute -top-3 left-1/2 -translate-x-1/2 ${large ? "w-28 h-12" : "w-16 h-7"} rounded-[70%_70%_30%_30%] ${
+            player ? "bg-gradient-to-b from-slate-950 via-cyan-950 to-slate-900" : "bg-gradient-to-b from-slate-950 via-fuchsia-950 to-slate-900"
+          }`} />
+          <div className={`absolute ${large ? "top-10" : "top-7"} left-1/2 -translate-x-1/2 flex ${large ? "gap-7" : "gap-3"}`}>
+            <span className={`${large ? "w-4 h-5" : "w-2 h-3"} rounded-full bg-gradient-to-b from-cyan-300 to-blue-500 shadow-[0_0_10px_rgba(34,211,238,.8)]`} />
+            <span className={`${large ? "w-4 h-5" : "w-2 h-3"} rounded-full bg-gradient-to-b from-pink-300 to-purple-500 shadow-[0_0_10px_rgba(236,72,153,.8)]`} />
+          </div>
+          <div className={`absolute ${large ? "bottom-7" : "bottom-4"} left-1/2 -translate-x-1/2 ${large ? "w-8" : "w-4"} h-1 rounded-full ${player ? "bg-cyan-400" : "bg-pink-400"}`} />
         </div>
-        <div className={`absolute bottom-2 left-1/2 -translate-x-1/2 w-5 h-1 rounded-full ${player ? "bg-cyan-300" : "bg-pink-300"}`} />
+        <div className={`absolute ${large ? "bottom-4" : "bottom-2"} left-1/2 -translate-x-1/2 ${large ? "text-3xl" : "text-lg"}`}>{player ? "⌘" : "⚡"}</div>
       </div>
-      <div className={`absolute ${large ? "top-14" : "top-11"} left-1/2 -translate-x-1/2 ${large ? "w-24 h-20" : "w-16 h-14"} rounded-2xl border ${player ? "border-cyan-400/50 bg-cyan-500/15" : "border-pink-400/50 bg-pink-500/15"} flex items-center justify-center`}>
-        <Code2 size={large ? 30 : 22} className={player ? "text-cyan-300" : "text-pink-300"} />
-      </div>
-      <div className={`absolute ${large ? "bottom-0" : "bottom-0"} left-1/2 -translate-x-1/2 w-1/2 h-2 rounded-full ${player ? "bg-cyan-400/30" : "bg-pink-400/30"} blur-md`} />
+      <div className={`absolute left-1/2 -translate-x-1/2 ${large ? "top-1" : "top-0"} ${large ? "w-40 h-40" : "w-24 h-24"} rounded-full blur-2xl opacity-30 ${player ? "bg-cyan-400" : "bg-pink-500"}`} />
     </motion.div>
   );
 }
@@ -745,18 +842,24 @@ function AnimeCoderAvatar({ side = "player", large = false }: { side?: "player" 
 function ModesScreen({ onSelect, onBack }: { onSelect: (mode: GameMode) => void; onBack: () => void }) {
   const modes = [
     { id: "practice" as GameMode, icon: "🧠", title: "Practice Mode", desc: "Relaxed learning with explanations after every answer.", color: "#8b5cf6", questions: "7 questions" },
-    { id: "battle" as GameMode, icon: "⚔️", title: "Battle Mode", desc: "Your answers become skills. Correct answers attack the Code Beast.", color: "#ef4444", questions: "7 questions" },
-    { id: "speed" as GameMode, icon: "⚡", title: "Speed Mode", desc: "Fast-paced challenge. Try to finish all questions quickly.", color: "#f59e0b", questions: "5 questions" },
+    { id: "battle" as GameMode, icon: "⚔️", title: "Battle Mode", desc: "Correct answers become attacks against the Code Beast with anime combat effects.", color: "#ef4444", questions: "7 questions" },
+    { id: "speed" as GameMode, icon: "⚡", title: "Speed Mode", desc: "Race the clock and finish before time runs out.", color: "#f59e0b", questions: "5 questions · 60 sec" },
+    { id: "debug" as GameMode, icon: "🐛", title: "Bug Hunter", desc: "Hunt down coding mistakes and build a debugging streak.", color: "#22c55e", questions: "7 questions" },
+    { id: "survival" as GameMode, icon: "🔥", title: "Code Survival", desc: "Keep your run alive. Wrong answers drain your life and streak.", color: "#06b6d4", questions: "10 questions" },
   ];
   return (
-    <div className="min-h-screen px-6 py-12">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen px-4 sm:px-6 py-10">
+      <div className="max-w-5xl mx-auto">
         <button onClick={onBack} className="flex items-center gap-2 text-white/50 hover:text-white font-mono text-sm mb-8"><ArrowLeft size={16}/> Back</button>
-        <div className="text-center mb-10"><Gamepad2 className="mx-auto text-purple-400 mb-3" size={36}/><h2 className="text-4xl font-mono font-black text-white">Choose Your Mode</h2><p className="text-white/40 font-mono text-sm mt-2">How do you want to test your skills?</p></div>
-        <div className="grid md:grid-cols-3 gap-4">
-          {modes.map((mode) => <button key={mode.id} onClick={() => onSelect(mode.id)} className="text-left rounded-2xl border border-white/10 bg-white/5 p-6 hover:bg-white/10 transition-all">
-            <div className="text-5xl mb-5">{mode.icon}</div><h3 className="text-xl font-mono font-black text-white mb-2">{mode.title}</h3><p className="text-white/50 text-sm font-mono leading-relaxed mb-5">{mode.desc}</p><div className="flex items-center justify-between"><span className="text-xs font-mono" style={{color:mode.color}}>{mode.questions}</span><ArrowRight size={17} className="text-white/30"/></div>
-          </button>)}
+        <div className="text-center mb-10"><Gamepad2 className="mx-auto text-purple-400 mb-3" size={40}/><h2 className="text-4xl md:text-5xl font-mono font-black text-white">CHOOSE YOUR GAME</h2><p className="text-white/40 font-mono text-sm mt-2">Every mode plays with your chosen soundtrack.</p></div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {modes.map((mode) => <motion.button key={mode.id} onClick={() => onSelect(mode.id)} whileHover={{ y: -5, scale: 1.01 }} whileTap={{ scale: .98 }}
+            className="text-left rounded-3xl border border-white/10 bg-white/5 p-6 hover:bg-white/10 transition-all shadow-xl">
+            <div className="text-5xl mb-5">{mode.icon}</div>
+            <h3 className="text-xl font-mono font-black text-white mb-2">{mode.title}</h3>
+            <p className="text-white/50 text-sm font-mono leading-relaxed mb-5">{mode.desc}</p>
+            <div className="flex items-center justify-between"><span className="text-xs font-mono" style={{color:mode.color}}>{mode.questions}</span><ArrowRight size={17} className="text-white/30"/></div>
+          </motion.button>)}
         </div>
       </div>
     </div>
@@ -784,7 +887,7 @@ function HomeScreen({
 }) {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-6 py-12 relative overflow-hidden">
-      <div className="absolute top-5 right-5 z-10 flex flex-wrap justify-end gap-2">
+      <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 w-[calc(100%-1.5rem)] max-w-4xl flex flex-wrap items-center justify-center gap-2">
         <button onClick={onProfile} className="flex items-center gap-2 px-3 py-2 rounded-xl border border-white/10 bg-white/5 text-white/70 font-mono text-xs">
           <User size={14} /> {profile.username ? "Profile" : "Student Profile"}
         </button>
@@ -871,10 +974,6 @@ function HomeScreen({
           <button onClick={onDuel}
             className="inline-flex items-center gap-2 px-5 py-3 rounded-xl border border-pink-500/30 bg-pink-500/10 text-pink-300 font-mono font-bold text-sm hover:bg-pink-500/20 transition-all">
             <Users size={16} /> 1v1 Friend Arena
-          </button>
-          <button onClick={onProfile}
-            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl border border-white/10 bg-white/5 text-white/60 font-mono font-bold text-sm hover:bg-white/10 transition-all">
-            <User size={16} /> Student Profile
           </button>
         </div>
       </motion.div>
@@ -1147,14 +1246,16 @@ function LanguageScreen({ onSelect }: { onSelect: (lang: string) => void }) {
 function GameScreen({
   langId,
   mode,
+  selectedTrack,
   onFinish,
 }: {
   langId: string;
   mode: GameMode;
+  selectedTrack: (typeof SPOTIFY_TRACKS)[number];
   onFinish: (score: number, xp: number, correct: number) => void;
 }) {
   const allQuestions = QUESTIONS[langId] ?? [];
-  const questions = mode === "speed" ? allQuestions.slice(0, Math.min(5, allQuestions.length)) : allQuestions;
+  const questions = mode === "speed" ? allQuestions.slice(0, Math.min(5, allQuestions.length)) : mode === "survival" ? [...allQuestions, ...allQuestions.slice(0, 3)] : allQuestions;
   const lang = LANGUAGES.find((l) => l.id === langId)!;
   const [qIndex, setQIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
@@ -1169,10 +1270,12 @@ function GameScreen({
   const [enemyHP, setEnemyHP] = useState(100);
   const [playerHP, setPlayerHP] = useState(100);
   const [battleMessage, setBattleMessage] = useState("Choose your attack.");
+  const [attackFx, setAttackFx] = useState<"player" | "enemy" | null>(null);
+  const [hitFx, setHitFx] = useState(false);
   const [timeLeft, setTimeLeft] = useState(mode === "speed" ? 60 : 0);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const finishedRef = useRef(false);
-  const battleSkills = ["Code Slash", "Logic Strike", "Debug Blast", "Syntax Smash", "Algorithm Beam"];
+  const battleSkills = ["Code Slash", "Logic Strike", "Debug Blast", "Syntax Smash", "Algorithm Beam", "Quantum Break", "Neon Compile", "Final Function"];
 
   const playSfx = useCallback((kind: "correct" | "wrong" | "click" | "timer" | "finish") => {
     if (!soundEnabled || typeof window === "undefined") return;
@@ -1182,7 +1285,7 @@ function GameScreen({
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       const frequencies = {
-        correct: [660, 880], wrong: [220, 160], click: [420], timer: [740, 520], finish: [523, 659, 784],
+        correct: [660, 880, 1046], wrong: [220, 160], click: [420], timer: [740, 520], finish: [523, 659, 784],
       }[kind];
       osc.type = kind === "wrong" ? "sawtooth" : "sine";
       osc.frequency.setValueAtTime(frequencies[0], ctx.currentTime);
@@ -1245,13 +1348,20 @@ function GameScreen({
     }
 
     if (mode === "battle") {
+      setHitFx(true);
+      setAttackFx(correct ? "player" : "enemy");
+      window.setTimeout(() => { setHitFx(false); setAttackFx(null); }, 650);
       if (correct) {
-        setEnemyHP((hp) => Math.max(0, hp - 20));
-        setBattleMessage(`⚡ ${battleSkills[qIndex % battleSkills.length]}! -20 HP`);
+        const damage = 18 + Math.min(streak * 2, 12);
+        setEnemyHP((hp) => Math.max(0, hp - damage));
+        setBattleMessage(`⚡ ${battleSkills[qIndex % battleSkills.length]}! -${damage} HP`);
       } else {
         setPlayerHP((hp) => Math.max(0, hp - 15));
         setBattleMessage("💥 Code Beast counterattacks! -15 HP");
       }
+    }
+    if (mode === "survival" && !correct) {
+      setPlayerHP((hp) => Math.max(0, hp - 20));
     }
   }, [answerState, currentQ, mode, playSfx, qIndex, streak, battleSkills]);
 
@@ -1275,7 +1385,7 @@ function GameScreen({
             <div className="flex items-center gap-2 min-w-0">
               <span className="text-2xl">{lang.icon}</span>
               <span className="font-mono font-bold text-white truncate">{lang.name}</span>
-              <span className="hidden sm:inline text-xs font-mono text-white/30">· {mode.toUpperCase()}</span>
+              <span className="hidden sm:inline text-xs font-mono text-white/30">· {mode.toUpperCase()}</span><span className="hidden md:inline text-[10px] font-mono text-green-300/60">· 🎵 {selectedTrack.title}</span>
             </div>
             <div className="flex items-center gap-2">
               {mode === "speed" && (
@@ -1302,13 +1412,13 @@ function GameScreen({
               <motion.div animate={{ boxShadow: ["0 0 0 rgba(239,68,68,0)", "0 0 35px rgba(168,85,247,.16)", "0 0 0 rgba(239,68,68,0)"] }} transition={{ repeat: Infinity, duration: 2.5 }}
                 className="rounded-3xl border border-purple-500/20 bg-gradient-to-br from-red-500/10 via-purple-500/10 to-cyan-500/10 p-3 sm:p-4 mb-5 overflow-hidden relative">
                 <div className="flex items-center justify-center gap-3 sm:gap-8 relative">
-                  <AnimeCoderAvatar side="enemy" large />
+                  <AnimeCoderAvatar side="enemy" large attacking={attackFx === "enemy"} hit={hitFx && attackFx === "player"} />
                   <div className="text-center min-w-0">
                     <p className="text-[10px] font-mono text-white/30 tracking-[0.25em]">CODE BATTLE</p>
                     <p className="text-xs sm:text-sm font-mono font-black text-purple-300">YOUR SKILL IS YOUR WEAPON</p>
                     <div className="mt-3 text-xs font-mono font-black text-white/70">{battleMessage}</div>
                   </div>
-                  <AnimeCoderAvatar side="player" large />
+                  <AnimeCoderAvatar side="player" large attacking={attackFx === "player"} hit={hitFx && attackFx === "enemy"} />
                 </div>
                 <div className="grid grid-cols-2 gap-3 sm:gap-5 mt-3">
                   <div><div className="flex justify-between mb-1"><span className="text-[10px] font-mono text-red-300">CODE BEAST</span><span className="text-[10px] font-mono text-red-300">{enemyHP} HP</span></div><div className="h-3 bg-black/20 rounded-full overflow-hidden"><motion.div className="h-full bg-gradient-to-r from-red-600 to-pink-500" animate={{ width: `${enemyHP}%` }} /></div></div>
@@ -1380,14 +1490,14 @@ function GameScreen({
                 <p className="text-[10px] font-mono font-black text-green-300 tracking-widest">BATTLE SOUNDTRACK</p>
                 <span className="text-[9px] font-mono text-white/30">Desktop side panel · Mobile below battle</span>
               </div>
-              <MusicPlayer compact />
+              <MusicPlayer compact selectedTrack={selectedTrack} />
             </aside>
           )}
         </div>
 
         {mode !== "battle" && (
           <div className="mt-5 max-w-2xl mx-auto">
-            <MusicPlayer compact />
+            <MusicPlayer compact selectedTrack={selectedTrack} />
           </div>
         )}
       </div>
@@ -1490,6 +1600,7 @@ function DuelScreen({
   friendName,
   friendRankName,
   friendPhoto,
+  selectedTrack,
   onFinish,
 }: {
   langId: string;
@@ -1498,9 +1609,11 @@ function DuelScreen({
   friendName: string;
   friendRankName: string;
   friendPhoto: string;
+  selectedTrack: (typeof SPOTIFY_TRACKS)[number];
   onFinish: () => void;
 }) {
-  const questions = (QUESTIONS[langId] ?? []).slice(0, 5);
+  const baseQuestions = QUESTIONS[langId] ?? [];
+  const questions = Array.from({ length: 10 }, (_, i) => baseQuestions[i % Math.max(baseQuestions.length, 1)]).filter(Boolean);
   const lang = LANGUAGES.find((l) => l.id === langId)!;
   const [qIndex, setQIndex] = useState(0);
   const [turn, setTurn] = useState<"you" | "friend">("you");
@@ -1508,13 +1621,37 @@ function DuelScreen({
   const [youScore, setYouScore] = useState(0);
   const [friendScore, setFriendScore] = useState(0);
   const [locked, setLocked] = useState(false);
+  const [attackFx, setAttackFx] = useState<"you" | "friend" | null>(null);
+  const [hitFx, setHitFx] = useState(false);
+  const [battleText, setBattleText] = useState("READY!");
   const currentQ = questions[qIndex];
+
+  const playDuelSfx = (correct: boolean) => {
+    try {
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator(); const gain = ctx.createGain();
+      osc.type = correct ? "sine" : "sawtooth";
+      osc.frequency.setValueAtTime(correct ? 880 : 180, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(correct ? 1320 : 90, ctx.currentTime + .22);
+      gain.gain.setValueAtTime(.0001, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(.09, ctx.currentTime + .02);
+      gain.gain.exponentialRampToValueAtTime(.0001, ctx.currentTime + .28);
+      osc.connect(gain); gain.connect(ctx.destination); osc.start(); osc.stop(ctx.currentTime + .3);
+      setTimeout(() => ctx.close(), 400);
+    } catch {}
+  };
 
   const answer = (index: number) => {
     if (locked) return;
     setSelected(index);
     const correct = index === currentQ.answer;
     setLocked(true);
+    playDuelSfx(correct);
+    setHitFx(true);
+    setAttackFx(correct ? turn : turn === "you" ? "friend" : "you");
+    setBattleText(correct ? (turn === "you" ? "CODE SLASH!" : "SYNTAX STRIKE!") : "COUNTER ATTACK!");
+    window.setTimeout(() => { setHitFx(false); setAttackFx(null); }, 650);
 
     if (turn === "you" && correct) setYouScore((s) => s + 1);
     if (turn === "friend" && correct) setFriendScore((s) => s + 1);
@@ -1527,7 +1664,7 @@ function DuelScreen({
         setQIndex((i) => i + 1);
         setTurn("you");
       } else onFinish();
-    }, 700);
+    }, 1500);
   };
 
   const friendRank = RANKS.find((r) => r.name === friendRankName) ?? RANKS[2];
@@ -1537,7 +1674,7 @@ function DuelScreen({
       <div className="absolute inset-0 bg-gradient-to-br from-cyan-950/20 via-purple-950/20 to-pink-950/20 pointer-events-none"/>
       <div className="max-w-6xl mx-auto relative">
         <div className="flex items-center justify-between mb-5">
-          <div><p className="text-purple-300 text-xs font-mono font-black">1V1 CODE ARENA</p><p className="text-white/30 text-xs font-mono mt-1">{lang.icon} {lang.name} · Round {qIndex + 1}/5</p></div>
+          <div><p className="text-purple-300 text-xs font-mono font-black">1V1 CODE ARENA</p><p className="text-white/30 text-xs font-mono mt-1">{lang.icon} {lang.name} · Round {qIndex + 1}/{questions.length}</p></div>
           <button onClick={onFinish} className="text-white/30 hover:text-white text-xs font-mono">Leave Arena</button>
         </div>
 
@@ -1571,13 +1708,26 @@ function DuelScreen({
         </div>
 
         <div className="flex items-center justify-center gap-4 sm:gap-10 mb-5">
-          <AnimeCoderAvatar side="player" large />
-          <div className="text-center">
-            <div className="text-3xl sm:text-5xl font-mono font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-white to-pink-300">VS</div>
-            <p className="text-[9px] sm:text-[10px] font-mono text-white/35 tracking-[0.25em] mt-1">CODE WARRIORS</p>
+          <AnimeCoderAvatar side="player" large attacking={attackFx === "you"} hit={hitFx && attackFx === "friend"} />
+          <div className="text-center min-w-[80px]">
+            <motion.div animate={hitFx ? { scale: [1, 1.35, 1], rotate: [0, 8, -8, 0] } : {}} className="text-3xl sm:text-5xl font-mono font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-white to-pink-300">VS</motion.div>
+            <p className="text-[9px] sm:text-[10px] font-mono text-yellow-300 tracking-[0.25em] mt-1">{battleText}</p>
           </div>
-          <AnimeCoderAvatar side="enemy" large />
+          <AnimeCoderAvatar side="enemy" large attacking={attackFx === "friend"} hit={hitFx && attackFx === "you"} />
         </div>
+
+        <AnimatePresence>
+          {hitFx && (
+            <motion.div initial={{ opacity: 0, scale: .3 }} animate={{ opacity: [0, 1, 0], scale: [0.3, 1.2, 1.7] }} exit={{ opacity: 0 }}
+              className={`fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none text-4xl sm:text-7xl font-mono font-black ${
+                attackFx === "you" ? "text-cyan-300" : "text-pink-300"
+              }`} style={{ textShadow: "0 0 30px currentColor" }}>
+              {battleText}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <div className="max-w-3xl mx-auto mb-5"><MusicPlayer compact selectedTrack={selectedTrack} /></div>
 
         <div className="max-w-3xl mx-auto rounded-3xl border border-white/10 bg-white/5 p-5 md:p-7 shadow-2xl">
           <div className="flex items-center justify-between mb-4"><span className="text-xs font-mono text-white/35">Question {qIndex + 1}</span><span className="text-xs font-mono text-yellow-300">+{currentQ.xp} XP</span></div>
@@ -1739,6 +1889,8 @@ export default function App() {
   const [screen, setScreen] = useState<Screen>("welcome");
   const [gameMode, setGameMode] = useState<GameMode>("practice");
   const [selectedLang, setSelectedLang] = useState<string | null>(null);
+  const [selectedTrack, setSelectedTrack] = useState<(typeof SPOTIFY_TRACKS)[number]>(SPOTIFY_TRACKS[0]);
+  const [musicReturn, setMusicReturn] = useState<"game" | "duel">("game");
   const [results, setResults] = useState<{ score: number; xp: number; correct: number } | null>(null);
   const [lifetimeXP, setLifetimeXP] = useState(() => Number(localStorage.getItem("codequest-total-xp") || 0));
   const [duelLang, setDuelLang] = useState<string | null>(null);
@@ -1803,7 +1955,7 @@ export default function App() {
         * { box-sizing: border-box; }
         body { overflow-x: hidden; }
         .dark-mode { background: #070711; min-height: 100vh; }
-        .light-mode { background: #eef2ff; color: #111827; min-height: 100vh; }
+        .light-mode { background: linear-gradient(135deg,#f8fafc,#eef2ff 45%,#ecfeff); color: #111827; min-height: 100vh; }
         .light-mode .text-white { color: #111827 !important; }
         .light-mode .text-white\\/80 { color: #374151 !important; }
         .light-mode .text-white\\/70 { color: #4b5563 !important; }
@@ -1835,6 +1987,10 @@ export default function App() {
         .light-mode .text-white\/40 { color: #6b7280 !important; }
         .light-mode .text-white\/30 { color: #9ca3af !important; }
         .light-mode input::placeholder { color: #9ca3af !important; }
+        .light-mode .text-white\/10 { color: rgba(17,24,39,.15) !important; }
+        .light-mode iframe { filter: none; }
+        button { -webkit-tap-highlight-color: transparent; }
+        @media (max-width: 640px) { body { min-width: 0; } }
       `}</style>
 
       <div className="fixed inset-0 pointer-events-none"
@@ -1894,8 +2050,20 @@ export default function App() {
               onSelect={(lang) => {
                 setSelectedLang(lang);
                 setResults(null);
-                setScreen("game");
+                setMusicReturn("game");
+                setScreen("music");
               }}
+            />
+          </motion.div>
+        )}
+
+        {screen === "music" && (
+          <motion.div key="music" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <MusicSelectionScreen
+              selectedTrack={selectedTrack}
+              onSelect={setSelectedTrack}
+              onBack={() => setScreen(musicReturn === "duel" ? "duel-setup" : "language")}
+              onContinue={() => setScreen(musicReturn)}
             />
           </motion.div>
         )}
@@ -1905,6 +2073,7 @@ export default function App() {
             <GameScreen
               langId={selectedLang}
               mode={gameMode}
+              selectedTrack={selectedTrack}
               onFinish={(score, xp, correct) => {
                 setResults({ score, xp, correct });
                 addLifetimeXP(xp);
@@ -1926,7 +2095,8 @@ export default function App() {
                 setFriendName(name);
                 setFriendRankName(rank);
                 setFriendPhoto(photo);
-                setScreen("duel");
+                setMusicReturn("duel");
+                setScreen("music");
               }}
             />
           </motion.div>
@@ -1941,6 +2111,7 @@ export default function App() {
               friendName={friendName}
               friendRankName={friendRankName}
               friendPhoto={friendPhoto}
+              selectedTrack={selectedTrack}
               onFinish={() => setScreen("home")}
             />
           </motion.div>
@@ -1953,13 +2124,14 @@ export default function App() {
               score={results.score}
               xp={results.xp}
               correct={results.correct}
-              total={gameMode === "speed" ? Math.min(5, totalQs) : totalQs}
+              total={gameMode === "speed" ? Math.min(5, totalQs) : gameMode === "survival" ? Math.min(10, totalQs + 3) : totalQs}
               profile={profile}
               totalXP={lifetimeXP}
               onPhotoUpdate={updatePhoto}
               onReplay={() => {
                 setResults(null);
-                setScreen("game");
+                setMusicReturn("game");
+                setScreen("music");
               }}
               onHome={() => {
                 setSelectedLang(null);
