@@ -719,7 +719,7 @@ const DEBUG_QUESTIONS_BY_LANGUAGE: Record<string, Question[]> = {
 
 const DEBUG_QUESTIONS: Question[] = DEBUG_QUESTIONS_BY_LANGUAGE.javascript;
 
-function WelcomeScreen({ onContinue, darkMode, onToggleTheme }: { onContinue: () => void; darkMode: boolean; onToggleTheme: () => void }) {
+function WelcomeScreen({ onContinue }: { onContinue: () => void }) {
   return (
     <div className="min-h-screen relative overflow-hidden flex items-center justify-center px-4 py-10">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_25%,rgba(124,58,237,.24),transparent_32%),radial-gradient(circle_at_20%_80%,rgba(6,182,212,.14),transparent_30%),radial-gradient(circle_at_85%_70%,rgba(236,72,153,.12),transparent_30%)]" />
@@ -727,10 +727,6 @@ function WelcomeScreen({ onContinue, darkMode, onToggleTheme }: { onContinue: ()
         <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 28, ease: "linear" }} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[70vw] max-w-[720px] aspect-square rounded-full border border-purple-400/10" />
         <motion.div animate={{ rotate: -360 }} transition={{ repeat: Infinity, duration: 18, ease: "linear" }} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[48vw] max-w-[500px] aspect-square rounded-full border border-cyan-400/10 border-dashed" />
       </div>
-
-      <button onClick={onToggleTheme} className="absolute top-5 right-5 z-20 flex items-center gap-2 px-4 py-2.5 rounded-xl border border-white/10 bg-black/20 backdrop-blur-xl text-white/70 font-mono text-xs hover:bg-white/10">
-        {darkMode ? <Sun size={15} /> : <Moon size={15} />} {darkMode ? "Light Mode" : "Dark Mode"}
-      </button>
 
       <div className="absolute hidden lg:block top-24 left-8 text-[11px] font-mono text-cyan-300/30 rotate-[-8deg]">{`while(skill){ learn(); levelUp(); }`}</div>
       <div className="absolute hidden lg:block bottom-28 right-8 text-[11px] font-mono text-purple-300/30 rotate-[7deg]">{`if(correct) { attack(); }`}</div>
@@ -1131,11 +1127,15 @@ function ProfileScreen({
   totalXP,
   onSave,
   onBack,
+  darkMode,
+  onToggleTheme,
 }: {
   profile: StudentProfile;
   totalXP: number;
   onSave: (profile: StudentProfile) => void;
   onBack: () => void;
+  darkMode: boolean;
+  onToggleTheme: () => void;
 }) {
   const [form, setForm] = useState<StudentProfile>(profile);
 
@@ -1181,6 +1181,20 @@ function ProfileScreen({
 
           <div className="mb-5">
             <RankBadge totalXP={totalXP} />
+          </div>
+
+          <div className="mb-5 rounded-2xl border border-white/10 bg-black/10 p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <Menu size={15} className="text-cyan-300" />
+              <span className="text-[10px] font-mono font-black tracking-[0.24em] text-cyan-300">SETTINGS</span>
+            </div>
+            <button type="button" onClick={onToggleTheme} className="flex w-full items-center justify-between rounded-xl border border-white/10 bg-white/5 px-3 py-3 text-left">
+              <span className="flex items-center gap-2">
+                {darkMode ? <Sun size={16} className="text-yellow-300" /> : <Moon size={16} className="text-cyan-300" />}
+                <span className="text-sm font-mono text-white/80">{darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}</span>
+              </span>
+              <span className="text-[11px] font-mono text-white/40">{darkMode ? "Light" : "Dark"}</span>
+            </button>
           </div>
 
           <form onSubmit={submit} className="space-y-4 mt-7">
@@ -2193,24 +2207,6 @@ function GlobalMusicController({
   return null;
 }
 
-function GlobalMenu({ onGuidelines, onToggleTheme, darkMode, onMusic }: { onGuidelines: () => void; onToggleTheme: () => void; darkMode: boolean; onMusic: () => void }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <div className="fixed top-3 right-3 z-[90]">
-      <button onClick={() => setOpen(v => !v)} aria-label="Open CodeQuest menu" className="w-11 h-11 rounded-2xl border border-white/10 bg-black/35 backdrop-blur-2xl text-white/75 flex items-center justify-center shadow-xl hover:border-cyan-400/30">
-        {open ? <X size={20}/> : <span className="flex flex-col gap-1.5"><span className="block w-5 h-0.5 bg-current rounded"/><span className="block w-5 h-0.5 bg-current rounded"/><span className="block w-5 h-0.5 bg-current rounded"/></span>}
-      </button>
-      <AnimatePresence>
-        {open && <motion.div initial={{ opacity: 0, y: -8, scale: .96 }} animate={{ opacity: 1, y: 6, scale: 1 }} exit={{ opacity: 0, y: -8, scale: .96 }} className="absolute right-0 mt-2 w-[min(14rem,calc(100vw-1.5rem))] max-w-[calc(100vw-1.5rem)] rounded-2xl border border-white/10 bg-[#0b0b14]/95 backdrop-blur-2xl p-2 shadow-2xl">
-          <button onClick={() => { setOpen(false); onGuidelines(); }} className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-white/75 hover:bg-white/10 font-mono text-xs"><BookOpenCheck size={16}/> Guidelines</button>
-          <button onClick={() => { setOpen(false); onToggleTheme(); }} className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-white/75 hover:bg-white/10 font-mono text-xs">{darkMode ? <Sun size={16}/> : <Moon size={16}/>} {darkMode ? "Light Mode" : "Dark Mode"}</button>
-          <button onClick={() => { setOpen(false); onMusic(); }} className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-green-300 hover:bg-green-500/10 font-mono text-xs"><Music size={16}/> Music Selection</button>
-        </motion.div>}
-      </AnimatePresence>
-    </div>
-  );
-}
-
 // ─── App ─────────────────────────────────────────────────────────────────────
 
 export default function App() {
@@ -2387,23 +2383,13 @@ export default function App() {
 
       <>
         <GlobalMusicController selectedTrack={selectedTrack} />
-        {screen !== "welcome" && (
-          <>
-          <GlobalMenu
-            darkMode={darkMode}
-            onGuidelines={() => setScreen("guidelines")}
-            onToggleTheme={() => setDarkMode((v) => !v)}
-            onMusic={() => { setMusicReturn(screen === "duel" ? "duel" : screen === "game" ? "game" : "home"); setScreen("music"); }}
-          />
-          </>
-        )}
       </>
 
       <AnimatePresence mode="wait">
 
         {screen === "welcome" && (
           <motion.div key="welcome" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <WelcomeScreen darkMode={darkMode} onToggleTheme={() => setDarkMode((v) => !v)} onContinue={continueFromWelcome} />
+            <WelcomeScreen onContinue={continueFromWelcome} />
           </motion.div>
         )}
 
@@ -2426,7 +2412,14 @@ export default function App() {
 
         {screen === "profile" && (
           <motion.div key="profile" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <ProfileScreen profile={profile} totalXP={lifetimeXP} onSave={saveProfile} onBack={() => setScreen("home")} />
+            <ProfileScreen
+              profile={profile}
+              totalXP={lifetimeXP}
+              onSave={saveProfile}
+              onBack={() => setScreen("home")}
+              darkMode={darkMode}
+              onToggleTheme={() => setDarkMode((v) => !v)}
+            />
           </motion.div>
         )}
 
