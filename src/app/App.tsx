@@ -607,15 +607,54 @@ const SPOTIFY_TRACKS = [
   { id: "0p20HotsDDhhAUtJ2KOAg9", title: "Relaxing Beats for Late Night Coding", artist: "Lo Fi Hip Hop", category: "Focus" },
 ];
 
-const DEBUG_QUESTIONS: Question[] = [
-  { id: 101, type: "code", question: "Find the bug: which change fixes this JavaScript loop?", code: `for (let i = 0; i <= 5; i--) {\n  console.log(i);\n}`, options: ["Change i-- to i++", "Change <= to >=", "Remove let", "Remove console.log"], answer: 0, explanation: "The counter must increase with i++ so the loop can reach its stopping condition.", xp: 20 },
-  { id: 102, type: "code", question: "Find the Python bug that causes an indentation error.", code: `if score > 50:\nprint("Pass")`, options: ["Indent print", "Remove if", "Change > to <", "Add a semicolon"], answer: 0, explanation: "Python uses indentation to define the body of an if statement.", xp: 20 },
-  { id: 103, type: "multiple", question: "A variable is used before it is declared. What kind of bug is this?", options: ["Logic error", "Reference/declaration error", "Styling error", "Network error"], answer: 1, explanation: "Using an undeclared variable causes a reference/declaration problem in many languages.", xp: 20 },
-  { id: 104, type: "code", question: "Which fix prevents a division-by-zero crash?", code: `result = total / count`, options: ["Check count !== 0 first", "Delete total", "Multiply by zero", "Convert count to text"], answer: 0, explanation: "Validate that count is not zero before dividing.", xp: 25 },
-  { id: 105, type: "multiple", question: "The program runs but produces the wrong result. What should you investigate first?", options: ["Logic", "Monitor brightness", "Keyboard layout", "File name color"], answer: 0, explanation: "A wrong result while the program runs is commonly a logic error.", xp: 20 },
-  { id: 106, type: "code", question: "Which line correctly checks whether a value is null in JavaScript?", code: `const value = null;`, options: ["value === null", "value = null", "value == undefined only", "null.value"], answer: 0, explanation: "Strict equality with null is the direct check for a null value.", xp: 20 },
-  { id: 107, type: "multiple", question: "What is the best debugging habit after reproducing a bug?", options: ["Inspect the failing input and trace the code", "Delete the project", "Ignore the error", "Restart forever"], answer: 0, explanation: "Reproduce, inspect inputs, trace execution, isolate the cause, then fix and retest.", xp: 25 },
-];
+const DEBUG_QUESTIONS_BY_LANGUAGE: Record<string, Question[]> = {
+  python: [
+    { id: 201, type: "code", question: "Fix the Python indentation bug.", code: `if score >= 75:\nprint("Passed")`, options: ["Indent print() under if", "Remove if", "Add ;", "Change >= to <="], answer: 0, explanation: "Python requires indentation to define the body of an if statement.", xp: 25 },
+    { id: 202, type: "code", question: "Fix the Python loop so it counts upward.", code: `for i in range(5):\n    print(i)`, options: ["This code is already correct", "Change range to range(-5)", "Remove print", "Use i--"], answer: 0, explanation: "range(5) correctly produces 0 through 4, so no fix is needed.", xp: 25 },
+  ],
+  javascript: [
+    { id: 211, type: "code", question: "Fix the JavaScript loop that never reaches the end.", code: `for (let i = 0; i < 5; i--) {\n  console.log(i);\n}`, options: ["Change i-- to i++", "Change < to >", "Remove let", "Remove console.log"], answer: 0, explanation: "The counter must increase toward 5, so i++ is required.", xp: 25 },
+    { id: 212, type: "code", question: "Fix the JavaScript null-check bug.", code: `const user = null;\nconsole.log(user.name);`, options: ["Check user before reading name", "Use user.name = null", "Remove const", "Convert user to number"], answer: 0, explanation: "Accessing a property on null throws an error. Check that user exists first.", xp: 25 },
+  ],
+  html: [
+    { id: 221, type: "code", question: "Fix the HTML form bug: the input cannot be submitted with the intended field name.", code: `<form>\n  <input id="email">\n</form>`, options: ["Add name=\"email\"", "Remove the input", "Change form to div", "Add Python code"], answer: 0, explanation: "A form control should have a name attribute so its value can be submitted as form data.", xp: 25 },
+    { id: 222, type: "code", question: "Fix the CSS bug that prevents the text color rule from applying.", code: `.title { color: bluish; }`, options: ["Use a valid color such as blue", "Add Python", "Remove color", "Change .title to <title>"], answer: 0, explanation: "bluish is not a valid CSS color keyword. Use blue, a hex value, rgb(), etc.", xp: 25 },
+  ],
+  java: [
+    { id: 231, type: "code", question: "Fix the Java comparison bug.", code: `int age = 18;\nif (age = 18) {\n  System.out.println("Adult");\n}`, options: ["Change = to ==", "Change int to string", "Remove if", "Use ==="], answer: 0, explanation: "Java uses == for comparison; = assigns a value.", xp: 25 },
+    { id: 232, type: "code", question: "Fix the Java array index bug.", code: `int[] nums = {1,2,3};\nSystem.out.println(nums[3]);`, options: ["Use nums[2]", "Use nums[4]", "Remove the array", "Use nums[-1]"], answer: 0, explanation: "The last valid index is 2 because Java arrays are zero-indexed.", xp: 25 },
+  ],
+  cpp: [
+    { id: 241, type: "code", question: "Fix the C++ output bug.", code: `int x = 5;\ncout << x`, options: ["Add a semicolon", "Remove cout", "Change int to string", "Add Python"], answer: 0, explanation: "The C++ statement needs a semicolon at the end.", xp: 25 },
+    { id: 242, type: "code", question: "Fix the C++ array bounds bug.", code: `int a[3] = {1,2,3};\ncout << a[3];`, options: ["Use a[2]", "Use a[4]", "Use a[-3]", "Delete a"], answer: 0, explanation: "Valid indexes are 0, 1, and 2. Index 3 is out of bounds.", xp: 25 },
+  ],
+  c: [
+    { id: 251, type: "code", question: "Fix the C format-specifier bug.", code: `int age = 20;\nprintf("%s", age);`, options: ["Use %d", "Use %f", "Use %c only", "Remove age"], answer: 0, explanation: "%d is the correct printf format specifier for an int.", xp: 25 },
+    { id: 252, type: "code", question: "Fix the C pointer bug.", code: `int x = 5;\nint *p;\n*p = x;`, options: ["Set p = &x before dereferencing", "Delete x", "Use p++", "Change int to float"], answer: 0, explanation: "p must point to valid memory before *p is used.", xp: 25 },
+  ],
+  typescript: [
+    { id: 261, type: "code", question: "Fix the TypeScript type bug.", code: `let score: number = "100";`, options: ["Use 100 without quotes", "Change number to boolean", "Remove score", "Use undefined"], answer: 0, explanation: "A number variable must receive a number, not a string.", xp: 25 },
+    { id: 262, type: "code", question: "Fix the TypeScript optional-value bug.", code: `let name: string | undefined;\nconsole.log(name.toUpperCase());`, options: ["Check name before calling toUpperCase()", "Remove string", "Use name = false", "Add a semicolon only"], answer: 0, explanation: "name can be undefined, so TypeScript requires a guard before calling a string method.", xp: 25 },
+  ],
+  php: [
+    { id: 271, type: "code", question: "Fix the PHP variable bug.", code: `$name = "Elmer";\necho name;`, options: ["Use echo $name;", "Use echo #name;", "Remove $ from assignment", "Use console.log"], answer: 0, explanation: "PHP variables require the $ prefix when they are referenced.", xp: 25 },
+    { id: 272, type: "code", question: "Fix the PHP comparison bug.", code: `$age = 18;\nif ($age = 20) { echo "OK"; }`, options: ["Change = to == or ===", "Remove $age", "Use =>", "Use ===="], answer: 0, explanation: "= assigns a value; == or === compares values.", xp: 25 },
+  ],
+  sql: [
+    { id: 281, type: "code", question: "Fix the SQL query that has the wrong clause order.", code: `SELECT name FROM users\nWHERE age > 18\nORDER BY name;`, options: ["This query is already correct", "Move WHERE after ORDER BY", "Remove SELECT", "Replace WHERE with if"], answer: 0, explanation: "SELECT, FROM, WHERE, then ORDER BY is valid SQL clause order.", xp: 25 },
+    { id: 282, type: "code", question: "Fix the SQL NULL comparison bug.", code: `SELECT * FROM users WHERE email = NULL;`, options: ["Use email IS NULL", "Use email == NULL", "Use email := NULL", "Remove WHERE"], answer: 0, explanation: "SQL uses IS NULL / IS NOT NULL for NULL checks.", xp: 25 },
+  ],
+  csharp: [
+    { id: 291, type: "code", question: "Fix the C# comparison bug.", code: `int score = 90;\nif (score = 90) Console.WriteLine("A");`, options: ["Change = to ==", "Change int to string", "Remove if", "Use ==="], answer: 0, explanation: "C# uses == for equality comparison.", xp: 25 },
+    { id: 292, type: "code", question: "Fix the C# array index bug.", code: `int[] nums = {1,2,3};\nConsole.WriteLine(nums[3]);`, options: ["Use nums[2]", "Use nums[4]", "Use nums[-1]", "Delete nums"], answer: 0, explanation: "The last valid index is 2 for a three-item array.", xp: 25 },
+  ],
+  kotlin: [
+    { id: 301, type: "code", question: "Fix the Kotlin null-safety bug.", code: `var name: String? = null\nprintln(name.length)`, options: ["Use name?.length", "Remove String?", "Use name++", "Use === only"], answer: 0, explanation: "A nullable String must be safely accessed with ?. or checked first.", xp: 25 },
+    { id: 302, type: "code", question: "Fix the Kotlin mutable-variable bug.", code: `val score = 10\nscore = 20`, options: ["Change val to var", "Change 20 to null", "Remove score", "Use const"], answer: 0, explanation: "val is read-only; use var when the value needs to change.", xp: 25 },
+  ],
+};
+
+const DEBUG_QUESTIONS: Question[] = DEBUG_QUESTIONS_BY_LANGUAGE.javascript;
 
 function WelcomeScreen({ onContinue, darkMode, onToggleTheme }: { onContinue: () => void; darkMode: boolean; onToggleTheme: () => void }) {
   return (
@@ -739,20 +778,11 @@ function MusicSelectionScreen({
               </motion.button>
             ))}
           </div>
-
-          <div className="mt-5 rounded-2xl border border-white/10 bg-black/20 p-3">
-            <p className="text-[10px] font-mono text-white/40 mb-2">SELECTED TRACK</p>
-            <p className="font-mono font-black text-green-300">{selectedTrack.title}</p>
-            <p className="font-mono text-xs text-white/40">{selectedTrack.artist}</p>
-            <iframe
-              key={`preview-${selectedTrack.id}`}
-              src={`https://open.spotify.com/embed/track/${selectedTrack.id}?utm_source=generator&theme=0&autoplay=1&start=0`}
-              width="100%" height="152" frameBorder="0"
-              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-              loading="lazy" title={`Spotify preview for ${selectedTrack.title}`} className="w-full rounded-2xl mt-3"
-            />
+          <div className="mt-5 rounded-2xl border border-green-500/20 bg-green-500/5 p-4 text-center">
+            <Music size={24} className="mx-auto text-green-300 mb-2" />
+            <p className="text-green-300 font-mono font-black text-sm">GLOBAL SOUNDTRACK ARMED</p>
+            <p className="text-white/35 font-mono text-[10px] mt-1">Your selected track plays from the beginning and stays with you across the whole website.</p>
           </div>
-
           <button onClick={onContinue}
             className="w-full mt-5 py-4 rounded-2xl bg-gradient-to-r from-green-500 via-cyan-500 to-purple-600 text-white font-mono font-black text-lg shadow-xl shadow-green-500/15">
             Lock In & Start Game <ArrowRight size={19} className="inline ml-2" />
@@ -869,14 +899,14 @@ function ModesScreen({ onSelect, onBack }: { onSelect: (mode: GameMode) => void;
     { id: "practice" as GameMode, icon: "🧠", title: "Practice Mode", desc: "Relaxed learning with explanations after every answer.", color: "#8b5cf6", questions: "7 questions" },
     { id: "battle" as GameMode, icon: "⚔️", title: "Battle Mode", desc: "Correct answers become attacks against the Code Beast with anime combat effects.", color: "#ef4444", questions: "7 questions" },
     { id: "speed" as GameMode, icon: "⚡", title: "Speed Mode", desc: "Race the clock and finish before time runs out.", color: "#f59e0b", questions: "5 questions · 60 sec" },
-    { id: "debug" as GameMode, icon: "🐛", title: "Bug Hunter", desc: "Hunt down coding mistakes and build a debugging streak.", color: "#22c55e", questions: "7 bug challenges" },
+    { id: "debug" as GameMode, icon: "🐛", title: "Bug Hunter", desc: "Open broken code, identify the bug, and fix it in the language you choose.", color: "#22c55e", questions: "Language-specific bug fixes" },
     { id: "survival" as GameMode, icon: "🔥", title: "Code Survival", desc: "Keep your run alive. Wrong answers drain your life and streak.", color: "#06b6d4", questions: "12 lives-on-the-line" },
   ];
   return (
     <div className="min-h-screen px-4 sm:px-6 py-10">
       <div className="max-w-5xl mx-auto">
         <button onClick={onBack} className="flex items-center gap-2 text-white/50 hover:text-white font-mono text-sm mb-8"><ArrowLeft size={16}/> Back</button>
-        <div className="text-center mb-10"><Gamepad2 className="mx-auto text-purple-400 mb-3" size={40}/><h2 className="text-4xl md:text-5xl font-mono font-black text-white">CHOOSE YOUR GAME</h2><p className="text-white/40 font-mono text-sm mt-2">Every mode plays with your chosen soundtrack.</p></div>
+        <div className="text-center mb-10"><Gamepad2 className="mx-auto text-purple-400 mb-3" size={40}/><h2 className="text-4xl md:text-5xl font-mono font-black text-white">CHOOSE YOUR GAME</h2><p className="text-white/40 font-mono text-sm mt-2">Your soundtrack stays active while you explore the whole CodeQuest world.</p></div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {modes.map((mode) => <motion.button key={mode.id} onClick={() => onSelect(mode.id)} whileHover={{ y: -5, scale: 1.01 }} whileTap={{ scale: .98 }}
             className="text-left rounded-3xl border border-white/10 bg-white/5 p-6 hover:bg-white/10 transition-all shadow-xl">
@@ -924,6 +954,10 @@ function HomeScreen({
               <p className="text-white font-mono font-black truncate">{profile.username || "Code Warrior"}</p>
               <p className="text-white/40 text-[10px] font-mono truncate">{profile.yearLevel || "Player"} · {profile.course || "Programmer"}</p>
               <div className="mt-2"><RankBadge totalXP={totalXP} compact /></div>
+              <div className="mt-2">
+                <div className="flex justify-between text-[8px] font-mono text-white/30 mb-1"><span>RANK PROGRESS</span><span>{totalXP} XP</span></div>
+                <div className="h-1.5 rounded-full bg-white/10 overflow-hidden"><motion.div className="h-full rounded-full bg-gradient-to-r from-purple-500 to-cyan-400" animate={{ width: `${Math.max(5, Math.min(100, ((totalXP - getRank(totalXP).minXP) / Math.max(1, ((RANKS[RANKS.indexOf(getRank(totalXP)) + 1]?.minXP ?? getRank(totalXP).minXP + 500) - getRank(totalXP).minXP))) * 100))}%` }} /></div>
+              </div>
             </div>
           </div>
         </div>
@@ -949,7 +983,7 @@ function HomeScreen({
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="text-center max-w-3xl mx-auto lg:ml-64"
+        className="text-center max-w-4xl mx-auto lg:ml-64 relative"
       >
         <motion.div
           className="inline-flex items-center gap-2 bg-purple-500/20 border border-purple-500/30 rounded-full px-4 py-2 mb-8"
@@ -971,6 +1005,17 @@ function HomeScreen({
         <p className="text-white/30 text-sm mb-12">
           Choose your mode, pick a language, answer challenges, and level up your coding skills.
         </p>
+
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: .2 }} className="max-w-2xl mx-auto w-full mb-7 rounded-3xl border border-purple-500/20 bg-gradient-to-r from-purple-500/10 via-white/5 to-cyan-500/10 p-4 text-left shadow-2xl">
+          <div className="flex items-center justify-between gap-3 mb-3">
+            <div><p className="text-[10px] font-mono text-purple-300 tracking-[.25em] font-black">CODING JOURNEY PROGRESS</p><p className="text-white font-mono font-black text-sm mt-1">{getRank(totalXP).name}</p></div>
+            <span className="text-cyan-300 font-mono font-black text-sm">{totalXP} XP</span>
+          </div>
+          <div className="h-3 rounded-full bg-white/10 overflow-hidden border border-white/5">
+            <motion.div className="h-full rounded-full bg-gradient-to-r from-violet-500 via-fuchsia-500 to-cyan-400" initial={{ width: 0 }} animate={{ width: `${Math.max(4, Math.min(100, ((totalXP - getRank(totalXP).minXP) / Math.max(1, ((RANKS[RANKS.indexOf(getRank(totalXP)) + 1]?.minXP ?? getRank(totalXP).minXP + 500) - getRank(totalXP).minXP))) * 100))}%` }} transition={{ duration: 1 }} />
+          </div>
+          <div className="flex justify-between mt-2 text-[9px] font-mono text-white/35"><span>Rank progress</span><span>{RANKS[RANKS.indexOf(getRank(totalXP)) + 1] ? `${Math.max(0, RANKS[RANKS.indexOf(getRank(totalXP)) + 1].minXP - totalXP)} XP to next rank` : "MAX RANK — LEGENDARY"}</span></div>
+        </motion.div>
 
         <div className="grid grid-cols-3 gap-4 mb-10 max-w-md mx-auto">
           {[
@@ -1271,16 +1316,14 @@ function LanguageScreen({ onSelect }: { onSelect: (lang: string) => void }) {
 function GameScreen({
   langId,
   mode,
-  selectedTrack,
   onFinish,
 }: {
   langId: string;
   mode: GameMode;
-  selectedTrack: (typeof SPOTIFY_TRACKS)[number];
   onFinish: (score: number, xp: number, correct: number) => void;
 }) {
   const allQuestions = QUESTIONS[langId] ?? [];
-  const debugQuestions = DEBUG_QUESTIONS;
+  const debugQuestions = DEBUG_QUESTIONS_BY_LANGUAGE[langId] ?? DEBUG_QUESTIONS;
   const questions = mode === "debug" ? debugQuestions : mode === "speed" ? allQuestions.slice(0, Math.min(5, allQuestions.length)) : mode === "survival" ? Array.from({ length: 12 }, (_, i) => allQuestions[i % Math.max(allQuestions.length, 1)]).filter(Boolean) : allQuestions;
   const lang = LANGUAGES.find((l) => l.id === langId)!;
   const [qIndex, setQIndex] = useState(0);
@@ -1414,7 +1457,7 @@ function GameScreen({
             <div className="flex items-center gap-2 min-w-0">
               <span className="text-2xl">{lang.icon}</span>
               <span className="font-mono font-bold text-white truncate">{lang.name}</span>
-              <span className="hidden sm:inline text-xs font-mono text-white/30">· {mode.toUpperCase()}</span><span className="hidden md:inline text-[10px] font-mono text-green-300/60">· 🎵 {selectedTrack.title}</span>
+              <span className="hidden sm:inline text-xs font-mono text-white/30">· {mode.toUpperCase()}</span><span className="hidden md:inline text-[10px] font-mono text-green-300/60">· 🎵 GLOBAL SOUNDTRACK</span>
             </div>
             <div className="flex items-center gap-2">
               {mode === "speed" && (
@@ -1461,7 +1504,7 @@ function GameScreen({
               <motion.div key={qIndex} initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} transition={{ duration: 0.25 }} className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2 mb-3">
                   <div className="flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-mono font-bold border" style={{ color: lang.color, borderColor: `${lang.color}40`, backgroundColor: `${lang.color}15` }}>
-                    <Target size={11} /> {mode === "debug" ? "Bug Hunt" : currentQ.type === "multiple" ? "Multiple Choice" : currentQ.type === "code" ? "Code Challenge" : "True or False"}
+                    <Target size={11} /> {mode === "debug" ? `${lang.name} Bug Fix` : currentQ.type === "multiple" ? "Multiple Choice" : currentQ.type === "code" ? "Code Challenge" : "True or False"}
                   </div>
                   <span className="text-xs font-mono text-yellow-400/70">+{currentQ.xp} XP</span>
                   {mode === "battle" && <span className="text-xs font-mono text-red-300/70">⚔ {battleSkills[qIndex % battleSkills.length]}</span>}
@@ -1513,23 +1556,7 @@ function GameScreen({
               </motion.div>
             </AnimatePresence>
           </main>
-
-          {mode === "battle" && (
-            <aside className="min-w-0 lg:sticky lg:top-4">
-              <div className="mb-2 flex items-center justify-between">
-                <p className="text-[10px] font-mono font-black text-green-300 tracking-widest">BATTLE SOUNDTRACK</p>
-                <span className="text-[9px] font-mono text-white/30">Desktop side panel · Mobile below battle</span>
-              </div>
-              <MusicPlayer compact selectedTrack={selectedTrack} />
-            </aside>
-          )}
         </div>
-
-        {mode !== "battle" && (
-          <div className="mt-5 max-w-2xl mx-auto">
-            <MusicPlayer compact selectedTrack={selectedTrack} />
-          </div>
-        )}
       </div>
     </div>
   );
@@ -1646,7 +1673,6 @@ function DuelScreen({
   friendRankName,
   friendPhoto,
   characterId,
-  selectedTrack,
   onFinish,
 }: {
   langId: string;
@@ -1656,7 +1682,6 @@ function DuelScreen({
   friendRankName: string;
   friendPhoto: string;
   characterId: string;
-  selectedTrack: (typeof SPOTIFY_TRACKS)[number];
   onFinish: () => void;
 }) {
   const baseQuestions = QUESTIONS[langId] ?? [];
@@ -1780,7 +1805,6 @@ function DuelScreen({
           )}
         </AnimatePresence>
 
-        <div className="max-w-3xl mx-auto mb-5"><MusicPlayer compact selectedTrack={selectedTrack} /></div>
 
         <div className="max-w-3xl mx-auto rounded-3xl border border-white/10 bg-white/5 p-5 md:p-7 shadow-2xl">
           <div className="flex items-center justify-between mb-4"><span className="text-xs font-mono text-white/35">Question {qIndex + 1}</span><span className="text-xs font-mono text-yellow-300">+{currentQ.xp} XP</span></div>
@@ -1965,13 +1989,31 @@ function ResultsScreen({
   );
 }
 
+function GlobalMusicDock({ selectedTrack, onChange }: { selectedTrack: (typeof SPOTIFY_TRACKS)[number]; onChange: (track: (typeof SPOTIFY_TRACKS)[number]) => void }) {
+  return (
+    <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} className="fixed bottom-4 right-4 z-[70] w-[min(360px,calc(100vw-2rem))] rounded-3xl border border-green-400/20 bg-[#08110f]/95 backdrop-blur-2xl shadow-[0_0_60px_rgba(34,197,94,.15)] p-3">
+      <div className="flex items-center gap-2 mb-2">
+        <div className="w-8 h-8 rounded-xl bg-green-500/15 flex items-center justify-center"><Music size={15} className="text-green-300" /></div>
+        <div className="min-w-0 flex-1"><p className="text-green-300 font-mono font-black text-[10px] tracking-widest">CODEQUEST SOUNDTRACK</p><p className="text-white/50 font-mono text-[9px] truncate">{selectedTrack.title} · {selectedTrack.artist}</p></div>
+        <button onClick={() => { const i = SPOTIFY_TRACKS.findIndex(t => t.id === selectedTrack.id); onChange(SPOTIFY_TRACKS[(i + 1) % SPOTIFY_TRACKS.length]); }} className="px-2 py-1 rounded-lg border border-white/10 bg-white/5 text-white/50 text-[9px] font-mono">NEXT</button>
+      </div>
+      <iframe key={`global-${selectedTrack.id}`} src={`https://open.spotify.com/embed/track/${selectedTrack.id}?utm_source=generator&theme=0&autoplay=1&start=0`} width="100%" height="80" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="eager" title={`Global Spotify player for ${selectedTrack.title}`} className="w-full rounded-2xl" />
+    </motion.div>
+  );
+}
+
 // ─── App ─────────────────────────────────────────────────────────────────────
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>("welcome");
   const [gameMode, setGameMode] = useState<GameMode>("practice");
   const [selectedLang, setSelectedLang] = useState<string | null>(null);
-  const [selectedTrack, setSelectedTrack] = useState<(typeof SPOTIFY_TRACKS)[number]>(SPOTIFY_TRACKS[0]);
+  const [selectedTrack, setSelectedTrack] = useState<(typeof SPOTIFY_TRACKS)[number]>(() => {
+    try {
+      const savedId = localStorage.getItem("codequest-selected-track");
+      return SPOTIFY_TRACKS.find((track) => track.id === savedId) ?? SPOTIFY_TRACKS[0];
+    } catch { return SPOTIFY_TRACKS[0]; }
+  });
   const [musicReturn, setMusicReturn] = useState<"game" | "duel" | "home">("game");
   const [results, setResults] = useState<{ score: number; xp: number; correct: number } | null>(null);
   const [lifetimeXP, setLifetimeXP] = useState(() => Number(localStorage.getItem("codequest-total-xp") || 0));
@@ -1993,6 +2035,10 @@ export default function App() {
   });
 
   const totalQs = selectedLang ? (QUESTIONS[selectedLang]?.length ?? 0) : 0;
+
+  useEffect(() => {
+    localStorage.setItem("codequest-selected-track", selectedTrack.id);
+  }, [selectedTrack]);
 
   useEffect(() => {
     localStorage.setItem("codequest-theme", darkMode ? "dark" : "light");
@@ -2158,7 +2204,6 @@ export default function App() {
             <GameScreen
               langId={selectedLang}
               mode={gameMode}
-              selectedTrack={selectedTrack}
               onFinish={(score, xp, correct) => {
                 setResults({ score, xp, correct });
                 addLifetimeXP(xp);
@@ -2198,7 +2243,6 @@ export default function App() {
               friendRankName={friendRankName}
               friendPhoto={friendPhoto}
               characterId={duelCharacterId}
-              selectedTrack={selectedTrack}
               onFinish={() => setScreen("home")}
             />
           </motion.div>
@@ -2211,7 +2255,7 @@ export default function App() {
               score={results.score}
               xp={results.xp}
               correct={results.correct}
-              total={gameMode === "debug" ? DEBUG_QUESTIONS.length : gameMode === "speed" ? Math.min(5, totalQs) : gameMode === "survival" ? 12 : totalQs}
+              total={gameMode === "debug" ? (DEBUG_QUESTIONS_BY_LANGUAGE[selectedLang]?.length ?? 0) : gameMode === "speed" ? Math.min(5, totalQs) : gameMode === "survival" ? 12 : totalQs}
               profile={profile}
               totalXP={lifetimeXP}
               onPhotoUpdate={updatePhoto}
@@ -2228,6 +2272,10 @@ export default function App() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {screen !== "welcome" && (
+        <GlobalMusicDock selectedTrack={selectedTrack} onChange={setSelectedTrack} />
+      )}
     </div>
   );
 }
