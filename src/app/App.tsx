@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import type { FormEvent } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Code2, Zap, Trophy, Star, ArrowRight, RotateCcw, CheckCircle2, XCircle, Flame, Target, BookOpen, ChevronRight, User, GraduationCap, School, BookOpenCheck, Moon, Sun, Music, ArrowLeft, Swords, Shield, Camera, Gamepad2, Crown, Medal, Users, Sparkles, Heart, Volume2, Palette, Pencil, Terminal, Bug, Flame as FlameIcon } from "lucide-react";
+import { Code2, Zap, Trophy, Star, ArrowRight, RotateCcw, CheckCircle2, XCircle, Flame, Target, BookOpen, ChevronRight, User, GraduationCap, School, BookOpenCheck, Moon, Sun, Music, ArrowLeft, Swords, Shield, Camera, Gamepad2, Crown, Medal, Users, Sparkles, Heart, Volume2, Palette, Pencil, Terminal, Bug, Flame as FlameIcon, Menu, X } from "lucide-react";
 
 // ─── Data ───────────────────────────────────────────────────────────────────
 
@@ -751,7 +751,7 @@ function WelcomeScreen({ onContinue, darkMode, onToggleTheme }: { onContinue: ()
           className="group inline-flex items-center gap-3 px-9 sm:px-12 py-4 sm:py-5 rounded-2xl bg-gradient-to-r from-violet-600 via-fuchsia-500 to-cyan-500 text-white font-mono font-black text-base sm:text-lg shadow-2xl shadow-purple-500/25">
           ENTER CODEQUEST <ArrowRight size={21} className="group-hover:translate-x-1 transition-transform"/>
         </motion.button>
-        <p className="text-white/25 text-[10px] font-mono mt-4">Create your profile → choose your game → choose your music → PLAY.</p>
+        <p className="text-white/25 text-[10px] font-mono mt-4">Built by Elmer Makig-angay — an aspiring web developer turning code into interactive adventures.</p>
       </motion.div>
     </div>
   );
@@ -773,7 +773,7 @@ function MusicSelectionScreen({
   const visibleTracks = category === "All" ? SPOTIFY_TRACKS : SPOTIFY_TRACKS.filter((t) => t.category === category);
 
   return (
-    <div className="min-h-screen px-4 sm:px-6 py-8 sm:py-12 relative overflow-hidden">
+    <div className="min-h-screen px-3 sm:px-5 py-6 sm:py-8 relative overflow-hidden">
       <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_20%_20%,rgba(168,85,247,.18),transparent_35%),radial-gradient(circle_at_80%_70%,rgba(6,182,212,.14),transparent_35%)]" />
       <div className="max-w-5xl mx-auto relative">
         <button onClick={onBack} className="flex items-center gap-2 text-white/50 hover:text-white font-mono text-sm mb-8">
@@ -785,13 +785,13 @@ function MusicSelectionScreen({
             className="mx-auto w-16 h-16 rounded-2xl bg-gradient-to-br from-green-500 to-cyan-500 flex items-center justify-center shadow-2xl shadow-green-500/25 mb-4">
             <Music size={30} className="text-white" />
           </motion.div>
-          <p className="text-green-300 text-xs font-mono font-black tracking-[0.3em]">SOUNDTRACK LOCK-IN</p>
-          <h2 className="text-4xl md:text-6xl font-mono font-black text-white mt-2">CHOOSE YOUR BATTLE MUSIC</h2>
-          <p className="text-white/40 font-mono text-sm mt-3">Pick one track before you play. Your choice follows you into the game.</p>
+          <p className="text-green-300 text-xs font-mono font-black tracking-[0.3em]">GLOBAL SOUNDTRACK</p>
+          <h2 className="text-4xl md:text-6xl font-mono font-black text-white mt-2">CHOOSE YOUR SOUNDTRACK</h2>
+          <p className="text-white/40 font-mono text-sm mt-3">Choose a track anytime. Selecting one closes this screen and keeps the soundtrack playing globally.</p>
         </motion.div>
 
         <div className="rounded-3xl border border-green-500/20 bg-gradient-to-br from-green-500/10 via-white/5 to-cyan-500/10 p-4 sm:p-6 shadow-2xl">
-          <div className="flex gap-2 overflow-x-auto pb-2 mb-4">
+          <div className="flex flex-wrap gap-2 pb-2 mb-4">
             {categories.map((item) => (
               <button key={item} onClick={() => setCategory(item)}
                 className={`shrink-0 px-3 py-2 rounded-full text-[10px] font-mono border ${
@@ -802,7 +802,7 @@ function MusicSelectionScreen({
             ))}
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[360px] overflow-y-auto pr-1">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {visibleTracks.map((track) => (
               <motion.button key={track.id} whileHover={{ y: -2 }} whileTap={{ scale: .98 }} onClick={() => onSelect(track)}
                 className={`text-left p-4 rounded-2xl border transition-all ${
@@ -828,9 +828,9 @@ function MusicSelectionScreen({
           </div>
           <button onClick={onContinue}
             className="w-full mt-5 py-4 rounded-2xl bg-gradient-to-r from-green-500 via-cyan-500 to-purple-600 text-white font-mono font-black text-lg shadow-xl shadow-green-500/15">
-            Lock In & Start Game <ArrowRight size={19} className="inline ml-2" />
+            Select Track & Return <ArrowRight size={19} className="inline ml-2" />
           </button>
-          <p className="text-center text-white/25 text-[10px] font-mono mt-3">Selected music is locked before the game and loaded from the beginning. If Chrome blocks autoplay, tap Play once.</p>
+          <p className="text-center text-white/25 text-[10px] font-mono mt-3">Your soundtrack is global across the website. Spotify/Chrome may require one Play tap because of browser autoplay rules.</p>
         </div>
       </div>
     </div>
@@ -857,7 +857,7 @@ function MusicPlayer({ compact = false, selectedTrack }: { compact?: boolean; se
         <span className="ml-auto shrink-0 text-[10px] font-mono text-white/30">{SPOTIFY_TRACKS.length} tracks</span>
       </div>
 
-      <div className="flex gap-1.5 overflow-x-auto pb-1 mb-3 scrollbar-thin">
+      <div className="flex flex-wrap gap-1.5 pb-1 mb-3">
         {categories.map((item) => (
           <button key={item} onClick={() => setCategory(item)}
             className={`shrink-0 px-2.5 py-1.5 rounded-full text-[9px] font-mono border transition-all ${
@@ -868,7 +868,7 @@ function MusicPlayer({ compact = false, selectedTrack }: { compact?: boolean; se
         ))}
       </div>
 
-      <div className="grid grid-cols-2 gap-2 mb-3 max-h-36 overflow-y-auto pr-1">
+      <div className="grid grid-cols-2 gap-2 mb-3">
         {visibleTracks.map((item) => (
           <button key={item.id} onClick={() => setTrack(item)}
             className={`min-w-0 text-left p-2.5 rounded-xl border transition-all ${
@@ -965,158 +965,6 @@ function ModesScreen({ onSelect, onBack }: { onSelect: (mode: GameMode) => void;
   );
 }
 
-function HomeScreen({
-  onStart,
-  onProfile,
-  onGuidelines,
-  onToggleTheme,
-  darkMode,
-  profile,
-  totalXP,
-  onDuel,
-  onMusic,
-  selectedTrack,
-  systemTheme,
-  setSystemTheme,
-}: {
-  onStart: () => void;
-  onProfile: () => void;
-  onGuidelines: () => void;
-  onToggleTheme: () => void;
-  darkMode: boolean;
-  profile: StudentProfile;
-  totalXP: number;
-  onDuel: () => void;
-  onMusic: () => void;
-  selectedTrack: (typeof SPOTIFY_TRACKS)[number];
-  systemTheme: "space" | "sunset" | "city" | "beach";
-  setSystemTheme: (theme: "space" | "sunset" | "city" | "beach") => void;
-}) {
-  return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-6 py-12 relative overflow-hidden">
-      <aside className="absolute left-3 top-3 bottom-3 z-20 w-[300px] hidden xl:flex flex-col gap-3">
-        <div className="rounded-3xl border border-green-400/20 bg-black/30 backdrop-blur-2xl p-3 shadow-2xl shadow-green-500/10">
-          <div className="flex items-center gap-3 mb-3 px-2">
-            <Music size={15} className="text-green-300" />
-            <div className="min-w-0 flex-1"><p className="text-green-300 font-mono font-black text-[10px] tracking-[.22em]">SOUNDTRACK</p><p className="text-white/40 font-mono text-[9px] truncate">{selectedTrack.title} · {selectedTrack.artist}</p></div>
-            <button onClick={onMusic} className="px-2.5 py-1.5 rounded-xl bg-green-500/15 border border-green-400/20 text-green-300 text-[9px] font-mono">CHANGE</button>
-          </div>
-          <div className="rounded-2xl overflow-hidden border border-white/10">
-            <iframe key={`side-music-${selectedTrack.id}`} src={`https://open.spotify.com/embed/track/${selectedTrack.id}?utm_source=generator&theme=0&autoplay=1&start=0`} width="100%" height="80" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="eager" title="CodeQuest soundtrack" />
-          </div>
-        </div>
-        <button onClick={onProfile} className="text-left rounded-3xl border border-white/10 bg-black/20 backdrop-blur-2xl p-4 shadow-2xl hover:border-cyan-400/30 transition-all group">
-          <div className="flex items-center gap-3">
-            {profile.photo ? <img src={profile.photo} className="w-16 h-16 rounded-2xl object-cover border border-cyan-400/30" alt="Profile"/> : <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500/30 to-cyan-500/20 flex items-center justify-center"><User className="text-cyan-300"/></div>}
-            <div className="min-w-0 flex-1">
-              <p className="text-white font-mono font-black truncate">{profile.username || "Code Warrior"}</p>
-              <p className="text-white/40 text-[10px] font-mono truncate">{profile.yearLevel || "Player"} · {profile.course || "Programmer"}</p>
-              <div className="mt-2"><RankBadge totalXP={totalXP} compact /></div>
-              <div className="mt-2">
-                <div className="flex justify-between text-[8px] font-mono text-white/30 mb-1"><span>RANK PROGRESS</span><span>{totalXP} XP</span></div>
-                <div className="h-1.5 rounded-full bg-white/10 overflow-hidden"><motion.div className="h-full rounded-full bg-gradient-to-r from-purple-500 to-cyan-400" animate={{ width: `${Math.max(5, Math.min(100, ((totalXP - getRank(totalXP).minXP) / Math.max(1, ((RANKS[RANKS.indexOf(getRank(totalXP)) + 1]?.minXP ?? getRank(totalXP).minXP + 500) - getRank(totalXP).minXP))) * 100))}%` }} /></div>
-              </div>
-            </div>
-            <div className="ml-auto self-start px-2 py-1 rounded-lg bg-cyan-400/10 border border-cyan-400/20 text-cyan-300 text-[8px] font-mono opacity-0 group-hover:opacity-100 transition-opacity"><Pencil size={10} className="inline mr-1"/>EDIT</div>
-          </div>
-          <p className="mt-2 text-[9px] text-white/30 font-mono">Click your profile card to edit</p>
-        </button>
-        <div className="rounded-3xl border border-white/10 bg-black/20 backdrop-blur-2xl p-3 space-y-2">
-          <button onClick={onGuidelines} className="w-full flex items-center gap-3 px-3 py-3 rounded-2xl bg-white/5 hover:bg-white/10 text-white/75 font-mono text-xs"><BookOpenCheck size={15}/> Guidelines</button>
-          <button onClick={onToggleTheme} className="w-full flex items-center gap-3 px-3 py-3 rounded-2xl bg-white/5 hover:bg-white/10 text-white/75 font-mono text-xs">{darkMode ? <Sun size={15}/> : <Moon size={15}/>} {darkMode ? "Light Mode" : "Dark Mode"}</button>
-          <div className="rounded-2xl bg-white/5 border border-white/10 p-2">
-            <div className="flex items-center gap-2 px-1 mb-2"><Palette size={14} className="text-purple-300"/><span className="text-[9px] font-mono text-white/50">SYSTEM THEME</span></div>
-            <div className="grid grid-cols-4 gap-1">
-              {([['space','🌌'],['sunset','🌇'],['city','🌃'],['beach','🏝️']] as const).map(([id,icon]) => <button key={id} onClick={() => setSystemTheme(id)} className={`py-2 rounded-xl text-sm border ${systemTheme===id ? 'border-cyan-400/50 bg-cyan-400/10' : 'border-white/5 bg-black/10'}`} title={id}>{icon}</button>)}
-            </div>
-          </div>
-          <button onClick={onMusic} className="w-full flex items-center gap-3 px-3 py-3 rounded-2xl bg-green-500/10 border border-green-500/20 hover:bg-green-500/15 text-green-300 font-mono text-xs"><Music size={15}/> Music Selection <span className="ml-auto truncate max-w-[105px] text-[9px] text-green-400/60">{selectedTrack.title}</span></button>
-        </div>
-      </aside>
-      <div className="absolute top-3 left-1/2 -translate-x-1/2 z-20 lg:hidden w-[calc(100%-1rem)] flex gap-2 overflow-x-auto pb-1">
-        <button onClick={onGuidelines} className="shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl border border-white/10 bg-white/5 text-white/70 font-mono text-xs"><BookOpenCheck size={14}/> Guidelines</button>
-        <button onClick={onToggleTheme} className="shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl border border-white/10 bg-white/5 text-white/70 font-mono text-xs">{darkMode ? <Sun size={14}/> : <Moon size={14}/>} Theme</button>
-        {([['space','🌌'],['sunset','🌇'],['city','🌃'],['beach','🏝️']] as const).map(([id,icon]) => <button key={id} onClick={() => setSystemTheme(id)} className="shrink-0 px-2.5 py-2 rounded-xl border border-white/10 bg-white/5 text-xs" title={id}>{icon}</button>)}
-        <button onClick={onMusic} className="shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl border border-green-500/20 bg-green-500/10 text-green-300 font-mono text-xs"><Music size={14}/> Music</button>
-      </div>
-      {/* background glows */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
-
-
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="text-center w-full max-w-5xl xl:ml-[300px] xl:w-[calc(100%-320px)] relative px-2 sm:px-4"
-      >
-        <motion.div
-          className="inline-flex items-center gap-2 bg-purple-500/20 border border-purple-500/30 rounded-full px-4 py-2 mb-8"
-          animate={{ scale: [1, 1.03, 1] }}
-          transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut" }}
-        >
-          <Zap size={16} className="text-yellow-400" />
-          <span className="text-sm font-mono text-purple-300">Created by Elmer</span>
-        </motion.div>
-
-        <h1 className="text-5xl md:text-7xl font-mono font-black mb-4 leading-none tracking-tight">
-          <span className="text-white">Code</span>
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400">Quest</span>
-        </h1>
-
-        <p className="text-white/50 text-lg font-mono mb-2">
-          "Your Coding Adventure Starts Here"
-        </p>
-        <p className="text-white/30 text-sm mb-12">
-          Choose your mode, pick a language, answer challenges, and level up your coding skills.
-        </p>
-
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: .2 }} className="max-w-2xl mx-auto w-full mb-7 rounded-3xl border border-purple-500/20 bg-gradient-to-r from-purple-500/10 via-white/5 to-cyan-500/10 p-4 text-left shadow-2xl">
-          <div className="flex items-center justify-between gap-3 mb-3">
-            <div><p className="text-[10px] font-mono text-purple-300 tracking-[.25em] font-black">CODING JOURNEY PROGRESS</p><p className="text-white font-mono font-black text-sm mt-1">{getRank(totalXP).name}</p></div>
-            <span className="text-cyan-300 font-mono font-black text-sm">{totalXP} XP</span>
-          </div>
-          <div className="h-3 rounded-full bg-white/10 overflow-hidden border border-white/5">
-            <motion.div className="h-full rounded-full bg-gradient-to-r from-violet-500 via-fuchsia-500 to-cyan-400" initial={{ width: 0 }} animate={{ width: `${Math.max(4, Math.min(100, ((totalXP - getRank(totalXP).minXP) / Math.max(1, ((RANKS[RANKS.indexOf(getRank(totalXP)) + 1]?.minXP ?? getRank(totalXP).minXP + 500) - getRank(totalXP).minXP))) * 100))}%` }} transition={{ duration: 1 }} />
-          </div>
-          <div className="flex justify-between mt-2 text-[9px] font-mono text-white/35"><span>Rank progress</span><span>{RANKS[RANKS.indexOf(getRank(totalXP)) + 1] ? `${Math.max(0, RANKS[RANKS.indexOf(getRank(totalXP)) + 1].minXP - totalXP)} XP to next rank` : "MAX RANK — LEGENDARY"}</span></div>
-        </motion.div>
-
-        <div className="grid grid-cols-3 gap-4 mb-10 max-w-md mx-auto">
-          {[
-            { icon: <BookOpen size={18} />, label: "7 Questions", color: "text-purple-400" },
-            { icon: <Zap size={18} />, label: "Earn XP", color: "text-yellow-400" },
-            { icon: <Trophy size={18} />, label: "Rank Up", color: "text-cyan-400" },
-          ].map((item) => (
-            <div key={item.label} className="bg-white/5 border border-white/10 rounded-xl p-3 flex flex-col items-center gap-2">
-              <span className={item.color}>{item.icon}</span>
-              <span className="text-xs font-mono text-white/60">{item.label}</span>
-            </div>
-          ))}
-        </div>
-
-        <motion.button
-          onClick={onStart}
-          className="group relative inline-flex items-center gap-3 bg-gradient-to-r from-purple-600 to-cyan-600 text-white font-mono font-bold text-lg px-10 py-4 rounded-2xl shadow-lg shadow-purple-500/25"
-          whileHover={{ scale: 1.04, boxShadow: "0 0 40px rgba(124, 58, 237, 0.5)" }}
-          whileTap={{ scale: 0.97 }}
-        >
-          Start Playing
-          <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-        </motion.button>
-
-        <div className="flex flex-wrap items-center justify-center gap-3 mt-4">
-          <button onClick={onDuel}
-            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl border border-pink-500/30 bg-pink-500/10 text-pink-300 font-mono font-bold text-sm hover:bg-pink-500/20 transition-all">
-            <Users size={16} /> 1v1 Friend Arena
-          </button>
-        </div>
-      </motion.div>
-    </div>
-  );
-}
-
-
 function RankBadge({ totalXP, compact = false }: { totalXP: number; compact?: boolean }) {
   const rank = getRank(totalXP);
   return (
@@ -1138,6 +986,125 @@ type StudentProfile = {
   school: string;
   photo: string;
 };
+
+function HomeScreen({
+  onStart,
+  onProfile,
+  onGuidelines,
+  onToggleTheme,
+  darkMode,
+  profile,
+  totalXP,
+  onDuel,
+  onMusic,
+  selectedTrack,
+}: {
+  onStart: () => void;
+  onProfile: () => void;
+  onGuidelines: () => void;
+  onToggleTheme: () => void;
+  darkMode: boolean;
+  profile: StudentProfile;
+  totalXP: number;
+  onDuel: () => void;
+  onMusic: () => void;
+  selectedTrack: (typeof SPOTIFY_TRACKS)[number];
+}) {
+  const rank = getRank(totalXP);
+  const questionCount = 7;
+  const nextRank = RANKS[RANKS.indexOf(rank) + 1];
+  const progress = nextRank
+    ? Math.max(4, Math.min(100, ((totalXP - rank.minXP) / Math.max(1, nextRank.minXP - rank.minXP)) * 100))
+    : 100;
+
+  return (
+    <div className="min-h-screen relative overflow-hidden px-3 sm:px-5 lg:px-8 py-4 sm:py-6">
+      <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_45%_28%,rgba(139,92,246,.16),transparent_30%),radial-gradient(circle_at_75%_70%,rgba(6,182,212,.12),transparent_30%)]" />
+      <div className="absolute -top-24 left-1/3 w-80 h-80 rounded-full bg-purple-600/10 blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full bg-cyan-500/10 blur-3xl pointer-events-none" />
+
+      {/* Profile is intentionally the main top-center identity card. Clicking it opens the editable profile. */}
+      <div className="relative z-20 flex justify-center">
+        <motion.button
+          onClick={onProfile}
+          initial={{ opacity: 0, y: -18 }}
+          animate={{ opacity: 1, y: 0 }}
+          whileHover={{ y: -2, scale: 1.01 }}
+          className="group w-full max-w-[520px] rounded-[28px] border border-white/10 bg-black/25 backdrop-blur-2xl p-3 sm:p-4 shadow-2xl shadow-purple-500/10 text-left"
+          aria-label="Edit profile"
+        >
+          <div className="flex items-center gap-3 sm:gap-4">
+            {profile.photo ? (
+              <img src={profile.photo} className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover border-2 border-cyan-400/40 shadow-lg" alt="Profile" />
+            ) : (
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-purple-500/30 to-cyan-500/20 border border-cyan-400/30 flex items-center justify-center"><User className="text-cyan-300" size={28}/></div>
+            )}
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2">
+                <p className="text-white font-mono font-black text-base sm:text-lg truncate">{profile.username || "Code Warrior"}</p>
+                <span className="text-[8px] font-mono text-cyan-300 border border-cyan-400/20 bg-cyan-400/10 rounded-full px-2 py-1 opacity-70 group-hover:opacity-100">EDIT</span>
+              </div>
+              <p className="text-white/40 text-[10px] sm:text-xs font-mono truncate">{profile.yearLevel || "Player"} · {profile.course || "Programmer"}</p>
+              <div className="mt-2"><RankBadge totalXP={totalXP} compact /></div>
+            </div>
+            <div className="hidden sm:block text-right shrink-0">
+              <p className="text-cyan-300 font-mono font-black text-sm">{totalXP} XP</p>
+              <p className="text-white/25 text-[8px] font-mono mt-1">{nextRank ? `${nextRank.minXP - totalXP} XP TO NEXT` : "MAX RANK"}</p>
+            </div>
+          </div>
+          <div className="mt-3">
+            <div className="flex justify-between text-[8px] font-mono text-white/30 mb-1"><span>RANK PROGRESS</span><span>{Math.round(progress)}%</span></div>
+            <div className="h-1.5 rounded-full bg-white/10 overflow-hidden"><motion.div className="h-full rounded-full bg-gradient-to-r from-purple-500 via-fuchsia-400 to-cyan-400" animate={{ width: `${progress}%` }} /></div>
+          </div>
+        </motion.button>
+      </div>
+
+      <motion.main initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: .08, duration: .55 }} className="relative z-10 w-full max-w-6xl mx-auto mt-6 sm:mt-8 lg:mt-10 pb-10">
+        <div className="text-center">
+          <motion.div className="inline-flex items-center gap-2 bg-purple-500/15 border border-purple-400/30 rounded-full px-4 py-2 mb-5" animate={{ scale: [1, 1.025, 1] }} transition={{ repeat: Infinity, duration: 2.8 }}>
+            <Zap size={16} className="text-yellow-400" />
+            <span className="text-xs sm:text-sm font-mono text-purple-300">Made with code, imagination &amp; ambition</span>
+          </motion.div>
+          <h1 className="text-6xl sm:text-7xl md:text-8xl font-mono font-black tracking-tight leading-none bg-gradient-to-r from-white via-purple-300 to-cyan-300 bg-clip-text text-transparent drop-shadow-[0_0_35px_rgba(139,92,246,.18)]">CodeQuest</h1>
+          <p className="text-white/55 font-mono text-base sm:text-lg md:text-xl mt-4">&quot;Your Coding Adventure Starts Here&quot;</p>
+          <p className="text-white/30 font-mono text-[10px] sm:text-xs md:text-sm max-w-2xl mx-auto mt-3 leading-6">Choose a mode, master a language, debug broken code, survive the compiler, and become the next coding legend.</p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-3xl mx-auto mt-7">
+          {([
+            { icon: BookOpen, title: `${questionCount} Questions`, sub: "Challenge yourself" },
+            { icon: Zap, title: "Earn XP", sub: "Build your rank" },
+            { icon: Trophy, title: rank.name, sub: "Level up your skills" },
+          ] as Array<{ icon: typeof BookOpen; title: string; sub: string }>).map(({ icon: Icon, title, sub }, i) => (
+            <motion.div key={String(title)} whileHover={{ y: -3 }} className={`rounded-2xl border p-4 text-center ${i === 0 ? "border-purple-400/20 bg-purple-500/10" : i === 1 ? "border-yellow-400/20 bg-yellow-500/10" : "border-cyan-400/20 bg-cyan-500/10"}`}>
+              <Icon size={22} className="mx-auto mb-2" />
+              <p className="font-mono font-black text-sm text-white">{title}</p>
+              <p className="font-mono text-[9px] text-white/35 mt-1">{sub}</p>
+            </motion.div>
+          ))}
+        </div>
+
+        <div className="rounded-[28px] border border-purple-400/20 bg-gradient-to-br from-purple-500/10 via-black/10 to-cyan-500/10 p-4 sm:p-5 mt-5 max-w-4xl mx-auto">
+          <div className="flex items-center justify-between gap-3 mb-2"><div><p className="text-[9px] font-mono tracking-[.28em] text-purple-300">CODING JOURNEY</p><p className="font-mono font-black text-white mt-1">{rank.name}</p></div><p className="font-mono font-black text-cyan-300">{totalXP} XP</p></div>
+          <div className="h-2.5 rounded-full bg-white/10 overflow-hidden"><motion.div className="h-full rounded-full bg-gradient-to-r from-purple-500 via-fuchsia-400 to-cyan-400" animate={{ width: `${progress}%` }} transition={{ duration: .8 }} /></div>
+          <p className="text-[8px] font-mono text-white/30 mt-2">{nextRank ? `${nextRank.minXP - totalXP} XP until ${nextRank.name}` : "You have reached the highest rank."}</p>
+        </div>
+
+        <div className="flex flex-col sm:flex-row justify-center items-center gap-3 mt-6">
+          <motion.button onClick={onStart} whileHover={{ scale: 1.03 }} whileTap={{ scale: .98 }} className="w-full sm:w-auto min-w-[250px] px-8 py-4 rounded-2xl bg-gradient-to-r from-purple-600 via-fuchsia-500 to-cyan-500 text-white font-mono font-black text-lg shadow-2xl shadow-purple-500/20">Start Playing <ArrowRight size={20} className="inline ml-2"/></motion.button>
+          <button onClick={onDuel} className="w-full sm:w-auto px-7 py-4 rounded-2xl border border-pink-400/30 bg-pink-500/10 text-pink-300 font-mono font-black text-sm hover:bg-pink-500/15"><Users size={17} className="inline mr-2"/>1v1 Friend Arena</button>
+        </div>
+
+        <div className="mt-8 flex justify-center">
+          <div className="flex items-center gap-3 px-4 py-3 rounded-2xl border border-white/10 bg-black/15 backdrop-blur-xl">
+            <img src="/developer-photo.png" alt="Elmer Makig-angay" className="w-10 h-10 rounded-xl object-cover border border-cyan-400/30" />
+            <div className="text-left"><p className="text-[8px] font-mono tracking-[.22em] text-cyan-300">CODEQUEST CREATOR</p><p className="text-xs sm:text-sm font-mono font-black text-white">Made by Elmer Makig-angay</p><p className="text-[9px] font-mono text-white/35">An aspiring web developer turning code into adventures.</p></div>
+          </div>
+        </div>
+      </motion.main>
+    </div>
+  );
+}
 
 function ProfileScreen({
   profile,
@@ -2088,15 +2055,39 @@ function ResultsScreen({
 }
 
 function GlobalMusicDock({ selectedTrack, onChange }: { selectedTrack: (typeof SPOTIFY_TRACKS)[number]; onChange: (track: (typeof SPOTIFY_TRACKS)[number]) => void }) {
+  const nextTrack = () => {
+    const i = SPOTIFY_TRACKS.findIndex(t => t.id === selectedTrack.id);
+    onChange(SPOTIFY_TRACKS[(i + 1) % SPOTIFY_TRACKS.length]);
+  };
   return (
-    <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} className="fixed top-3 left-3 z-[70] w-[min(300px,calc(100vw-2rem))] xl:hidden rounded-3xl border border-green-400/20 bg-[#08110f]/95 backdrop-blur-2xl shadow-[0_0_60px_rgba(34,197,94,.15)] p-3">
-      <div className="flex items-center gap-2 mb-2">
-        <div className="w-8 h-8 rounded-xl bg-green-500/15 flex items-center justify-center"><Music size={15} className="text-green-300" /></div>
-        <div className="min-w-0 flex-1"><p className="text-green-300 font-mono font-black text-[10px] tracking-widest">CODEQUEST SOUNDTRACK</p><p className="text-white/50 font-mono text-[9px] truncate">{selectedTrack.title} · {selectedTrack.artist}</p></div>
-        <button onClick={() => { const i = SPOTIFY_TRACKS.findIndex(t => t.id === selectedTrack.id); onChange(SPOTIFY_TRACKS[(i + 1) % SPOTIFY_TRACKS.length]); }} className="px-2 py-1 rounded-lg border border-white/10 bg-white/5 text-white/50 text-[9px] font-mono">NEXT</button>
+    <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} className="fixed top-3 left-3 z-[80] w-[250px] max-w-[calc(100vw-5.5rem)] rounded-2xl border border-green-400/20 bg-[#07110e]/95 backdrop-blur-2xl shadow-[0_0_45px_rgba(34,197,94,.14)] overflow-hidden">
+      <div className="h-[78px] overflow-hidden">
+        <iframe key={`global-${selectedTrack.id}`} src={`https://open.spotify.com/embed/track/${selectedTrack.id}?utm_source=generator&theme=0&autoplay=1&start=0`} width="100%" height="80" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="eager" title={`Global CodeQuest soundtrack: ${selectedTrack.title}`} className="block w-full h-[80px]" />
       </div>
-      <iframe key={`global-${selectedTrack.id}`} src={`https://open.spotify.com/embed/track/${selectedTrack.id}?utm_source=generator&theme=0&autoplay=1&start=0`} width="100%" height="80" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="eager" title={`Global Spotify player for ${selectedTrack.title}`} className="w-full rounded-2xl" />
+      <div className="flex items-center gap-2 px-3 py-2 border-t border-green-400/10">
+        <Music size={12} className="text-green-300 shrink-0" />
+        <div className="min-w-0 flex-1"><p className="text-[8px] tracking-[.18em] font-mono font-black text-green-300">GLOBAL SOUNDTRACK</p><p className="text-[9px] font-mono text-white/45 truncate">{selectedTrack.title} · {selectedTrack.artist}</p></div>
+        <button onClick={nextTrack} className="shrink-0 px-2 py-1 rounded-lg border border-white/10 bg-white/5 text-white/45 text-[8px] font-mono hover:text-white">NEXT</button>
+      </div>
     </motion.div>
+  );
+}
+
+function GlobalMenu({ onGuidelines, onToggleTheme, darkMode, onMusic }: { onGuidelines: () => void; onToggleTheme: () => void; darkMode: boolean; onMusic: () => void }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="fixed top-3 right-3 z-[90]">
+      <button onClick={() => setOpen(v => !v)} aria-label="Open CodeQuest menu" className="w-11 h-11 rounded-2xl border border-white/10 bg-black/35 backdrop-blur-2xl text-white/75 flex items-center justify-center shadow-xl hover:border-cyan-400/30">
+        {open ? <X size={20}/> : <span className="flex flex-col gap-1.5"><span className="block w-5 h-0.5 bg-current rounded"/><span className="block w-5 h-0.5 bg-current rounded"/><span className="block w-5 h-0.5 bg-current rounded"/></span>}
+      </button>
+      <AnimatePresence>
+        {open && <motion.div initial={{ opacity: 0, y: -8, scale: .96 }} animate={{ opacity: 1, y: 6, scale: 1 }} exit={{ opacity: 0, y: -8, scale: .96 }} className="absolute right-0 mt-2 w-56 rounded-2xl border border-white/10 bg-[#0b0b14]/95 backdrop-blur-2xl p-2 shadow-2xl">
+          <button onClick={() => { setOpen(false); onGuidelines(); }} className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-white/75 hover:bg-white/10 font-mono text-xs"><BookOpenCheck size={16}/> Guidelines</button>
+          <button onClick={() => { setOpen(false); onToggleTheme(); }} className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-white/75 hover:bg-white/10 font-mono text-xs">{darkMode ? <Sun size={16}/> : <Moon size={16}/>} {darkMode ? "Light Mode" : "Dark Mode"}</button>
+          <button onClick={() => { setOpen(false); onMusic(); }} className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-green-300 hover:bg-green-500/10 font-mono text-xs"><Music size={16}/> Music Selection</button>
+        </motion.div>}
+      </AnimatePresence>
+    </div>
   );
 }
 
@@ -2124,8 +2115,6 @@ export default function App() {
     const saved = localStorage.getItem("codequest-theme-mode");
     return saved !== "light";
   });
-  type ThemeName = "space" | "sunset" | "city" | "beach";
-  const [systemTheme, setSystemTheme] = useState<ThemeName>(() => (localStorage.getItem("codequest-system-theme") as ThemeName) || "space");
   const [profile, setProfile] = useState<StudentProfile>(() => {
     try {
       return JSON.parse(localStorage.getItem("codequest-profile") || '{"username":"","yearLevel":"","course":"","school":"","photo":""}');
@@ -2142,9 +2131,8 @@ export default function App() {
 
   useEffect(() => {
     localStorage.setItem("codequest-theme-mode", darkMode ? "dark" : "light");
-    localStorage.setItem("codequest-system-theme", systemTheme);
     document.documentElement.style.colorScheme = darkMode ? "dark" : "light";
-  }, [darkMode, systemTheme]);
+  }, [darkMode]);
 
   const saveProfile = (next: StudentProfile) => {
     const firstProfile = !profile.username;
@@ -2178,7 +2166,7 @@ export default function App() {
   };
 
   return (
-    <div className={`${darkMode ? "dark-mode" : "light-mode"} theme-${systemTheme} min-h-screen text-foreground overflow-x-hidden`}
+    <div className={`${darkMode ? "dark-mode" : "light-mode"} min-h-screen text-foreground overflow-x-hidden`}
       style={{ fontFamily: "'JetBrains Mono', 'Inter', monospace" }}>
       <style>{`
         html, body, #root { width: 100%; min-height: 100%; margin: 0; }
@@ -2219,18 +2207,22 @@ export default function App() {
         .light-mode input::placeholder { color: #9ca3af !important; }
         .light-mode .text-white\/10 { color: rgba(17,24,39,.15) !important; }
         .light-mode iframe { filter: none; }
-
-        .theme-space { --cq-a:#8b5cf6; --cq-b:#06b6d4; }
-        .theme-sunset { --cq-a:#f97316; --cq-b:#ec4899; }
-        .theme-city { --cq-a:#38bdf8; --cq-b:#6366f1; }
-        .theme-beach { --cq-a:#14b8a6; --cq-b:#facc15; }
-        .theme-space .bg-gradient-to-r.from-purple-600 { }
         .light-mode { text-shadow: none; }
         .light-mode button, .light-mode input, .light-mode select, .light-mode textarea { filter: contrast(1.05) saturate(1.05); }
-        .theme-sunset .fixed.inset-0 { background-image: radial-gradient(circle at 15% 20%, rgba(249,115,22,.13), transparent 32%), radial-gradient(circle at 80% 70%, rgba(236,72,153,.12), transparent 34%) !important; }
-        .theme-city .fixed.inset-0 { background-image: linear-gradient(rgba(56,189,248,.04) 1px, transparent 1px), linear-gradient(90deg, rgba(99,102,241,.04) 1px, transparent 1px) !important; background-size: 34px 34px !important; }
-        .theme-beach .fixed.inset-0 { background-image: radial-gradient(circle at 20% 20%, rgba(20,184,166,.13), transparent 34%), radial-gradient(circle at 80% 20%, rgba(250,204,21,.10), transparent 32%) !important; }
         button { -webkit-tap-highlight-color: transparent; }
+        .light-mode { background: #f4f7fb !important; color: #111827 !important; }
+        .light-mode .bg-black\/35, .light-mode .bg-black\/30, .light-mode .bg-black\/25, .light-mode .bg-black\/20, .light-mode .bg-black\/15 { background-color: rgba(255,255,255,.96) !important; }
+        .light-mode .text-white { color: #111827 !important; }
+        .light-mode .text-white\/75 { color: #334155 !important; }
+        .light-mode .text-white\/55 { color: #475569 !important; }
+        .light-mode .text-white\/50, .light-mode .text-white\/45, .light-mode .text-white\/40 { color: #64748b !important; }
+        .light-mode .text-white\/35, .light-mode .text-white\/30, .light-mode .text-white\/25 { color: #64748b !important; }
+        .light-mode .border-white\/10 { border-color: rgba(15,23,42,.16) !important; }
+        .light-mode .border-white\/20 { border-color: rgba(15,23,42,.22) !important; }
+        .light-mode .bg-white\/5 { background-color: rgba(15,23,42,.045) !important; }
+        .light-mode .bg-white\/10 { background-color: rgba(15,23,42,.075) !important; }
+        .light-mode input, .light-mode textarea, .light-mode select { background-color: #ffffff !important; color: #111827 !important; border-color: rgba(15,23,42,.2) !important; }
+        .light-mode input::placeholder, .light-mode textarea::placeholder { color: #64748b !important; }
         @media (max-width: 640px) { body { min-width: 0; } }
       `}</style>
 
@@ -2242,6 +2234,18 @@ export default function App() {
           backgroundSize: "40px 40px",
         }}
       />
+
+      {screen !== "welcome" && (
+        <>
+          <GlobalMusicDock selectedTrack={selectedTrack} onChange={(track) => setSelectedTrack(track)} />
+          <GlobalMenu
+            darkMode={darkMode}
+            onGuidelines={() => setScreen("guidelines")}
+            onToggleTheme={() => setDarkMode((v) => !v)}
+            onMusic={() => { setMusicReturn(screen === "duel" ? "duel" : screen === "game" ? "game" : "home"); setScreen("music"); }}
+          />
+        </>
+      )}
 
       <AnimatePresence mode="wait">
 
@@ -2264,8 +2268,6 @@ export default function App() {
               onDuel={() => setScreen("duel-setup")}
               onMusic={() => { setMusicReturn("home"); setScreen("music"); }}
               selectedTrack={selectedTrack}
-              systemTheme={systemTheme}
-              setSystemTheme={setSystemTheme}
             />
           </motion.div>
         )}
@@ -2305,7 +2307,7 @@ export default function App() {
           <motion.div key="music" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
             <MusicSelectionScreen
               selectedTrack={selectedTrack}
-              onSelect={setSelectedTrack}
+              onSelect={(track) => { setSelectedTrack(track); setScreen(musicReturn); }}
               onBack={() => setScreen(musicReturn === "duel" ? "duel-setup" : musicReturn === "home" ? "home" : "language")}
               onContinue={() => setScreen(musicReturn)}
             />
@@ -2384,9 +2386,6 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      {screen !== "welcome" && (
-        <GlobalMusicDock selectedTrack={selectedTrack} onChange={setSelectedTrack} />
-      )}
     </div>
   );
 }
