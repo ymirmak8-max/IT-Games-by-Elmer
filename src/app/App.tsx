@@ -1,7 +1,49 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import type { FormEvent } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Code2, Zap, Trophy, Star, ArrowRight, RotateCcw, CheckCircle2, XCircle, Flame, Target, BookOpen, ChevronRight, User, GraduationCap, School, BookOpenCheck, Moon, Sun, Music, ArrowLeft, Swords, Shield, Camera, Gamepad2, Crown, Medal, Users, Sparkles, Heart, Volume2, Palette, Pencil, Terminal, Bug, Flame as FlameIcon, Menu, X } from "lucide-react";
+import {
+  Code2,
+  Zap,
+  Trophy,
+  Star,
+  ArrowRight,
+  RotateCcw,
+  CheckCircle2,
+  XCircle,
+  Flame,
+  Target,
+  BookOpen,
+  ChevronRight,
+  User,
+  GraduationCap,
+  School,
+  BookOpenCheck,
+  Moon,
+  Sun,
+  Music,
+  ArrowLeft,
+  Swords,
+  Shield,
+  Camera,
+  Gamepad2,
+  Crown,
+  Medal,
+  Users,
+  Sparkles,
+  Heart,
+  Volume2,
+  Palette,
+  Pencil,
+  Terminal,
+  Bug,
+  Flame as FlameIcon,
+  Menu,
+  X,
+  Play,
+  Pause,
+  SkipForward,
+  VolumeX,
+} from "lucide-react";
 
 // ─── Data ───────────────────────────────────────────────────────────────────
 
@@ -32,429 +74,67 @@ type Question = {
 
 const BASE_QUESTIONS: Record<string, Question[]> = {
   python: [
-    {
-      id: 1, type: "multiple",
-      question: "What keyword do you use to define a function in Python?",
-      options: ["function", "def", "func", "define"],
-      answer: 1,
-      explanation: "`def` is the keyword used to define functions in Python. Example: `def greet(): print('Hello!')`",
-      xp: 10,
-    },
-    {
-      id: 2, type: "code",
-      question: "What does this code print?",
-      code: `x = [1, 2, 3, 4, 5]\nprint(x[2])`,
-      options: ["1", "2", "3", "5"],
-      answer: 2,
-      explanation: "Python lists are zero-indexed. `x[2]` accesses the third element, which is `3`.",
-      xp: 15,
-    },
-    {
-      id: 3, type: "multiple",
-      question: "Which of these is the correct way to write a comment in Python?",
-      options: ["// This is a comment", "/* Comment */", "# This is a comment", "-- Comment"],
-      answer: 2,
-      explanation: "Python uses `#` for single-line comments. Unlike many languages, there are no `//` or `/* */` comments.",
-      xp: 10,
-    },
-    {
-      id: 4, type: "code",
-      question: "What is the output of this code?",
-      code: `name = "Alice"\nprint(f"Hello, {name}!")`,
-      options: ["Hello, name!", "Hello, Alice!", "{name}", "Error"],
-      answer: 1,
-      explanation: "f-strings in Python let you embed variables inside curly braces `{}`. `{name}` becomes `Alice`.",
-      xp: 15,
-    },
-    {
-      id: 5, type: "truefalse",
-      question: "In Python, indentation is just a style preference and doesn't affect code execution.",
-      options: ["True", "False"],
-      answer: 1,
-      explanation: "FALSE! Indentation is REQUIRED in Python. It defines code blocks (like function bodies, loops, if-statements).",
-      xp: 10,
-    },
-    {
-      id: 6, type: "code",
-      question: "What does this loop print?",
-      code: `for i in range(3):\n    print(i)`,
-      options: ["1 2 3", "0 1 2", "0 1 2 3", "1 2"],
-      answer: 1,
-      explanation: "`range(3)` generates numbers 0, 1, 2. The loop prints each one — so output is `0`, `1`, `2`.",
-      xp: 20,
-    },
-    {
-      id: 7, type: "multiple",
-      question: "Which data type would you use to store a list of unique items with no duplicates?",
-      options: ["list", "tuple", "set", "dict"],
-      answer: 2,
-      explanation: "A `set` automatically removes duplicates and only stores unique values. `{1, 2, 3}` is a set.",
-      xp: 20,
-    },
+    { id: 1, type: "multiple", question: "What keyword do you use to define a function in Python?", options: ["function", "def", "func", "define"], answer: 1, explanation: "`def` is the keyword used to define functions in Python. Example: `def greet(): print('Hello!')`", xp: 10 },
+    { id: 2, type: "code", question: "What does this code print?", code: `x = [1, 2, 3, 4, 5]\nprint(x[2])`, options: ["1", "2", "3", "5"], answer: 2, explanation: "Python lists are zero-indexed. `x[2]` accesses the third element, which is `3`.", xp: 15 },
+    { id: 3, type: "multiple", question: "Which of these is the correct way to write a comment in Python?", options: ["// This is a comment", "/* Comment */", "# This is a comment", "-- Comment"], answer: 2, explanation: "Python uses `#` for single-line comments. Unlike many languages, there are no `//` or `/* */` comments.", xp: 10 },
+    { id: 4, type: "code", question: "What is the output of this code?", code: `name = "Alice"\nprint(f"Hello, {name}!")`, options: ["Hello, name!", "Hello, Alice!", "{name}", "Error"], answer: 1, explanation: "f-strings in Python let you embed variables inside curly braces `{}`. `{name}` becomes `Alice`.", xp: 15 },
+    { id: 5, type: "truefalse", question: "In Python, indentation is just a style preference and doesn't affect code execution.", options: ["True", "False"], answer: 1, explanation: "FALSE! Indentation is REQUIRED in Python. It defines code blocks (like function bodies, loops, if-statements).", xp: 10 },
+    { id: 6, type: "code", question: "What does this loop print?", code: `for i in range(3):\n    print(i)`, options: ["1 2 3", "0 1 2", "0 1 2 3", "1 2"], answer: 1, explanation: "`range(3)` generates numbers 0, 1, 2. The loop prints each one — so output is `0`, `1`, `2`.", xp: 20 },
+    { id: 7, type: "multiple", question: "Which data type would you use to store a list of unique items with no duplicates?", options: ["list", "tuple", "set", "dict"], answer: 2, explanation: "A `set` automatically removes duplicates and only stores unique values. `{1, 2, 3}` is a set.", xp: 20 },
   ],
   javascript: [
-    {
-      id: 1, type: "multiple",
-      question: "Which keyword declares a variable that CANNOT be reassigned?",
-      options: ["var", "let", "const", "fixed"],
-      answer: 2,
-      explanation: "`const` declares a constant — once assigned, its value cannot be reassigned. Use `let` for variables that change.",
-      xp: 10,
-    },
-    {
-      id: 2, type: "code",
-      question: "What does this code output?",
-      code: `console.log(typeof "Hello");`,
-      options: ["string", "text", "String", "undefined"],
-      answer: 0,
-      explanation: "`typeof` returns a string describing the type. Strings return `\"string\"` (lowercase).",
-      xp: 15,
-    },
-    {
-      id: 3, type: "multiple",
-      question: "Which method adds an item to the END of an array?",
-      options: ["push()", "pop()", "shift()", "unshift()"],
-      answer: 0,
-      explanation: "`push()` adds elements to the END. `unshift()` adds to the START. `pop()` removes from end, `shift()` from start.",
-      xp: 10,
-    },
-    {
-      id: 4, type: "code",
-      question: "What is the result?",
-      code: `const nums = [1, 2, 3];\nconst doubled = nums.map(n => n * 2);\nconsole.log(doubled);`,
-      options: ["[1, 2, 3]", "[2, 4, 6]", "[3, 4, 5]", "undefined"],
-      answer: 1,
-      explanation: "`.map()` creates a NEW array by applying a function to each element. Each number is doubled → `[2, 4, 6]`.",
-      xp: 20,
-    },
-    {
-      id: 5, type: "truefalse",
-      question: "In JavaScript, `===` and `==` always produce the same result.",
-      options: ["True", "False"],
-      answer: 1,
-      explanation: "FALSE! `==` does type coercion (`'5' == 5` is `true`). `===` checks both value AND type (`'5' === 5` is `false`).",
-      xp: 15,
-    },
-    {
-      id: 6, type: "multiple",
-      question: "What does an arrow function `() => {}` do differently from a regular function?",
-      options: ["It runs faster", "It has no `this` binding", "It can't take parameters", "It always returns undefined"],
-      answer: 1,
-      explanation: "Arrow functions don't have their own `this` — they inherit it from the surrounding scope. This is key for callbacks.",
-      xp: 20,
-    },
-    {
-      id: 7, type: "code",
-      question: "What does this output?",
-      code: `async function greet() {\n  return "Hello!";\n}\nconsole.log(typeof greet());`,
-      options: ["string", "object", "Promise", "undefined"],
-      answer: 1,
-      explanation: "Async functions always return a Promise, even if you return a plain value. `typeof` a Promise is `'object'`.",
-      xp: 25,
-    },
+    { id: 1, type: "multiple", question: "Which keyword declares a variable that CANNOT be reassigned?", options: ["var", "let", "const", "fixed"], answer: 2, explanation: "`const` declares a constant — once assigned, its value cannot be reassigned. Use `let` for variables that change.", xp: 10 },
+    { id: 2, type: "code", question: "What does this code output?", code: `console.log(typeof "Hello");`, options: ["string", "text", "String", "undefined"], answer: 0, explanation: "`typeof` returns a string describing the type. Strings return `\"string\"` (lowercase).", xp: 15 },
+    { id: 3, type: "multiple", question: "Which method adds an item to the END of an array?", options: ["push()", "pop()", "shift()", "unshift()"], answer: 0, explanation: "`push()` adds elements to the END. `unshift()` adds to the START. `pop()` removes from end, `shift()` from start.", xp: 10 },
+    { id: 4, type: "code", question: "What is the result?", code: `const nums = [1, 2, 3];\nconst doubled = nums.map(n => n * 2);\nconsole.log(doubled);`, options: ["[1, 2, 3]", "[2, 4, 6]", "[3, 4, 5]", "undefined"], answer: 1, explanation: "`.map()` creates a NEW array by applying a function to each element. Each number is doubled → `[2, 4, 6]`.", xp: 20 },
+    { id: 5, type: "truefalse", question: "In JavaScript, `===` and `==` always produce the same result.", options: ["True", "False"], answer: 1, explanation: "FALSE! `==` does type coercion (`'5' == 5` is `true`). `===` checks both value AND type (`'5' === 5` is `false`).", xp: 15 },
+    { id: 6, type: "multiple", question: "What does an arrow function `() => {}` do differently from a regular function?", options: ["It runs faster", "It has no `this` binding", "It can't take parameters", "It always returns undefined"], answer: 1, explanation: "Arrow functions don't have their own `this` — they inherit it from the surrounding scope. This is key for callbacks.", xp: 20 },
+    { id: 7, type: "code", question: "What does this output?", code: `async function greet() {\n  return "Hello!";\n}\nconsole.log(typeof greet());`, options: ["string", "object", "Promise", "undefined"], answer: 1, explanation: "Async functions always return a Promise, even if you return a plain value. `typeof` a Promise is `'object'`.", xp: 25 },
   ],
   html: [
-    {
-      id: 1, type: "multiple",
-      question: "Which HTML tag creates the largest heading?",
-      options: ["<h6>", "<h1>", "<heading>", "<title>"],
-      answer: 1,
-      explanation: "`<h1>` is the largest heading. Headings go from `<h1>` (largest) to `<h6>` (smallest).",
-      xp: 10,
-    },
-    {
-      id: 2, type: "code",
-      question: "What does this CSS do?",
-      code: `.box {\n  display: flex;\n  justify-content: center;\n  align-items: center;\n}`,
-      options: ["Makes the box invisible", "Centers content horizontally only", "Centers content both horizontally and vertically", "Adds a border"],
-      answer: 2,
-      explanation: "`justify-content: center` centers horizontally, `align-items: center` centers vertically — together they center content in both directions.",
-      xp: 15,
-    },
-    {
-      id: 3, type: "multiple",
-      question: "Which CSS property controls the space INSIDE an element (between content and border)?",
-      options: ["margin", "padding", "spacing", "gap"],
-      answer: 1,
-      explanation: "`padding` is the space inside the element. `margin` is the space OUTSIDE (between elements).",
-      xp: 10,
-    },
-    {
-      id: 4, type: "truefalse",
-      question: "The `<div>` element has special semantic meaning in HTML.",
-      options: ["True", "False"],
-      answer: 1,
-      explanation: "FALSE! `<div>` is a generic container with NO semantic meaning. Use semantic tags like `<header>`, `<nav>`, `<main>`, `<section>` when appropriate.",
-      xp: 10,
-    },
-    {
-      id: 5, type: "code",
-      question: "What is wrong with this HTML?",
-      code: `<img src="photo.jpg">`,
-      options: ["Nothing, it's correct", "Missing the alt attribute", "img tags need a closing tag", "src should be href"],
-      answer: 1,
-      explanation: "Always include `alt` text for accessibility! Screen readers and users with slow connections depend on it: `<img src='photo.jpg' alt='description'>`",
-      xp: 15,
-    },
-    {
-      id: 6, type: "multiple",
-      question: "Which CSS unit is RELATIVE to the root font size?",
-      options: ["px", "em", "rem", "vh"],
-      answer: 2,
-      explanation: "`rem` (root em) is relative to the root `<html>` element's font-size. `em` is relative to the parent element. `px` is absolute.",
-      xp: 20,
-    },
-    {
-      id: 7, type: "code",
-      question: "Which CSS makes text bold?",
-      code: `/* Which property? */\np {\n  ______: bold;\n}`,
-      options: ["text-weight", "font-bold", "font-weight", "weight"],
-      answer: 2,
-      explanation: "`font-weight: bold` makes text bold. You can also use numeric values: `font-weight: 700` equals bold.",
-      xp: 10,
-    },
+    { id: 1, type: "multiple", question: "Which HTML tag creates the largest heading?", options: ["<h6>", "<h1>", "<heading>", "<title>"], answer: 1, explanation: "`<h1>` is the largest heading. Headings go from `<h1>` (largest) to `<h6>` (smallest).", xp: 10 },
+    { id: 2, type: "code", question: "What does this CSS do?", code: `.box {\n  display: flex;\n  justify-content: center;\n  align-items: center;\n}`, options: ["Makes the box invisible", "Centers content horizontally only", "Centers content both horizontally and vertically", "Adds a border"], answer: 2, explanation: "`justify-content: center` centers horizontally, `align-items: center` centers vertically — together they center content in both directions.", xp: 15 },
+    { id: 3, type: "multiple", question: "Which CSS property controls the space INSIDE an element (between content and border)?", options: ["margin", "padding", "spacing", "gap"], answer: 1, explanation: "`padding` is the space inside the element. `margin` is the space OUTSIDE (between elements).", xp: 10 },
+    { id: 4, type: "truefalse", question: "The `<div>` element has special semantic meaning in HTML.", options: ["True", "False"], answer: 1, explanation: "FALSE! `<div>` is a generic container with NO semantic meaning. Use semantic tags like `<header>`, `<nav>`, `<main>`, `<section>` when appropriate.", xp: 10 },
+    { id: 5, type: "code", question: "What is wrong with this HTML?", code: `<img src="photo.jpg">`, options: ["Nothing, it's correct", "Missing the alt attribute", "img tags need a closing tag", "src should be href"], answer: 1, explanation: "Always include `alt` text for accessibility! Screen readers and users with slow connections depend on it: `<img src='photo.jpg' alt='description'>`", xp: 15 },
+    { id: 6, type: "multiple", question: "Which CSS unit is RELATIVE to the root font size?", options: ["px", "em", "rem", "vh"], answer: 2, explanation: "`rem` (root em) is relative to the root `<html>` element's font-size. `em` is relative to the parent element. `px` is absolute.", xp: 20 },
+    { id: 7, type: "code", question: "Which CSS makes text bold?", code: `/* Which property? */\np {\n  ______: bold;\n}`, options: ["text-weight", "font-bold", "font-weight", "weight"], answer: 2, explanation: "`font-weight: bold` makes text bold. You can also use numeric values: `font-weight: 700` equals bold.", xp: 10 },
   ],
   java: [
-    {
-      id: 1, type: "multiple",
-      question: "What is the correct way to declare a public integer variable named `score` in Java?",
-      options: ["int public score;", "public int score;", "score int public;", "public score int;"],
-      answer: 1,
-      explanation: "Java syntax: access modifier first (`public`), then type (`int`), then name (`score`). Always in that order.",
-      xp: 10,
-    },
-    {
-      id: 2, type: "code",
-      question: "What does this print?",
-      code: `String s = "Hello";\nSystem.out.println(s.length());`,
-      options: ["4", "5", "6", "Error"],
-      answer: 1,
-      explanation: "`\"Hello\"` has 5 characters: H-e-l-l-o. `.length()` returns `5`.",
-      xp: 10,
-    },
-    {
-      id: 3, type: "multiple",
-      question: "Java is considered a ________ language because code is compiled to bytecode.",
-      options: ["interpreted", "platform-independent", "scripting", "untyped"],
-      answer: 1,
-      explanation: "Java compiles to bytecode that runs on the JVM (Java Virtual Machine), making it platform-independent — 'Write Once, Run Anywhere'.",
-      xp: 15,
-    },
-    {
-      id: 4, type: "truefalse",
-      question: "In Java, `String` is a primitive data type.",
-      options: ["True", "False"],
-      answer: 1,
-      explanation: "FALSE! `String` is a class (object type) in Java. Primitive types are: `int`, `double`, `boolean`, `char`, `byte`, `short`, `long`, `float`.",
-      xp: 15,
-    },
-    {
-      id: 5, type: "code",
-      question: "What is the output?",
-      code: `int[] arr = {10, 20, 30};\nSystem.out.println(arr[1]);`,
-      options: ["10", "20", "30", "1"],
-      answer: 1,
-      explanation: "Arrays in Java are zero-indexed. `arr[0]` = 10, `arr[1]` = 20, `arr[2]` = 30.",
-      xp: 15,
-    },
-    {
-      id: 6, type: "multiple",
-      question: "Which keyword is used to inherit a class in Java?",
-      options: ["implements", "extends", "inherits", "super"],
-      answer: 1,
-      explanation: "`extends` is used for class inheritance. `implements` is for interfaces. Example: `class Dog extends Animal {}`",
-      xp: 20,
-    },
-    {
-      id: 7, type: "multiple",
-      question: "What does `void` mean as a return type?",
-      options: ["Returns null", "Returns 0", "Returns nothing", "Returns empty string"],
-      answer: 2,
-      explanation: "`void` means the method returns NOTHING. It performs an action but doesn't give back a value.",
-      xp: 10,
-    },
+    { id: 1, type: "multiple", question: "What is the correct way to declare a public integer variable named `score` in Java?", options: ["int public score;", "public int score;", "score int public;", "public score int;"], answer: 1, explanation: "Java syntax: access modifier first (`public`), then type (`int`), then name (`score`). Always in that order.", xp: 10 },
+    { id: 2, type: "code", question: "What does this print?", code: `String s = "Hello";\nSystem.out.println(s.length());`, options: ["4", "5", "6", "Error"], answer: 1, explanation: "`\"Hello\"` has 5 characters: H-e-l-l-o. `.length()` returns `5`.", xp: 10 },
+    { id: 3, type: "multiple", question: "Java is considered a ________ language because code is compiled to bytecode.", options: ["interpreted", "platform-independent", "scripting", "untyped"], answer: 1, explanation: "Java compiles to bytecode that runs on the JVM (Java Virtual Machine), making it platform-independent — 'Write Once, Run Anywhere'.", xp: 15 },
+    { id: 4, type: "truefalse", question: "In Java, `String` is a primitive data type.", options: ["True", "False"], answer: 1, explanation: "FALSE! `String` is a class (object type) in Java. Primitive types are: `int`, `double`, `boolean`, `char`, `byte`, `short`, `long`, `float`.", xp: 15 },
+    { id: 5, type: "code", question: "What is the output?", code: `int[] arr = {10, 20, 30};\nSystem.out.println(arr[1]);`, options: ["10", "20", "30", "1"], answer: 1, explanation: "Arrays in Java are zero-indexed. `arr[0]` = 10, `arr[1]` = 20, `arr[2]` = 30.", xp: 15 },
+    { id: 6, type: "multiple", question: "Which keyword is used to inherit a class in Java?", options: ["implements", "extends", "inherits", "super"], answer: 1, explanation: "`extends` is used for class inheritance. `implements` is for interfaces. Example: `class Dog extends Animal {}`", xp: 20 },
+    { id: 7, type: "multiple", question: "What does `void` mean as a return type?", options: ["Returns null", "Returns 0", "Returns nothing", "Returns empty string"], answer: 2, explanation: "`void` means the method returns NOTHING. It performs an action but doesn't give back a value.", xp: 10 },
   ],
   cpp: [
-    {
-      id: 1, type: "multiple",
-      question: "What symbol is used for output in C++?",
-      options: ["print()", "System.out", "cout <<", "console.log"],
-      answer: 2,
-      explanation: "`cout <<` (from `<iostream>`) is C++'s output stream. Example: `cout << \"Hello\" << endl;`",
-      xp: 10,
-    },
-    {
-      id: 2, type: "code",
-      question: "What does this code do?",
-      code: `int x = 5;\nint* ptr = &x;\ncout << *ptr;`,
-      options: ["Prints memory address", "Prints 5", "Causes an error", "Prints &x"],
-      answer: 1,
-      explanation: "`&x` gets the address of x. `*ptr` dereferences the pointer — getting the VALUE at that address, which is `5`.",
-      xp: 25,
-    },
-    {
-      id: 3, type: "multiple",
-      question: "What does `#include <iostream>` do?",
-      options: ["Imports a class", "Includes the input/output stream library", "Defines the main function", "Compiles the code"],
-      answer: 1,
-      explanation: "`#include` adds a header file to your code. `<iostream>` provides `cin` and `cout` for input/output.",
-      xp: 10,
-    },
-    {
-      id: 4, type: "truefalse",
-      question: "C++ automatically manages memory — you never need to free allocated memory manually.",
-      options: ["True", "False"],
-      answer: 1,
-      explanation: "FALSE! C++ requires manual memory management. Use `new` to allocate and `delete` to free memory. Memory leaks happen when you forget `delete`!",
-      xp: 20,
-    },
-    {
-      id: 5, type: "code",
-      question: "What is the output?",
-      code: `for (int i = 0; i < 3; i++) {\n  cout << i << " ";\n}`,
-      options: ["1 2 3", "0 1 2", "0 1 2 3", "1 2"],
-      answer: 1,
-      explanation: "`i` starts at 0, runs while `i < 3`. Prints 0, 1, 2 (each followed by a space).",
-      xp: 15,
-    },
-    {
-      id: 6, type: "multiple",
-      question: "Which C++ feature allows a function to have the same name but different parameters?",
-      options: ["Overriding", "Overloading", "Templates", "Inheritance"],
-      answer: 1,
-      explanation: "Function overloading lets you define multiple functions with the same name but different parameter types or counts.",
-      xp: 20,
-    },
-    {
-      id: 7, type: "multiple",
-      question: "What is `std::` in C++?",
-      options: ["A class name", "Standard library namespace", "A data type", "A compile flag"],
-      answer: 1,
-      explanation: "`std` is the standard namespace. Writing `using namespace std;` lets you skip the `std::` prefix and write `cout` instead of `std::cout`.",
-      xp: 15,
-    },
+    { id: 1, type: "multiple", question: "What symbol is used for output in C++?", options: ["print()", "System.out", "cout <<", "console.log"], answer: 2, explanation: "`cout <<` (from `<iostream>`) is C++'s output stream. Example: `cout << \"Hello\" << endl;`", xp: 10 },
+    { id: 2, type: "code", question: "What does this code do?", code: `int x = 5;\nint* ptr = &x;\ncout << *ptr;`, options: ["Prints memory address", "Prints 5", "Causes an error", "Prints &x"], answer: 1, explanation: "`&x` gets the address of x. `*ptr` dereferences the pointer — getting the VALUE at that address, which is `5`.", xp: 25 },
+    { id: 3, type: "multiple", question: "What does `#include <iostream>` do?", options: ["Imports a class", "Includes the input/output stream library", "Defines the main function", "Compiles the code"], answer: 1, explanation: "`#include` adds a header file to your code. `<iostream>` provides `cin` and `cout` for input/output.", xp: 10 },
+    { id: 4, type: "truefalse", question: "C++ automatically manages memory — you never need to free allocated memory manually.", options: ["True", "False"], answer: 1, explanation: "FALSE! C++ requires manual memory management. Use `new` to allocate and `delete` to free memory. Memory leaks happen when you forget `delete`!", xp: 20 },
+    { id: 5, type: "code", question: "What is the output?", code: `for (int i = 0; i < 3; i++) {\n  cout << i << " ";\n}`, options: ["1 2 3", "0 1 2", "0 1 2 3", "1 2"], answer: 1, explanation: "`i` starts at 0, runs while `i < 3`. Prints 0, 1, 2 (each followed by a space).", xp: 15 },
+    { id: 6, type: "multiple", question: "Which C++ feature allows a function to have the same name but different parameters?", options: ["Overriding", "Overloading", "Templates", "Inheritance"], answer: 1, explanation: "Function overloading lets you define multiple functions with the same name but different parameter types or counts.", xp: 20 },
+    { id: 7, type: "multiple", question: "What is `std::` in C++?", options: ["A class name", "Standard library namespace", "A data type", "A compile flag"], answer: 1, explanation: "`std` is the standard namespace. Writing `using namespace std;` lets you skip the `std::` prefix and write `cout` instead of `std::cout`.", xp: 15 },
   ],
-
   c: [
-    {
-      id: 1, type: "multiple",
-      question: "Which function is the starting point of a C program?",
-      options: ["start()", "main()", "begin()", "run()"],
-      answer: 1,
-      explanation: "Every standard C program starts execution from the main() function.",
-      xp: 10,
-    },
-    {
-      id: 2, type: "code",
-      question: "What does this code print?",
-      code: `#include <stdio.h>\nint main() {\n  printf("Hello");\n  return 0;\n}`,
-      options: ["Hello", "printf", "Error", "Nothing"],
-      answer: 0,
-      explanation: "printf() displays text on the screen, so this program prints Hello.",
-      xp: 10,
-    },
-    {
-      id: 3, type: "multiple",
-      question: "Which header file is commonly used for printf() and scanf()?",
-      options: ["<string.h>", "<math.h>", "<stdio.h>", "<stdlib.h>"],
-      answer: 2,
-      explanation: "<stdio.h> provides standard input and output functions such as printf() and scanf().",
-      xp: 15,
-    },
-    {
-      id: 4, type: "truefalse",
-      question: "In C, array indexing starts at 0.",
-      options: ["True", "False"],
-      answer: 0,
-      explanation: "TRUE! The first element of a C array is at index 0.",
-      xp: 10,
-    },
-    {
-      id: 5, type: "code",
-      question: "What is the output?",
-      code: `int x = 5;\nint y = 3;\nprintf("%d", x + y);`,
-      options: ["2", "8", "15", "53"],
-      answer: 1,
-      explanation: "The + operator adds 5 and 3, so printf() outputs 8.",
-      xp: 15,
-    },
-    {
-      id: 6, type: "multiple",
-      question: "Which symbol is used to get the address of a variable in C?",
-      options: ["*", "&", "#", "@"],
-      answer: 1,
-      explanation: "The & operator is the address-of operator. For example, &x gives the memory address of x.",
-      xp: 20,
-    },
-    {
-      id: 7, type: "multiple",
-      question: "Which format specifier is commonly used to print an integer with printf()?",
-      options: ["%s", "%f", "%d", "%c"],
-      answer: 2,
-      explanation: "%d is commonly used for signed integer values with printf().",
-      xp: 15,
-    },
+    { id: 1, type: "multiple", question: "Which function is the starting point of a C program?", options: ["start()", "main()", "begin()", "run()"], answer: 1, explanation: "Every standard C program starts execution from the main() function.", xp: 10 },
+    { id: 2, type: "code", question: "What does this code print?", code: `#include <stdio.h>\nint main() {\n  printf("Hello");\n  return 0;\n}`, options: ["Hello", "printf", "Error", "Nothing"], answer: 0, explanation: "printf() displays text on the screen, so this program prints Hello.", xp: 10 },
+    { id: 3, type: "multiple", question: "Which header file is commonly used for printf() and scanf()?", options: ["<string.h>", "<math.h>", "<stdio.h>", "<stdlib.h>"], answer: 2, explanation: "<stdio.h> provides standard input and output functions such as printf() and scanf().", xp: 15 },
+    { id: 4, type: "truefalse", question: "In C, array indexing starts at 0.", options: ["True", "False"], answer: 0, explanation: "TRUE! The first element of a C array is at index 0.", xp: 10 },
+    { id: 5, type: "code", question: "What is the output?", code: `int x = 5;\nint y = 3;\nprintf("%d", x + y);`, options: ["2", "8", "15", "53"], answer: 1, explanation: "The + operator adds 5 and 3, so printf() outputs 8.", xp: 15 },
+    { id: 6, type: "multiple", question: "Which symbol is used to get the address of a variable in C?", options: ["*", "&", "#", "@"], answer: 1, explanation: "The & operator is the address-of operator. For example, &x gives the memory address of x.", xp: 20 },
+    { id: 7, type: "multiple", question: "Which format specifier is commonly used to print an integer with printf()?", options: ["%s", "%f", "%d", "%c"], answer: 2, explanation: "%d is commonly used for signed integer values with printf().", xp: 15 },
   ],
   typescript: [
-    {
-      id: 1, type: "multiple",
-      question: "How do you declare a variable with a specific type in TypeScript?",
-      options: ["let name = string;", "let name: string;", "string let name;", "var name<string>;"],
-      answer: 1,
-      explanation: "TypeScript uses `:` for type annotations. `let name: string = 'Alice'` tells TypeScript `name` must always be a string.",
-      xp: 10,
-    },
-    {
-      id: 2, type: "code",
-      question: "What's wrong with this TypeScript code?",
-      code: `let age: number = 25;\nage = "thirty";`,
-      options: ["Nothing, it's fine", "Type error: can't assign string to number", "Missing semicolon", "age is not defined"],
-      answer: 1,
-      explanation: "TypeScript won't allow assigning a `string` to a `number` type. This is exactly what TypeScript protects you from!",
-      xp: 15,
-    },
-    {
-      id: 3, type: "multiple",
-      question: "What does the TypeScript type `string | number` mean?",
-      options: ["Only string", "Only number", "Either string or number", "Both string and number at once"],
-      answer: 2,
-      explanation: "`|` creates a Union Type — the value can be EITHER type. `string | number` means it accepts both strings and numbers.",
-      xp: 15,
-    },
-    {
-      id: 4, type: "truefalse",
-      question: "TypeScript code runs directly in the browser without any compilation.",
-      options: ["True", "False"],
-      answer: 1,
-      explanation: "FALSE! TypeScript must be compiled (transpiled) to JavaScript before the browser can run it. The `tsc` compiler handles this.",
-      xp: 10,
-    },
-    {
-      id: 5, type: "code",
-      question: "What does this interface define?",
-      code: `interface User {\n  name: string;\n  age: number;\n  isAdmin?: boolean;\n}`,
-      options: ["A class with methods", "A data shape — an object with name, age, and optional isAdmin", "A function type", "An enum"],
-      answer: 1,
-      explanation: "Interfaces define the shape of objects. The `?` after `isAdmin` makes it optional — objects can omit it.",
-      xp: 20,
-    },
-    {
-      id: 6, type: "multiple",
-      question: "What does the `any` type do in TypeScript?",
-      options: ["Matches only primitive types", "Opts out of type checking entirely", "Makes a variable required", "Creates a generic type"],
-      answer: 1,
-      explanation: "`any` disables type checking for that variable — it accepts anything. Using it too much defeats TypeScript's purpose!",
-      xp: 15,
-    },
-    {
-      id: 7, type: "code",
-      question: "What does this generic function do?",
-      code: `function identity<T>(arg: T): T {\n  return arg;\n}`,
-      options: ["Only works with strings", "Returns the same type it receives", "Always returns undefined", "Converts any type to string"],
-      answer: 1,
-      explanation: "Generics (`<T>`) let functions work with any type while preserving type info. `identity(5)` returns a `number`, `identity('hi')` returns a `string`.",
-      xp: 25,
-    },
+    { id: 1, type: "multiple", question: "How do you declare a variable with a specific type in TypeScript?", options: ["let name = string;", "let name: string;", "string let name;", "var name<string>;"], answer: 1, explanation: "TypeScript uses `:` for type annotations. `let name: string = 'Alice'` tells TypeScript `name` must always be a string.", xp: 10 },
+    { id: 2, type: "code", question: "What's wrong with this TypeScript code?", code: `let age: number = 25;\nage = "thirty";`, options: ["Nothing, it's fine", "Type error: can't assign string to number", "Missing semicolon", "age is not defined"], answer: 1, explanation: "TypeScript won't allow assigning a `string` to a `number` type. This is exactly what TypeScript protects you from!", xp: 15 },
+    { id: 3, type: "multiple", question: "What does the TypeScript type `string | number` mean?", options: ["Only string", "Only number", "Either string or number", "Both string and number at once"], answer: 2, explanation: "`|` creates a Union Type — the value can be EITHER type. `string | number` means it accepts both strings and numbers.", xp: 15 },
+    { id: 4, type: "truefalse", question: "TypeScript code runs directly in the browser without any compilation.", options: ["True", "False"], answer: 1, explanation: "FALSE! TypeScript must be compiled (transpiled) to JavaScript before the browser can run it. The `tsc` compiler handles this.", xp: 10 },
+    { id: 5, type: "code", question: "What does this interface define?", code: `interface User {\n  name: string;\n  age: number;\n  isAdmin?: boolean;\n}`, options: ["A class with methods", "A data shape — an object with name, age, and optional isAdmin", "A function type", "An enum"], answer: 1, explanation: "Interfaces define the shape of objects. The `?` after `isAdmin` makes it optional — objects can omit it.", xp: 20 },
+    { id: 6, type: "multiple", question: "What does the `any` type do in TypeScript?", options: ["Matches only primitive types", "Opts out of type checking entirely", "Makes a variable required", "Creates a generic type"], answer: 1, explanation: "`any` disables type checking for that variable — it accepts anything. Using it too much defeats TypeScript's purpose!", xp: 15 },
+    { id: 7, type: "code", question: "What does this generic function do?", code: `function identity<T>(arg: T): T {\n  return arg;\n}`, options: ["Only works with strings", "Returns the same type it receives", "Always returns undefined", "Converts any type to string"], answer: 1, explanation: "Generics (`<T>`) let functions work with any type while preserving type info. `identity(5)` returns a `number`, `identity('hi')` returns a `string`.", xp: 25 },
   ],
   php: [
     { id: 1, type: "multiple", question: "Which symbol starts a variable in PHP?", options: ["#", "$", "@", "%"], answer: 1, explanation: "PHP variables begin with the dollar sign, such as $name.", xp: 10 },
@@ -491,8 +171,8 @@ const BASE_QUESTIONS: Record<string, Question[]> = {
     { id: 5, type: "multiple", question: "Which keyword declares a mutable variable?", options: ["val", "var", "mut", "change"], answer: 1, explanation: "var declares a variable whose value can be changed.", xp: 15 },
     { id: 6, type: "code", question: "What is the result?", code: `val a = 2\nval b = 4\nprintln(a * b)`, options: ["6", "8", "24", "2"], answer: 1, explanation: "2 multiplied by 4 equals 8.", xp: 20 },
     { id: 7, type: "multiple", question: "Which symbol is used for a single-line comment?", options: ["#", "//", "<!--", "--"], answer: 1, explanation: "Kotlin uses // for single-line comments.", xp: 20 },
-
-  ]};
+  ],
+};
 
 const BONUS_QUESTIONS: Question[] = [
   { id: 1001, type: "multiple", question: "Which data structure follows the FIFO rule?", options: ["Stack", "Queue", "Tree", "Graph"], answer: 1, explanation: "FIFO means First In, First Out, which is the defining behavior of a queue.", xp: 15 },
@@ -531,147 +211,17 @@ const QUESTIONS: Record<string, Question[]> = Object.fromEntries(
   ])
 ) as Record<string, Question[]>;
 
-// ─── Types ───────────────────────────────────────────────────────────────────
-
 type Screen = "welcome" | "home" | "profile" | "guidelines" | "modes" | "language" | "music" | "game" | "results" | "duel-setup" | "duel";
+type GameMode = "practice" | "battle" | "speed" | "debug" | "survival" | "compiler";
 type AnswerState = "idle" | "correct" | "wrong";
 
-// ─── Components ──────────────────────────────────────────────────────────────
-
-function XPBar({ current, max, level }: { current: number; max: number; level: number }) {
-  const pct = Math.min((current / max) * 100, 100);
-  return (
-    <div className="flex items-center gap-3">
-      <div className="flex items-center gap-1 bg-purple-500/20 border border-purple-500/30 rounded-full px-3 py-1">
-        <Star size={12} className="text-yellow-400" />
-        <span className="text-yellow-400 font-mono font-bold text-xs">Lv.{level}</span>
-      </div>
-      <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
-        <motion.div
-          className="h-full bg-gradient-to-r from-purple-500 to-cyan-500 rounded-full"
-          initial={{ width: 0 }}
-          animate={{ width: `${pct}%` }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
-        />
-      </div>
-      <span className="text-xs font-mono text-white/40">{current}/{max} XP</span>
-    </div>
-  );
-}
-
-function CodeBlock({ code }: { code: string }) {
-  return (
-    <div className="relative rounded-xl overflow-hidden border border-white/10 bg-[#0d0d1a]">
-      <div className="flex items-center gap-1.5 px-4 py-2.5 border-b border-white/10 bg-white/5">
-        <div className="w-3 h-3 rounded-full bg-red-500/70" />
-        <div className="w-3 h-3 rounded-full bg-yellow-500/70" />
-        <div className="w-3 h-3 rounded-full bg-green-500/70" />
-        <span className="ml-2 text-white/30 text-xs font-mono">code.preview</span>
-      </div>
-      <pre className="p-4 text-sm font-mono leading-relaxed text-cyan-300 overflow-x-auto whitespace-pre">
-        {code}
-      </pre>
-    </div>
-  );
-}
-
-function ParticleEffect({ active, correct }: { active: boolean; correct: boolean }) {
-  if (!active) return null;
-  const color = correct ? "#22c55e" : "#ef4444";
-  const particles = Array.from({ length: correct ? 12 : 6 }, (_, i) => i);
-  return (
-    <div className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center">
-      {particles.map((i) => (
-        <motion.div
-          key={i}
-          className="absolute w-3 h-3 rounded-full"
-          style={{ backgroundColor: color }}
-          initial={{ x: 0, y: 0, scale: 1, opacity: 1 }}
-          animate={{
-            x: (Math.cos((i / particles.length) * Math.PI * 2) * 150) + (Math.random() - 0.5) * 80,
-            y: (Math.sin((i / particles.length) * Math.PI * 2) * 150) + (Math.random() - 0.5) * 80,
-            scale: 0,
-            opacity: 0,
-          }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-        />
-      ))}
-    </div>
-  );
-}
-
-
-const RANKS = [
-  { name: "Beginner Programmer", minXP: 0, icon: "🌱", color: "#94a3b8" },
-  { name: "Novice Programmer", minXP: 100, icon: "🛡️", color: "#60a5fa" },
-  { name: "Junior Programmer", minXP: 250, icon: "⚔️", color: "#a78bfa" },
-  { name: "Intermediate Programmer", minXP: 500, icon: "🔥", color: "#f59e0b" },
-  { name: "Advanced Programmer", minXP: 900, icon: "💎", color: "#22d3ee" },
-  { name: "Senior Programmer", minXP: 1500, icon: "👑", color: "#fbbf24" },
-];
-
-function getRank(totalXP: number) {
-  return [...RANKS].reverse().find((rank) => totalXP >= rank.minXP) ?? RANKS[0];
-}
-
-// ─── Screens ─────────────────────────────────────────────────────────────────
-
-
-type GameMode = "practice" | "battle" | "speed" | "debug" | "survival" | "compiler";
-
-type AnimeCharacter = { id: string; name: string; title: string; emoji: string; color: string; accent: string; attack: string; aura: string };
-
-const COMPILER_CHALLENGES: Record<string, { prompt: string; code: string; expected: string; hint: string }[]> = {
-  python: [
-    { prompt: "Complete the output statement.", code: "name = \"Elmer\"\nprint(____)", expected: "name", hint: "Print the variable named name." },
-    { prompt: "Complete the loop range.", code: "for i in range(____):\n    print(i)", expected: "5", hint: "Print 0, 1, 2, 3, 4." },
-  ],
-  javascript: [
-    { prompt: "Complete the console output.", code: "const score = 100;\nconsole.log(____);", expected: "score", hint: "Output the score variable." },
-    { prompt: "Complete the increment.", code: "let xp = 10;\nxp ____ 5;", expected: "+=", hint: "Add five XP to the variable." },
-  ],
-  java: [
-    { prompt: "Complete the Java print statement.", code: 'String name = "Elmer";\nSystem.out.println(____);', expected: "name", hint: "Print the name variable." },
-    { prompt: "Complete the comparison operator.", code: "if (score ____ 75) {\n    System.out.println(\"Pass\");\n}", expected: ">=", hint: "Pass when score is 75 or higher." },
-  ],
-  cpp: [
-    { prompt: "Complete the C++ output.", code: "int score = 90;\ncout << ____;", expected: "score", hint: "Send the score variable to cout." },
-    { prompt: "Complete the increment operator.", code: "int xp = 10;\nxp ____ 5;", expected: "+=", hint: "Add five to xp." },
-  ],
-  c: [
-    { prompt: "Complete the C output statement.", code: "int score = 90;\nprintf(\"%d\", ____);", expected: "score", hint: "Pass score as printf's argument." },
-    { prompt: "Complete the comparison.", code: "if (score ____ 75) {", expected: ">=", hint: "75 should count as passing." },
-  ],
-  typescript: [
-    { prompt: "Complete the typed variable output.", code: 'const username: string = "Elmer";\nconsole.log(____);', expected: "username", hint: "Output the typed variable." },
-    { prompt: "Complete the type annotation.", code: "let xp: ____ = 100;", expected: "number", hint: "XP is numeric." },
-  ],
-  php: [
-    { prompt: "Complete the PHP output.", code: '$name = "Elmer";\necho ____;', expected: "$name", hint: "Echo the variable including its $ prefix." },
-    { prompt: "Complete the PHP comparison.", code: "if ($score ____ 75) {", expected: ">=", hint: "75 or higher passes." },
-  ],
-  sql: [
-    { prompt: "Complete the SQL query.", code: "SELECT ____ FROM students;", expected: "*", hint: "Select every column." },
-    { prompt: "Complete the filter.", code: "SELECT * FROM students WHERE score ____ 75;", expected: ">=", hint: "Keep scores 75 and above." },
-  ],
-  csharp: [
-    { prompt: "Complete the C# output.", code: 'string name = "Elmer";\nConsole.WriteLine(____);', expected: "name", hint: "Write the name variable." },
-    { prompt: "Complete the comparison.", code: "if (score ____ 75) {", expected: ">=", hint: "75 is a passing score." },
-  ],
-  kotlin: [
-    { prompt: "Complete the Kotlin output.", code: 'val name = "Elmer"\nprintln(____)', expected: "name", hint: "Print the name value." },
-    { prompt: "Complete the mutable declaration.", code: "____ xp = 100", expected: "var", hint: "Use the mutable variable keyword." },
-  ],
+type StudentProfile = {
+  username: string;
+  yearLevel: string;
+  course: string;
+  school: string;
+  photo: string;
 };
-
-const ANIME_CHARACTERS: AnimeCharacter[] = [
-  { id: "nova", name: "Nova", title: "Neon Code Mage", emoji: "🧙‍♀️", color: "#8b5cf6", accent: "#22d3ee", attack: "NEON CODE BURST!", aura: "violet" },
-  { id: "kairo", name: "Kairo", title: "Cyber Blade Runner", emoji: "⚔️", color: "#06b6d4", accent: "#3b82f6", attack: "CYBER SLASH!", aura: "cyan" },
-  { id: "akari", name: "Akari", title: "Flame Syntax Ninja", emoji: "🔥", color: "#f97316", accent: "#ec4899", attack: "FLAME SYNTAX!", aura: "fire" },
-  { id: "rei", name: "Rei", title: "Quantum Hacker", emoji: "🦋", color: "#ec4899", accent: "#a855f7", attack: "QUANTUM BREAK!", aura: "pink" },
-  { id: "zen", name: "Zen", title: "Thunder Compiler", emoji: "⚡", color: "#facc15", accent: "#22c55e", attack: "THUNDER COMPILE!", aura: "gold" },
-];
-
 
 const SPOTIFY_TRACKS = [
   { id: "palagi-neo", title: "Palagi", artist: "TJ Monterde-inspired OPM", category: "OPM" },
@@ -690,26 +240,18 @@ const SPOTIFY_TRACKS = [
 
 type MusicTrack = (typeof SPOTIFY_TRACKS)[number];
 
-type MusicStyle = {
-  wave: OscillatorType;
-  notes: Array<[number, number]>;
-};
+const RANKS = [
+  { name: "Beginner Programmer", minXP: 0, icon: "🌱", color: "#94a3b8" },
+  { name: "Novice Programmer", minXP: 100, icon: "🛡️", color: "#60a5fa" },
+  { name: "Junior Programmer", minXP: 250, icon: "⚔️", color: "#a78bfa" },
+  { name: "Intermediate Programmer", minXP: 500, icon: "🔥", color: "#f59e0b" },
+  { name: "Advanced Programmer", minXP: 900, icon: "💎", color: "#22d3ee" },
+  { name: "Senior Programmer", minXP: 1500, icon: "👑", color: "#fbbf24" },
+];
 
-const getMusicStyle = (track: MusicTrack): MusicStyle => {
-  if (track.category === "Focus") {
-    return { wave: "sine", notes: [[220, 280], [330, 392], [392, 440], [440, 330]] };
-  }
-  if (track.category === "Pop" || track.artist.includes("Weeknd")) {
-    return { wave: "triangle", notes: [[440, 523], [554, 659], [698, 783], [659, 587]] };
-  }
-  if (track.category === "Rock / Alt") {
-    return { wave: "sawtooth", notes: [[196, 246], [246, 293], [329, 392], [392, 329]] };
-  }
-  if (track.category === "OPM") {
-    return { wave: "triangle", notes: [[220, 247], [294, 330], [392, 440], [330, 294]] };
-  }
-  return { wave: "square", notes: [[261, 329], [329, 392], [392, 440], [440, 523]] };
-};
+function getRank(totalXP: number) {
+  return [...RANKS].reverse().find((rank) => totalXP >= rank.minXP) ?? RANKS[0];
+}
 
 const DEBUG_QUESTIONS_BY_LANGUAGE: Record<string, Question[]> = {
   python: [
@@ -760,6 +302,283 @@ const DEBUG_QUESTIONS_BY_LANGUAGE: Record<string, Question[]> = {
 
 const DEBUG_QUESTIONS: Question[] = DEBUG_QUESTIONS_BY_LANGUAGE.javascript;
 
+// ─── Sound System (Synthesizer Audio Engine) ───────────────────────────────────
+
+class GlobalSoundSystem {
+  private ctx: AudioContext | null = null;
+  private currentTrack: MusicTrack = SPOTIFY_TRACKS[0];
+  private isPlaying = false;
+  private isMuted = false;
+  private intervalId: any = null;
+  private noteIndex = 0;
+
+  constructor() {}
+
+  private initCtx() {
+    if (!this.ctx && typeof window !== "undefined") {
+      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+      if (AudioContextClass) {
+        this.ctx = new AudioContextClass();
+      }
+    }
+    if (this.ctx && this.ctx.state === "suspended") {
+      this.ctx.resume();
+    }
+  }
+
+  public setTrack(track: MusicTrack) {
+    this.currentTrack = track;
+    if (this.isPlaying) {
+      this.stop();
+      this.start();
+    }
+  }
+
+  public getTrack() {
+    return this.currentTrack;
+  }
+
+  public togglePlay() {
+    if (this.isPlaying) {
+      this.stop();
+    } else {
+      this.start();
+    }
+    return this.isPlaying;
+  }
+
+  public toggleMute() {
+    this.isMuted = !this.isMuted;
+    return this.isMuted;
+  }
+
+  public getIsPlaying() {
+    return this.isPlaying;
+  }
+
+  public getIsMuted() {
+    return this.isMuted;
+  }
+
+  public start() {
+    this.initCtx();
+    if (!this.ctx) return;
+    this.isPlaying = true;
+
+    if (this.intervalId) clearInterval(this.intervalId);
+
+    const baseFreqs = [261.63, 293.66, 329.63, 349.23, 392.0, 440.0, 493.88, 523.25];
+    this.intervalId = setInterval(() => {
+      if (!this.isPlaying || this.isMuted || !this.ctx) return;
+      try {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        const freq = baseFreqs[(this.noteIndex + Math.floor(Math.random() * 3)) % baseFreqs.length];
+        osc.type = this.currentTrack.category === "Focus" ? "sine" : "triangle";
+        osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+
+        gain.gain.setValueAtTime(0.001, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.04, this.ctx.currentTime + 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 0.4);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.42);
+
+        this.noteIndex = (this.noteIndex + 1) % baseFreqs.length;
+      } catch (e) {}
+    }, 400);
+  }
+
+  public stop() {
+    this.isPlaying = false;
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+      this.intervalId = null;
+    }
+  }
+
+  public playSfx(type: "correct" | "wrong" | "attack" | "hit" | "finish") {
+    this.initCtx();
+    if (!this.ctx || this.isMuted) return;
+
+    try {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      const now = this.ctx.currentTime;
+
+      if (type === "correct") {
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(523.25, now);
+        osc.frequency.setValueAtTime(659.25, now + 0.08);
+        osc.frequency.setValueAtTime(783.99, now + 0.16);
+        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(now + 0.36);
+      } else if (type === "wrong") {
+        osc.type = "sawtooth";
+        osc.frequency.setValueAtTime(180, now);
+        osc.frequency.setValueAtTime(130, now + 0.1);
+        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(now + 0.31);
+      } else if (type === "attack") {
+        osc.type = "square";
+        osc.frequency.setValueAtTime(300, now);
+        osc.frequency.exponentialRampToValueAtTime(800, now + 0.15);
+        gain.gain.setValueAtTime(0.08, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(now + 0.21);
+      } else if (type === "hit") {
+        osc.type = "sawtooth";
+        osc.frequency.setValueAtTime(120, now);
+        osc.frequency.exponentialRampToValueAtTime(40, now + 0.2);
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(now + 0.26);
+      } else if (type === "finish") {
+        osc.type = "triangle";
+        osc.frequency.setValueAtTime(440, now);
+        osc.frequency.setValueAtTime(554.37, now + 0.1);
+        osc.frequency.setValueAtTime(659.25, now + 0.2);
+        osc.frequency.setValueAtTime(880, now + 0.3);
+        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(now + 0.61);
+      }
+    } catch (e) {}
+  }
+}
+
+const globalSound = new GlobalSoundSystem();
+
+// ─── UI Helper Components ─────────────────────────────────────────────────────
+
+function XPBar({ current, max, level }: { current: number; max: number; level: number }) {
+  const pct = Math.min((current / max) * 100, 100);
+  return (
+    <div className="flex items-center gap-3">
+      <div className="flex items-center gap-1 bg-purple-500/20 border border-purple-500/30 rounded-full px-3 py-1">
+        <Star size={12} className="text-yellow-400" />
+        <span className="text-yellow-400 font-mono font-bold text-xs">Lv.{level}</span>
+      </div>
+      <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
+        <motion.div
+          className="h-full bg-gradient-to-r from-purple-500 to-cyan-500 rounded-full"
+          initial={{ width: 0 }}
+          animate={{ width: `${pct}%` }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+        />
+      </div>
+      <span className="text-xs font-mono text-white/40">{current}/{max} XP</span>
+    </div>
+  );
+}
+
+function CodeBlock({ code }: { code: string }) {
+  return (
+    <div className="relative rounded-xl overflow-hidden border border-white/10 bg-[#0d0d1a]">
+      <div className="flex items-center gap-1.5 px-4 py-2.5 border-b border-white/10 bg-white/5">
+        <div className="w-3 h-3 rounded-full bg-red-500/70" />
+        <div className="w-3 h-3 rounded-full bg-yellow-500/70" />
+        <div className="w-3 h-3 rounded-full bg-green-500/70" />
+        <span className="ml-2 text-white/30 text-xs font-mono">code.preview</span>
+      </div>
+      <pre className="p-4 text-sm font-mono leading-relaxed text-cyan-300 overflow-x-auto whitespace-pre">
+        {code}
+      </pre>
+    </div>
+  );
+}
+
+function RankBadge({ totalXP, compact = false }: { totalXP: number; compact?: boolean }) {
+  const rank = getRank(totalXP);
+  return (
+    <div className={`flex items-center gap-2 rounded-xl border bg-black/10 ${compact ? "px-2.5 py-1.5" : "px-3 py-2"}`} style={{ borderColor: `${rank.color}55` }}>
+      <span className={compact ? "text-base" : "text-xl"}>{rank.icon}</span>
+      <div className="min-w-0">
+        <p className="font-mono font-black truncate" style={{ color: rank.color, fontSize: compact ? 10 : 12 }}>{rank.name}</p>
+        <p className="text-white/30 font-mono" style={{ fontSize: compact ? 8 : 9 }}>{totalXP} XP</p>
+      </div>
+      <Trophy size={compact ? 12 : 15} style={{ color: rank.color }} className="ml-auto shrink-0" />
+    </div>
+  );
+}
+
+function GlobalMusicControlBar({
+  currentTrack,
+  onOpenMusic,
+}: {
+  currentTrack: MusicTrack;
+  onOpenMusic: () => void;
+}) {
+  const [isPlaying, setIsPlaying] = useState(globalSound.getIsPlaying());
+  const [isMuted, setIsMuted] = useState(globalSound.getIsMuted());
+
+  const handleTogglePlay = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const playing = globalSound.togglePlay();
+    setIsPlaying(playing);
+  };
+
+  const handleToggleMute = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const muted = globalSound.toggleMute();
+    setIsMuted(muted);
+  };
+
+  return (
+    <div
+      onClick={onOpenMusic}
+      className="fixed bottom-4 right-4 z-50 flex items-center gap-3 px-4 py-2.5 rounded-2xl border border-green-500/30 bg-black/80 backdrop-blur-xl shadow-2xl cursor-pointer hover:border-green-400/60 transition-all group"
+    >
+      <div className="relative flex items-center justify-center w-8 h-8 rounded-xl bg-green-500/20 text-green-400">
+        <Music size={16} className={isPlaying ? "animate-spin" : ""} style={{ animationDuration: "4s" }} />
+      </div>
+      <div className="min-w-0 max-w-[130px] sm:max-w-[180px]">
+        <p className="text-[11px] font-mono font-black text-white truncate">{currentTrack.title}</p>
+        <p className="text-[9px] font-mono text-white/40 truncate">{currentTrack.artist}</p>
+      </div>
+      <div className="flex items-center gap-1 pl-2 border-l border-white/10">
+        <button
+          onClick={handleTogglePlay}
+          className="p-1.5 rounded-lg text-white/70 hover:text-white hover:bg-white/10"
+          title={isPlaying ? "Pause" : "Play"}
+        >
+          {isPlaying ? <Pause size={14} /> : <Play size={14} />}
+        </button>
+        <button
+          onClick={handleToggleMute}
+          className="p-1.5 rounded-lg text-white/70 hover:text-white hover:bg-white/10"
+          title={isMuted ? "Unmute" : "Mute"}
+        >
+          {isMuted ? <VolumeX size={14} className="text-red-400" /> : <Volume2 size={14} />}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Main Screen Components ───────────────────────────────────────────────────
+
 function WelcomeScreen({ onContinue }: { onContinue: () => void }) {
   return (
     <div className="cq-screen cq-page relative overflow-hidden px-3 sm:px-6 py-3 sm:py-6">
@@ -795,244 +614,6 @@ function WelcomeScreen({ onContinue }: { onContinue: () => void }) {
   );
 }
 
-function MusicSelectionScreen({
-  selectedTrack,
-  onSelect,
-  onBack,
-}: {
-  selectedTrack: (typeof SPOTIFY_TRACKS)[number];
-  onSelect: (track: (typeof SPOTIFY_TRACKS)[number]) => void;
-  onBack: () => void;
-}) {
-  const [category, setCategory] = useState("All");
-  const categories = ["All", "OPM", "The Weeknd", "Pop", "Rock / Alt", "Focus"];
-  const visibleTracks = category === "All" ? SPOTIFY_TRACKS : SPOTIFY_TRACKS.filter((t) => t.category === category);
-
-  return (
-    <div className="cq-screen px-3 sm:px-5 py-6 sm:py-8 relative overflow-hidden">
-      <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_20%_20%,rgba(168,85,247,.18),transparent_35%),radial-gradient(circle_at_80%_70%,rgba(6,182,212,.14),transparent_35%)]" />
-      <div className="max-w-5xl mx-auto relative">
-        <button onClick={onBack} className="flex items-center gap-2 text-white/50 hover:text-white font-mono text-sm mb-8">
-          <ArrowLeft size={16} /> Back
-        </button>
-
-        <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-8">
-          <motion.div animate={{ rotate: [0, 4, -4, 0], scale: [1, 1.06, 1] }} transition={{ repeat: Infinity, duration: 3 }}
-            className="mx-auto w-16 h-16 rounded-2xl bg-gradient-to-br from-green-500 to-cyan-500 flex items-center justify-center shadow-2xl shadow-green-500/25 mb-4">
-            <Music size={30} className="text-white" />
-          </motion.div>
-          <p className="text-green-300 text-xs font-mono font-black tracking-[0.3em]">GLOBAL SOUNDTRACK</p>
-          <h2 className="text-4xl md:text-6xl font-mono font-black text-white mt-2">CHOOSE YOUR SOUNDTRACK</h2>
-          <p className="text-white/40 font-mono text-sm mt-3">Choose a track anytime. Selecting one closes this screen and keeps the soundtrack playing globally.</p>
-        </motion.div>
-
-        <div className="rounded-3xl border border-green-500/20 bg-gradient-to-br from-green-500/10 via-white/5 to-cyan-500/10 p-4 sm:p-6 shadow-2xl">
-          <div className="flex flex-wrap gap-2 pb-2 mb-4">
-            {categories.map((item) => (
-              <button key={item} onClick={() => setCategory(item)}
-                className={`shrink-0 px-3 py-2 rounded-full text-[10px] font-mono border ${
-                  category === item ? "bg-green-500/20 border-green-400/50 text-green-300" : "bg-white/5 border-white/10 text-white/50"
-                }`}>
-                {item}
-              </button>
-            ))}
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {visibleTracks.map((track) => (
-              <motion.button key={track.id} whileHover={{ y: -2 }} whileTap={{ scale: .98 }} onClick={() => onSelect(track)}
-                className={`text-left p-4 rounded-2xl border transition-all ${
-                  selectedTrack.id === track.id ? "border-green-400/60 bg-green-500/15 shadow-lg shadow-green-500/10" : "border-white/10 bg-white/5 hover:bg-white/10"
-                }`}>
-                <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${selectedTrack.id === track.id ? "bg-green-500/20" : "bg-white/5"}`}>
-                    <Music size={17} className={selectedTrack.id === track.id ? "text-green-300" : "text-white/50"} />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="font-mono font-black text-sm text-white truncate">{track.title}</p>
-                    <p className="font-mono text-[10px] text-white/40 truncate">{track.artist}</p>
-                  </div>
-                </div>
-                <p className="mt-3 text-[9px] font-mono text-green-300/60">{track.category}</p>
-              </motion.button>
-            ))}
-          </div>
-          <div className="mt-5 rounded-2xl border border-green-500/20 bg-green-500/5 p-4 text-center">
-            <Music size={24} className="mx-auto text-green-300 mb-2" />
-            <p className="text-green-300 font-mono font-black text-sm">GLOBAL SOUNDTRACK ARMED</p>
-            <p className="text-white/35 font-mono text-[10px] mt-1">Your selected track plays from the beginning and stays with you across the whole website.</p>
-          </div>
-          <div className="mt-5 rounded-2xl border border-cyan-400/15 bg-cyan-500/5 px-4 py-3 text-center">
-            <p className="text-cyan-300 font-mono font-black text-xs">SELECT = PLAY NOW</p>
-            <p className="text-white/35 font-mono text-[10px] mt-1">Tap any song and this menu closes immediately. Your selected soundtrack remains global while you use CodeQuest.</p>
-          </div>
-          <p className="text-center text-white/25 text-[10px] font-mono mt-3">Tap once to start the soundtrack. It will keep playing as you explore the app.</p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function MusicPlayer({ compact = false, selectedTrack }: { compact?: boolean; selectedTrack?: (typeof SPOTIFY_TRACKS)[number] }) {
-  const [track, setTrack] = useState(selectedTrack ?? SPOTIFY_TRACKS[0]);
-  useEffect(() => { if (selectedTrack) setTrack(selectedTrack); }, [selectedTrack]);
-  const [category, setCategory] = useState("All");
-  const categories = ["All", "OPM", "The Weeknd", "Pop", "Rock / Alt", "Focus"];
-  const visibleTracks = category === "All" ? SPOTIFY_TRACKS : SPOTIFY_TRACKS.filter((item) => item.category === category);
-
-  return (
-    <div className={`rounded-3xl border border-green-500/20 bg-gradient-to-br from-green-500/10 via-white/5 to-cyan-500/5 shadow-2xl ${compact ? "p-3" : "p-4"}`}>
-      <div className="flex items-center gap-3 mb-3">
-        <div className="w-10 h-10 shrink-0 rounded-xl bg-green-500/15 border border-green-500/20 flex items-center justify-center">
-          <Music size={18} className="text-green-400" />
-        </div>
-        <div className="min-w-0">
-          <p className="font-mono text-sm font-black text-green-300">CODEQUEST MUSIC</p>
-          <p className="text-white/40 text-[10px] font-mono truncate">Browser soundtrack for your quest.</p>
-        </div>
-        <span className="ml-auto shrink-0 text-[10px] font-mono text-white/30">{SPOTIFY_TRACKS.length} tracks</span>
-      </div>
-
-      <div className="flex flex-wrap gap-1.5 pb-1 mb-3">
-        {categories.map((item) => (
-          <button key={item} onClick={() => setCategory(item)}
-            className={`shrink-0 px-2.5 py-1.5 rounded-full text-[9px] font-mono border transition-all ${
-              category === item ? "bg-green-500/20 border-green-500/40 text-green-300" : "bg-white/5 border-white/10 text-white/50 hover:text-white"
-            }`}>
-            {item}
-          </button>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-2 gap-2 mb-3">
-        {visibleTracks.map((item) => (
-          <button key={item.id} onClick={() => setTrack(item)}
-            className={`min-w-0 text-left p-2.5 rounded-xl border transition-all ${
-              track.id === item.id ? "bg-green-500/15 border-green-500/40" : "bg-white/5 border-white/10 hover:bg-white/10"
-            }`}>
-            <p className="text-[11px] font-mono font-bold text-white truncate">{item.title}</p>
-            <p className="text-[9px] font-mono text-white/40 truncate">{item.artist}</p>
-          </button>
-        ))}
-      </div>
-
-      <div className="rounded-2xl border border-green-500/15 bg-black/20 px-3 py-3 text-[10px] font-mono text-green-300">
-        <div className="flex items-center justify-between gap-2">
-          <span className="font-black">NOW PLAYING</span>
-          <span>{track.title}</span>
-        </div>
-        <p className="mt-1 text-white/45">{track.artist} · {track.category}</p>
-      </div>
-
-      <div className="flex items-center gap-2 mt-2 text-[9px] font-mono text-white/35">
-        <Volume2 size={11} />
-        <span>Selected track starts after your first tap. Audio is played through the browser.</span>
-      </div>
-    </div>
-  );
-}
-
-function AnimeCoderAvatar({ side = "player", large = false, attacking = false, hit = false }: { side?: "player" | "enemy"; large?: boolean; attacking?: boolean; hit?: boolean; character?: AnimeCharacter }) {
-  const player = side === "player";
-  const primary = player ? "#c9ff4d" : "#111827";
-  const secondary = player ? "#0f172a" : "#d8ff5a";
-  return (
-    <motion.div
-      animate={{
-        y: hit ? [0, -12, 8, -4, 0] : [0, -5, 0],
-        x: attacking ? (player ? [0, 55, -8, 0] : [0, -55, 8, 0]) : 0,
-        rotate: attacking ? (player ? [0, 10, -5, 0] : [0, -10, 5, 0]) : [0, 1, 0],
-        scale: hit ? [1, 1.18, .88, 1] : 1,
-      }}
-      transition={{ duration: attacking || hit ? .55 : 3, ease: "easeInOut", repeat: attacking || hit ? 0 : Infinity }}
-      className={`${large ? "w-40 h-44 sm:w-56 sm:h-56" : "w-20 h-20"} relative shrink-0 flex items-center justify-center`}
-      aria-label={player ? "Player combat core" : "Opponent combat core"}
-    >
-      <motion.div animate={{ rotate: 360 }} transition={{ duration: 9, repeat: Infinity, ease: "linear" }}
-        className={`absolute ${large ? "w-36 h-36 sm:w-48 sm:h-48" : "w-16 h-16"} rounded-[28%] border-2 ${player ? "border-[#c9ff4d]" : "border-slate-900"} bg-white/70 backdrop-blur-md shadow-[0_25px_80px_rgba(0,0,0,.22)]`}
-        style={{ transform: "rotate(45deg)" }}>
-        <div className="absolute inset-[13%] rounded-full" style={{ background: `radial-gradient(circle at 35% 30%, ${secondary}, ${primary} 45%, rgba(255,255,255,.12) 70%, transparent 72%)`, boxShadow: `inset -18px -18px 35px rgba(0,0,0,.18), 0 0 55px ${player ? "rgba(201,255,77,.55)" : "rgba(17,24,39,.28)"}` }} />
-        <motion.div animate={{ rotate: -720 }} transition={{ duration: 5, repeat: Infinity, ease: "linear" }} className="absolute inset-[-12%] rounded-full border border-dashed border-black/25" />
-      </motion.div>
-      <motion.div animate={{ scale: attacking ? [1, 1.45, .7, 1.15, 1] : [1, 1.08, 1], opacity: attacking ? [0,1,0] : [.35,.7,.35] }} transition={{ duration: attacking ? .65 : 2.1, repeat: attacking ? 0 : Infinity }}
-        className="absolute inset-0 rounded-full blur-3xl pointer-events-none" style={{ background: `radial-gradient(circle, ${player ? "rgba(201,255,77,.8)" : "rgba(17,24,39,.35)"}, transparent 66%)` }} />
-      {attacking && <motion.div initial={{ opacity: 0, scale: .2 }} animate={{ opacity: [0,1,0], scale: [0.2,1.5,2.8], rotate: [0,180,360] }} transition={{ duration: .7 }} className="absolute z-20 text-center font-black text-xl sm:text-4xl tracking-[-.04em]" style={{ color: player ? "#111827" : "#c9ff4d", textShadow: `0 0 30px ${player ? "#c9ff4d" : "#111827"}` }}>{player ? "CODE IMPACT" : "COUNTER"}</motion.div>}
-    </motion.div>
-  );
-}
-
-function ModesScreen({ onSelect, onBack, battleDifficulty, onDifficultyChange }: { onSelect: (mode: GameMode) => void; onBack: () => void; battleDifficulty: "easy" | "normal" | "hard"; onDifficultyChange: (d: "easy" | "normal" | "hard") => void }) {
-  const modes = [
-    { id: "practice" as GameMode, icon: "🧠", title: "Practice Mode", desc: "Relaxed learning with explanations after every answer.", color: "#8b5cf6", questions: "20 questions" },
-    { id: "battle" as GameMode, icon: "⚔️", title: "Battle Mode", desc: "Correct answers become attacks against the Code Beast with anime combat effects.", color: "#ef4444", questions: "20 questions" },
-    { id: "speed" as GameMode, icon: "⚡", title: "Speed Mode", desc: "Race the clock and finish before time runs out.", color: "#f59e0b", questions: "20 questions · 60 sec" },
-    { id: "debug" as GameMode, icon: "🐛", title: "Bug Hunter", desc: "Open broken code, identify the bug, and fix it in the language you choose.", color: "#22c55e", questions: "20 bug fixes" },
-    { id: "survival" as GameMode, icon: "🔥", title: "Code Survival", desc: "Keep your run alive. Wrong answers drain your life and streak.", color: "#06b6d4", questions: "20 lives-on-the-line" },
-    { id: "compiler" as GameMode, icon: "⌨️", title: "Compiler Lab", desc: "Type the missing code directly into a terminal-style compiler and execute your answer.", color: "#22d3ee", questions: "20 typing challenges" },
-  ];
-  return (
-    <div className="cq-screen px-4 sm:px-6 py-10">
-      <div className="max-w-5xl mx-auto">
-        <button onClick={onBack} className="flex items-center gap-2 text-white/50 hover:text-white font-mono text-sm mb-8"><ArrowLeft size={16}/> Back</button>
-        <div className="text-center mb-10"><Gamepad2 className="mx-auto text-purple-400 mb-3" size={40}/><h2 className="text-4xl md:text-5xl font-mono font-black text-white">CHOOSE YOUR GAME</h2><p className="text-white/40 font-mono text-sm mt-2">Your soundtrack stays active while you explore the whole CodeQuest world.</p></div>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {modes.map((mode) => <motion.button key={mode.id} onClick={() => onSelect(mode.id)} whileHover={{ y: -5, scale: 1.01 }} whileTap={{ scale: .98 }}
-            className="text-left rounded-3xl border border-white/10 bg-white/5 p-6 hover:bg-white/10 transition-all shadow-xl">
-            <div className="text-5xl mb-5">{mode.icon}</div>
-            <h3 className="text-xl font-mono font-black text-white mb-2">{mode.title}</h3>
-            <p className="text-white/50 text-sm font-mono leading-relaxed mb-5">{mode.desc}</p>
-            <div className="flex items-center justify-between"><span className="text-xs font-mono" style={{color:mode.color}}>{mode.questions}</span><ArrowRight size={17} className="text-white/30"/></div>
-          </motion.button>)}
-        </div>
-
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="mt-5 rounded-3xl border border-red-500/20 bg-gradient-to-r from-red-500/10 via-purple-500/10 to-cyan-500/10 p-4 sm:p-5">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <p className="text-red-300 text-[10px] font-mono font-black tracking-[.25em]">BATTLE CORE</p>
-              <h3 className="text-white font-mono font-black text-lg">Choose Battle Difficulty</h3>
-              <p className="text-white/35 font-mono text-[10px] mt-1">Difficulty changes enemy power, counter damage, and your attack strength.</p>
-            </div>
-            <div className="grid grid-cols-3 gap-2">
-              {(["easy","normal","hard"] as const).map((d) => (
-                <button key={d} onClick={() => onDifficultyChange(d)}
-                  className={`px-4 py-3 rounded-xl border font-mono font-black text-xs uppercase transition-all ${
-                    battleDifficulty === d
-                      ? d === "hard" ? "border-red-400 bg-red-500/20 text-red-200 shadow-lg shadow-red-500/20"
-                      : d === "normal" ? "border-purple-400 bg-purple-500/20 text-purple-200"
-                      : "border-cyan-400 bg-cyan-500/20 text-cyan-200"
-                      : "border-white/10 bg-white/5 text-white/40 hover:bg-white/10"
-                  }`}>{d}</button>
-              ))}
-            </div>
-          </div>
-        </motion.div>
-      </div>
-    </div>
-  );
-}
-
-function RankBadge({ totalXP, compact = false }: { totalXP: number; compact?: boolean }) {
-  const rank = getRank(totalXP);
-  return (
-    <div className={`flex items-center gap-2 rounded-xl border bg-black/10 ${compact ? "px-2.5 py-1.5" : "px-3 py-2"}`} style={{ borderColor: `${rank.color}55` }}>
-      <span className={compact ? "text-base" : "text-xl"}>{rank.icon}</span>
-      <div className="min-w-0">
-        <p className="font-mono font-black truncate" style={{ color: rank.color, fontSize: compact ? 10 : 12 }}>{rank.name}</p>
-        <p className="text-white/30 font-mono" style={{ fontSize: compact ? 8 : 9 }}>{totalXP} XP</p>
-      </div>
-      <Trophy size={compact ? 12 : 15} style={{ color: rank.color }} className="ml-auto shrink-0" />
-    </div>
-  );
-}
-
-type StudentProfile = {
-  username: string;
-  yearLevel: string;
-  course: string;
-  school: string;
-  photo: string;
-};
-
 function HomeScreen({
   onStart,
   onProfile,
@@ -1062,10 +643,8 @@ function HomeScreen({
   return (
     <div className="cq-screen relative overflow-hidden px-3 sm:px-5 lg:px-8 py-4 sm:py-6">
       <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_45%_28%,rgba(139,92,246,.16),transparent_30%),radial-gradient(circle_at_75%_70%,rgba(6,182,212,.12),transparent_30%)]" />
-      <div className="absolute -top-24 left-1/3 w-80 h-80 rounded-full bg-purple-600/10 blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full bg-cyan-500/10 blur-3xl pointer-events-none" />
 
-      {/* Profile is intentionally the main top-center identity card. Clicking it opens the editable profile. */}
+      {/* Profile Identity Header */}
       <div className="relative z-20 flex justify-center">
         <motion.button
           onClick={onProfile}
@@ -1073,7 +652,6 @@ function HomeScreen({
           animate={{ opacity: 1, y: 0 }}
           whileHover={{ y: -2, scale: 1.01 }}
           className="group w-full max-w-[520px] rounded-[28px] border border-white/10 bg-black/25 backdrop-blur-2xl p-3 sm:p-4 shadow-2xl shadow-purple-500/10 text-left"
-          aria-label="Edit profile"
         >
           <div className="flex items-center gap-3 sm:gap-4">
             {profile.photo ? (
@@ -1109,51 +687,116 @@ function HomeScreen({
           </motion.div>
           <h1 className="text-6xl sm:text-7xl md:text-8xl font-mono font-black tracking-tight leading-none bg-gradient-to-r from-white via-purple-300 to-cyan-300 bg-clip-text text-transparent drop-shadow-[0_0_35px_rgba(139,92,246,.18)]">CodeQuest</h1>
           <p className="text-white/55 font-mono text-base sm:text-lg md:text-xl mt-4">&quot;Your Coding Adventure Starts Here&quot;</p>
-          <p className="text-white/30 font-mono text-[10px] sm:text-xs md:text-sm max-w-2xl mx-auto mt-3 leading-6">Choose a mode, master a language, debug broken code, survive the compiler, and become the next coding legend.</p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-3xl mx-auto mt-7">
-          {(
-            [
-              [BookOpen, `${questionCount} Questions`, "Challenge yourself"],
-              [Zap, "Earn XP", "Build your rank"],
-              [Trophy, rank.name, "Level up your skills"],
-            ] as Array<[typeof BookOpen, string, string]>
-          ).map(([Icon, title, sub], i) => {
-            const C = Icon;
-            return <motion.div key={String(title)} whileHover={{ y: -3 }} className={`rounded-2xl border p-4 text-center ${i === 0 ? "border-purple-400/20 bg-purple-500/10" : i === 1 ? "border-yellow-400/20 bg-yellow-500/10" : "border-cyan-400/20 bg-cyan-500/10"}`}><C size={22} className="mx-auto mb-2" /><p className="font-mono font-black text-sm text-white">{title}</p><p className="font-mono text-[9px] text-white/35 mt-1">{sub}</p></motion.div>;
-          })}
-        </div>
-
-        <div className="rounded-[28px] border border-purple-400/20 bg-gradient-to-br from-purple-500/10 via-black/10 to-cyan-500/10 p-4 sm:p-5 mt-5 max-w-4xl mx-auto">
-          <div className="flex items-center justify-between gap-3 mb-2"><div><p className="text-[9px] font-mono tracking-[.28em] text-purple-300">CODING JOURNEY</p><p className="font-mono font-black text-white mt-1">{rank.name}</p></div><p className="font-mono font-black text-cyan-300">{totalXP} XP</p></div>
-          <div className="h-2.5 rounded-full bg-white/10 overflow-hidden"><motion.div className="h-full rounded-full bg-gradient-to-r from-purple-500 via-fuchsia-400 to-cyan-400" animate={{ width: `${progress}%` }} transition={{ duration: .8 }} /></div>
-          <p className="text-[8px] font-mono text-white/30 mt-2">{nextRank ? `${nextRank.minXP - totalXP} XP until ${nextRank.name}` : "You have reached the highest rank."}</p>
-        </div>
-
-        <div className="flex flex-col sm:flex-row justify-center items-center gap-3 mt-6">
+        <div className="flex flex-col sm:flex-row justify-center items-center gap-3 mt-8">
           <motion.button onClick={onStart} whileHover={{ scale: 1.03 }} whileTap={{ scale: .98 }} className="w-full sm:w-auto min-w-[250px] px-8 py-4 rounded-2xl bg-gradient-to-r from-purple-600 via-fuchsia-500 to-cyan-500 text-white font-mono font-black text-lg shadow-2xl shadow-purple-500/20">Start Playing <ArrowRight size={20} className="inline ml-2"/></motion.button>
           <button onClick={onDuel} className="w-full sm:w-auto px-7 py-4 rounded-2xl border border-pink-400/30 bg-pink-500/10 text-pink-300 font-mono font-black text-sm hover:bg-pink-500/15"><Users size={17} className="inline mr-2"/>1v1 Friend Arena</button>
         </div>
+      </motion.main>
+    </div>
+  );
+}
 
-        <div className="mt-7 grid sm:grid-cols-3 gap-3 max-w-5xl mx-auto">
-          <div className="rounded-2xl border border-cyan-400/15 bg-cyan-500/5 p-4 text-center">
-            <p className="text-[8px] font-mono tracking-[.22em] text-cyan-300">CREATOR</p>
-            <p className="text-xs sm:text-sm font-mono font-black text-white mt-1">Elmer Makig-angay</p>
-            <p className="text-[9px] font-mono text-white/35 mt-1">Aspiring web developer</p>
+function ModesScreen({
+  onSelect,
+  onBack,
+  battleDifficulty,
+  onDifficultyChange,
+}: {
+  onSelect: (mode: GameMode) => void;
+  onBack: () => void;
+  battleDifficulty: "easy" | "normal" | "hard";
+  onDifficultyChange: (d: "easy" | "normal" | "hard") => void;
+}) {
+  const modes = [
+    { id: "practice" as GameMode, icon: "🧠", title: "Practice Mode", desc: "Relaxed learning with explanations after every answer.", color: "#8b5cf6", questions: "20 questions" },
+    { id: "battle" as GameMode, icon: "⚔️", title: "Battle Mode", desc: "Correct answers unleash ultra-fast combo attacks against the Cyber Beast.", color: "#ef4444", questions: "20 questions" },
+    { id: "speed" as GameMode, icon: "⚡", title: "Speed Mode", desc: "Race the clock and finish before time runs out.", color: "#f59e0b", questions: "20 questions · 60 sec" },
+    { id: "debug" as GameMode, icon: "🐛", title: "Bug Hunter", desc: "Open broken code, identify the bug, and fix it.", color: "#22c55e", questions: "20 bug fixes" },
+    { id: "survival" as GameMode, icon: "🔥", title: "Code Survival", desc: "Keep your run alive. Wrong answers drain your life.", color: "#06b6d4", questions: "20 lives-on-the-line" },
+    { id: "compiler" as GameMode, icon: "⌨️", title: "Compiler Lab", desc: "Type missing code directly into the terminal.", color: "#22d3ee", questions: "20 typing challenges" },
+  ];
+
+  return (
+    <div className="cq-screen px-4 sm:px-6 py-10">
+      <div className="max-w-5xl mx-auto">
+        <button onClick={onBack} className="flex items-center gap-2 text-white/50 hover:text-white font-mono text-sm mb-8"><ArrowLeft size={16}/> Back</button>
+        <div className="text-center mb-10"><Gamepad2 className="mx-auto text-purple-400 mb-3" size={40}/><h2 className="text-4xl md:text-5xl font-mono font-black text-white">CHOOSE YOUR GAME</h2></div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {modes.map((mode) => (
+            <motion.button key={mode.id} onClick={() => onSelect(mode.id)} whileHover={{ y: -5, scale: 1.01 }} whileTap={{ scale: .98 }}
+              className="text-left rounded-3xl border border-white/10 bg-white/5 p-6 hover:bg-white/10 transition-all shadow-xl">
+              <div className="text-5xl mb-5">{mode.icon}</div>
+              <h3 className="text-xl font-mono font-black text-white mb-2">{mode.title}</h3>
+              <p className="text-white/50 text-sm font-mono leading-relaxed mb-5">{mode.desc}</p>
+              <div className="flex items-center justify-between"><span className="text-xs font-mono" style={{color:mode.color}}>{mode.questions}</span><ArrowRight size={17} className="text-white/30"/></div>
+            </motion.button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MusicSelectionScreen({
+  selectedTrack,
+  onSelect,
+  onBack,
+}: {
+  selectedTrack: MusicTrack;
+  onSelect: (track: MusicTrack) => void;
+  onBack: () => void;
+}) {
+  const [category, setCategory] = useState("All");
+  const categories = ["All", "OPM", "The Weeknd", "Pop", "Rock / Alt", "Focus"];
+  const visibleTracks = category === "All" ? SPOTIFY_TRACKS : SPOTIFY_TRACKS.filter((t) => t.category === category);
+
+  return (
+    <div className="cq-screen px-3 sm:px-5 py-6 sm:py-8 relative overflow-hidden">
+      <div className="max-w-5xl mx-auto relative">
+        <button onClick={onBack} className="flex items-center gap-2 text-white/50 hover:text-white font-mono text-sm mb-8">
+          <ArrowLeft size={16} /> Back
+        </button>
+
+        <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-8">
+          <Music size={40} className="mx-auto text-green-400 mb-3" />
+          <h2 className="text-4xl md:text-5xl font-mono font-black text-white">CHOOSE SOUNDTRACK</h2>
+        </motion.div>
+
+        <div className="rounded-3xl border border-green-500/20 bg-black/40 p-4 sm:p-6 shadow-2xl">
+          <div className="flex flex-wrap gap-2 pb-2 mb-4">
+            {categories.map((item) => (
+              <button key={item} onClick={() => setCategory(item)}
+                className={`shrink-0 px-3 py-2 rounded-full text-[10px] font-mono border ${
+                  category === item ? "bg-green-500/20 border-green-400/50 text-green-300" : "bg-white/5 border-white/10 text-white/50"
+                }`}>
+                {item}
+              </button>
+            ))}
           </div>
-          <div className="rounded-2xl border border-purple-400/15 bg-purple-500/5 p-4 text-center">
-            <p className="text-[8px] font-mono tracking-[.22em] text-purple-300">QUEST ENGINE</p>
-            <p className="text-xs sm:text-sm font-mono font-black text-white mt-1">20 challenges per mode</p>
-            <p className="text-[9px] font-mono text-white/35 mt-1">Battle · Speed · Debug · Survival · Compiler</p>
-          </div>
-          <div className="rounded-2xl border border-pink-400/15 bg-pink-500/5 p-4 text-center">
-            <p className="text-[8px] font-mono tracking-[.22em] text-pink-300">GLOBAL VIBE</p>
-            <p className="text-xs sm:text-sm font-mono font-black text-white mt-1">One soundtrack, everywhere</p>
-            <p className="text-[9px] font-mono text-white/35 mt-1">Choose music from your profile</p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {visibleTracks.map((track) => (
+              <motion.button key={track.id} whileHover={{ y: -2 }} whileTap={{ scale: .98 }} onClick={() => {
+                onSelect(track);
+                globalSound.setTrack(track);
+              }}
+                className={`text-left p-4 rounded-2xl border transition-all ${
+                  selectedTrack.id === track.id ? "border-green-400/60 bg-green-500/15 shadow-lg shadow-green-500/10" : "border-white/10 bg-white/5 hover:bg-white/10"
+                }`}>
+                <div className="flex items-center gap-3">
+                  <Music size={17} className={selectedTrack.id === track.id ? "text-green-300" : "text-white/50"} />
+                  <div className="min-w-0">
+                    <p className="font-mono font-black text-sm text-white truncate">{track.title}</p>
+                    <p className="font-mono text-[10px] text-white/40 truncate">{track.artist}</p>
+                  </div>
+                </div>
+              </motion.button>
+            ))}
           </div>
         </div>
-      </motion.main>
+      </div>
     </div>
   );
 }
@@ -1184,15 +827,11 @@ function ProfileScreen({
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
-    if (!form.username.trim() || !form.yearLevel || !form.course.trim() || !form.school.trim()) {
-      alert("Please complete all student profile fields.");
-      return;
-    }
     onSave({
-      username: form.username.trim(),
-      yearLevel: form.yearLevel,
-      course: form.course.trim(),
-      school: form.school.trim(),
+      username: form.username.trim() || "Code Warrior",
+      yearLevel: form.yearLevel || "1st Year",
+      course: form.course.trim() || "Computer Science",
+      school: form.school.trim() || "Tech Academy",
       photo: form.photo || "",
     });
   };
@@ -1204,122 +843,44 @@ function ProfileScreen({
           <ArrowLeft size={16} /> Back
         </button>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="rounded-2xl border border-white/10 bg-white/5 p-6 md:p-8"
-        >
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center">
-              <User className="text-purple-400" />
-            </div>
-            <div>
-              <h2 className="text-2xl font-mono font-black text-white">Student Profile</h2>
-              <p className="text-white/40 text-sm font-mono">Enter your information before starting.</p>
-            </div>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="rounded-2xl border border-white/10 bg-white/5 p-6 md:p-8">
+          <div className="flex items-center gap-3 mb-4">
+            <User className="text-purple-400" size={28} />
+            <h2 className="text-2xl font-mono font-black text-white">Student Profile</h2>
           </div>
 
           <div className="mb-5">
             <RankBadge totalXP={totalXP} />
           </div>
 
-          <div className="mb-5 rounded-2xl border border-white/10 bg-black/10 p-4">
-            <div className="flex items-center gap-2 mb-3">
-              <Menu size={15} className="text-cyan-300" />
-              <span className="text-[10px] font-mono font-black tracking-[0.24em] text-cyan-300">SETTINGS</span>
-            </div>
-            <button type="button" onClick={onToggleTheme} className="flex w-full items-center justify-between rounded-xl border border-white/10 bg-white/5 px-3 py-3 text-left">
+          <div className="mb-5 rounded-2xl border border-white/10 bg-black/10 p-4 space-y-2">
+            <button type="button" onClick={onMusic} className="flex w-full items-center justify-between rounded-xl border border-green-400/20 bg-green-500/5 px-3 py-3 text-left hover:bg-green-500/10 transition-all">
               <span className="flex items-center gap-2">
-                {darkMode ? <Sun size={16} className="text-yellow-300" /> : <Moon size={16} className="text-cyan-300" />}
-                <span className="text-sm font-mono text-white/80">{darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}</span>
-              </span>
-              <span className="text-[11px] font-mono text-white/40">{darkMode ? "Light" : "Dark"}</span>
-            </button>
-            <button type="button" onClick={onMusic} className="mt-2 flex w-full items-center justify-between rounded-xl border border-green-400/20 bg-green-500/5 px-3 py-3 text-left hover:bg-green-500/10 transition-all">
-              <span className="flex items-center gap-2 min-w-0">
                 <Music size={16} className="text-green-300 shrink-0" />
-                <span className="min-w-0">
-                  <span className="block text-sm font-mono text-white/80">Global Music</span>
-                  <span className="block text-[9px] font-mono text-white/35 truncate">Only your profile can change the soundtrack</span>
-                </span>
+                <span className="text-sm font-mono text-white/80">Global Music Track</span>
               </span>
-              <span className="text-[10px] font-mono text-green-300 truncate max-w-[120px]">{selectedTrack.title}</span>
+              <span className="text-[10px] font-mono text-green-300 truncate">{selectedTrack.title}</span>
             </button>
           </div>
 
-          <form onSubmit={submit} className="space-y-4 mt-7">
+          <form onSubmit={submit} className="space-y-4">
             <label className="block">
               <span className="text-xs font-mono text-white/50">Username</span>
-              <div className="relative mt-2">
-                <User size={16} className="absolute left-3 top-3.5 text-white/30" />
-                <input value={form.username} onChange={(e) => update("username", e.target.value)}
-                  placeholder="e.g. ElmerMak"
-                  className="w-full rounded-xl border border-white/10 bg-black/20 text-white placeholder:text-white/25 pl-10 pr-4 py-3 outline-none focus:border-purple-500/60" />
-              </div>
+              <input value={form.username} onChange={(e) => update("username", e.target.value)} className="w-full mt-1 rounded-xl border border-white/10 bg-black/20 text-white px-4 py-2.5 font-mono text-sm" />
             </label>
-
             <label className="block">
               <span className="text-xs font-mono text-white/50">Year Level</span>
-              <div className="relative mt-2">
-                <GraduationCap size={16} className="absolute left-3 top-3.5 text-white/30" />
-                <select value={form.yearLevel} onChange={(e) => update("yearLevel", e.target.value)}
-                  className="w-full rounded-xl border border-white/10 bg-[#11111f] text-white pl-10 pr-4 py-3 outline-none focus:border-purple-500/60">
-                  <option value="">Select year level</option>
-                  <option>1st Year</option>
-                  <option>2nd Year</option>
-                  <option>3rd Year</option>
-                  <option>4th Year</option>
-                  <option>5th Year</option>
-                  <option>Graduate / Other</option>
-                </select>
-              </div>
+              <input value={form.yearLevel} onChange={(e) => update("yearLevel", e.target.value)} className="w-full mt-1 rounded-xl border border-white/10 bg-black/20 text-white px-4 py-2.5 font-mono text-sm" />
             </label>
-
             <label className="block">
               <span className="text-xs font-mono text-white/50">Course</span>
-              <div className="relative mt-2">
-                <BookOpenCheck size={16} className="absolute left-3 top-3.5 text-white/30" />
-                <input value={form.course} onChange={(e) => update("course", e.target.value)}
-                  placeholder="e.g. BS Information Technology"
-                  className="w-full rounded-xl border border-white/10 bg-black/20 text-white placeholder:text-white/25 pl-10 pr-4 py-3 outline-none focus:border-purple-500/60" />
-              </div>
+              <input value={form.course} onChange={(e) => update("course", e.target.value)} className="w-full mt-1 rounded-xl border border-white/10 bg-black/20 text-white px-4 py-2.5 font-mono text-sm" />
             </label>
-
             <label className="block">
               <span className="text-xs font-mono text-white/50">School</span>
-              <div className="relative mt-2">
-                <School size={16} className="absolute left-3 top-3.5 text-white/30" />
-                <input value={form.school} onChange={(e) => update("school", e.target.value)}
-                  placeholder="e.g. Your University"
-                  className="w-full rounded-xl border border-white/10 bg-black/20 text-white placeholder:text-white/25 pl-10 pr-4 py-3 outline-none focus:border-purple-500/60" />
-              </div>
+              <input value={form.school} onChange={(e) => update("school", e.target.value)} className="w-full mt-1 rounded-xl border border-white/10 bg-black/20 text-white px-4 py-2.5 font-mono text-sm" />
             </label>
-
-
-            <div>
-              <span className="text-xs font-mono text-white/50">Profile Photo</span>
-              <div className="mt-2 flex items-center gap-4">
-                {form.photo ? <img src={form.photo} className="w-20 h-20 rounded-2xl object-cover border border-purple-500/30" alt="Profile preview" /> :
-                  <div className="w-20 h-20 rounded-2xl bg-purple-500/10 border border-white/10 flex items-center justify-center"><Camera className="text-white/30" /></div>}
-                <label className="cursor-pointer flex items-center gap-2 px-4 py-3 rounded-xl border border-white/10 bg-white/5 text-white/70 text-xs font-mono">
-                  <Camera size={15}/> {form.photo ? "Change Photo" : "Choose Photo"}
-                  <input type="file" accept="image/*" className="hidden" onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (!file) return;
-                    if (file.size > 2 * 1024 * 1024) { alert("Please choose an image smaller than 2MB."); return; }
-                    const reader = new FileReader();
-                    reader.onload = () => update("photo", String(reader.result));
-                    reader.readAsDataURL(file);
-                  }} />
-                </label>
-              </div>
-              <p className="text-white/25 text-xs font-mono mt-2">For winning profiles, add a clear student photo.</p>
-            </div>
-
-            <button type="submit"
-              className="w-full mt-3 py-4 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-600 text-white font-mono font-bold">
-              Save Profile & Continue <ArrowRight size={17} className="inline ml-2" />
-            </button>
+            <button type="submit" className="w-full mt-4 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-600 text-white font-mono font-bold">Save Profile</button>
           </form>
         </motion.div>
       </div>
@@ -1327,100 +888,18 @@ function ProfileScreen({
   );
 }
 
-function GuidelinesScreen({ onContinue, onBack }: { onContinue: () => void; onBack: () => void }) {
-  const guidelines = [
-    "Read each question carefully before selecting an answer.",
-    "Each language has 7 challenges with different XP values.",
-    "After answering, review the explanation to learn from mistakes.",
-    "Correct answers increase your XP and can build your streak.",
-    "Do not refresh the page while answering if you want to keep your current quiz.",
-    "You can listen to your selected soundtrack while answering by using the Music button.",
-    "Use the profile section to update your student information anytime.",
-  ];
-
-  return (
-    <div className="cq-screen px-6 py-10">
-      <div className="max-w-2xl mx-auto">
-        <button onClick={onBack} className="flex items-center gap-2 text-white/50 hover:text-white font-mono text-sm mb-8">
-          <ArrowLeft size={16} /> Back
-        </button>
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-          className="rounded-2xl border border-white/10 bg-white/5 p-7">
-          <div className="flex items-center gap-3 mb-7">
-            <BookOpenCheck className="text-cyan-400" />
-            <div>
-              <h2 className="text-2xl font-mono font-black text-white">Quiz Guidelines</h2>
-              <p className="text-white/40 text-sm font-mono">Follow these rules for a better learning experience.</p>
-            </div>
-          </div>
-
-          <div className="space-y-3 mb-8">
-            {guidelines.map((item, i) => (
-              <div key={item} className="flex gap-3 rounded-xl border border-white/10 bg-white/5 p-4">
-                <span className="w-6 h-6 shrink-0 rounded-full bg-purple-500/20 text-purple-300 flex items-center justify-center text-xs font-mono font-bold">{i + 1}</span>
-                <p className="text-white/70 text-sm font-mono leading-relaxed">{item}</p>
-              </div>
-            ))}
-          </div>
-
-          <button onClick={onContinue}
-            className="w-full py-4 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-600 text-white font-mono font-bold">
-            Choose a Language <ArrowRight size={17} className="inline ml-2" />
-          </button>
-        </motion.div>
-      </div>
-    </div>
-  );
-}
-
-function LanguageScreen({ onSelect }: { onSelect: (lang: string) => void }) {
+function LanguageScreen({ onSelect, onBack }: { onSelect: (lang: string) => void; onBack: () => void }) {
   return (
     <div className="cq-screen px-6 py-12">
       <div className="max-w-4xl mx-auto">
-        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-12">
-          <h2 className="text-4xl font-mono font-black text-white mb-3">
-            Pick Your Language
-          </h2>
-          <p className="text-white/40 font-mono text-sm">{"Choose a language to begin your quest"}</p>
-        </motion.div>
-
+        <button onClick={onBack} className="flex items-center gap-2 text-white/50 hover:text-white font-mono text-sm mb-8"><ArrowLeft size={16}/> Back</button>
+        <div className="text-center mb-10"><h2 className="text-4xl font-mono font-black text-white">Pick Your Language</h2></div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {LANGUAGES.map((lang, i) => (
-            <motion.button
-              key={lang.id}
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.08 }}
-              onClick={() => onSelect(lang.id)}
-              className="group text-left p-6 rounded-2xl border border-white/10 bg-white/5 relative overflow-hidden"
-              whileHover={{ scale: 1.03, borderColor: lang.color }}
-              whileTap={{ scale: 0.97 }}
-              style={{ "--hover-color": lang.color } as any}
-            >
-              {/* glow background */}
-              <div
-                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                style={{ background: `radial-gradient(ellipse at 30% 30%, ${lang.bg} 0%, transparent 70%)` }}
-              />
-
-              <div className="relative">
-                <div className="flex items-start justify-between mb-4">
-                  <span className="text-4xl">{lang.icon}</span>
-                  <ChevronRight
-                    size={18}
-                    className="text-white/20 group-hover:text-white/60 group-hover:translate-x-1 transition-all"
-                  />
-                </div>
-                <h3 className="text-xl font-mono font-bold text-white mb-2">{lang.name}</h3>
-                <p className="text-sm text-white/40 leading-relaxed">{lang.desc}</p>
-
-                <div className="mt-4 flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: lang.color }} />
-                  <span className="text-xs font-mono" style={{ color: lang.color }}>
-                    20 challenges · ~10 min
-                  </span>
-                </div>
-              </div>
+          {LANGUAGES.map((lang) => (
+            <motion.button key={lang.id} onClick={() => onSelect(lang.id)} whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="text-left p-6 rounded-2xl border border-white/10 bg-white/5">
+              <span className="text-4xl block mb-2">{lang.icon}</span>
+              <h3 className="text-xl font-mono font-bold text-white">{lang.name}</h3>
+              <p className="text-xs text-white/40 mt-1">{lang.desc}</p>
             </motion.button>
           ))}
         </div>
@@ -1429,1320 +908,639 @@ function LanguageScreen({ onSelect }: { onSelect: (lang: string) => void }) {
   );
 }
 
-function GameScreen({
+function GuidelinesScreen({ onContinue, onBack }: { onContinue: () => void; onBack: () => void }) {
+  return (
+    <div className="cq-screen px-6 py-10">
+      <div className="max-w-2xl mx-auto">
+        <button onClick={onBack} className="flex items-center gap-2 text-white/50 hover:text-white font-mono text-sm mb-8"><ArrowLeft size={16} /> Back</button>
+        <div className="rounded-2xl border border-white/10 bg-white/5 p-7">
+          <h2 className="text-2xl font-mono font-black text-white mb-4">Quiz Guidelines</h2>
+          <ul className="space-y-3 text-white/70 font-mono text-sm mb-6 list-disc pl-5">
+            <li>Answer questions accurately to build streak and earn XP.</li>
+            <li>In Battle Mode, correct answers hit the Cyber Beast with massive particle fx.</li>
+            <li>In 1v1 Arena, players take turns on the same device in a intense real-time clash.</li>
+          </ul>
+          <button onClick={onContinue} className="w-full py-4 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-600 text-white font-mono font-bold">Choose Language <ArrowRight size={17} className="inline ml-2" /></button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── HIGH-VOLTAGE BATTLE MODE SCREEN ───────────────────────────────────────────
+
+function BattleGameScreen({
+  langId,
+  onFinish,
+}: {
+  langId: string;
+  onFinish: (score: number, xp: number, correct: number) => void;
+}) {
+  const questions = QUESTIONS[langId] || QUESTIONS.javascript;
+  const [qIndex, setQIndex] = useState(0);
+  const [selected, setSelected] = useState<number | null>(null);
+  const [playerHP, setPlayerHP] = useState(100);
+  const [bossHP, setBossHP] = useState(100);
+  const [attackAnim, setAttackAnim] = useState<"player" | "boss" | null>(null);
+  const [combo, setCombo] = useState(0);
+  const [totalXP, setTotalXP] = useState(0);
+  const [correctCount, setCorrectCount] = useState(0);
+  const [fxText, setFxText] = useState<string | null>(null);
+
+  const currentQ = questions[qIndex];
+
+  const handleAnswer = (index: number) => {
+    if (selected !== null) return;
+    setSelected(index);
+
+    const isCorrect = index === currentQ.answer;
+
+    if (isCorrect) {
+      globalSound.playSfx("correct");
+      globalSound.playSfx("attack");
+      setAttackAnim("player");
+      setCombo((c) => c + 1);
+      setCorrectCount((c) => c + 1);
+      setTotalXP((x) => x + currentQ.xp * (1 + combo * 0.2));
+      setBossHP((hp) => Math.max(0, hp - 12));
+      setFxText(`CRITICAL HIT! +${Math.round(currentQ.xp * (1 + combo * 0.2))} XP`);
+    } else {
+      globalSound.playSfx("wrong");
+      globalSound.playSfx("hit");
+      setAttackAnim("boss");
+      setCombo(0);
+      setPlayerHP((hp) => Math.max(0, hp - 18));
+      setFxText("COUNTERED! -18 HP");
+    }
+
+    setTimeout(() => {
+      setAttackAnim(null);
+      setFxText(null);
+      setSelected(null);
+
+      if (qIndex < questions.length - 1 && playerHP > 0 && bossHP > 0) {
+        setQIndex((i) => i + 1);
+      } else {
+        globalSound.playSfx("finish");
+        onFinish(Math.round((correctCount / questions.length) * 100), totalXP, correctCount);
+      }
+    }, 1200);
+  };
+
+  return (
+    <div className="cq-screen p-4 sm:p-6 relative overflow-hidden bg-slate-950 flex flex-col justify-between">
+      {/* Visual FX background pulses */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(239,68,68,0.15),transparent_70%)] pointer-events-none" />
+
+      {/* Top Combat Stage Header */}
+      <div className="relative z-10 grid grid-cols-2 gap-4 max-w-4xl mx-auto w-full border border-red-500/30 bg-black/60 rounded-3xl p-4 backdrop-blur-xl">
+        {/* Player Stats */}
+        <div className="flex flex-col gap-1">
+          <div className="flex justify-between items-center text-xs font-mono text-cyan-400 font-bold">
+            <span>WARRIOR</span>
+            <span>{playerHP} HP</span>
+          </div>
+          <div className="w-full h-3 bg-white/10 rounded-full overflow-hidden border border-cyan-500/30">
+            <motion.div className="h-full bg-gradient-to-r from-cyan-500 to-blue-500" animate={{ width: `${playerHP}%` }} />
+          </div>
+        </div>
+
+        {/* Boss Stats */}
+        <div className="flex flex-col gap-1 text-right">
+          <div className="flex justify-between items-center text-xs font-mono text-red-400 font-bold">
+            <span>CYBER BEAST</span>
+            <span>{bossHP} HP</span>
+          </div>
+          <div className="w-full h-3 bg-white/10 rounded-full overflow-hidden border border-red-500/30">
+            <motion.div className="h-full bg-gradient-to-r from-red-600 to-orange-500" animate={{ width: `${bossHP}%` }} />
+          </div>
+        </div>
+      </div>
+
+      {/* Center Dynamic Battle Field */}
+      <div className="relative z-10 flex items-center justify-between max-w-2xl mx-auto w-full my-6 min-h-[160px]">
+        {/* Player Sprite Avatar */}
+        <motion.div
+          animate={attackAnim === "player" ? { x: [0, 120, 0], scale: [1, 1.3, 1] } : attackAnim === "boss" ? { x: [-10, 10, -10, 0] } : { y: [0, -8, 0] }}
+          transition={{ duration: 0.5, repeat: attackAnim ? 0 : Infinity }}
+          className="relative flex items-center justify-center w-24 h-24 rounded-3xl bg-cyan-500/20 border-2 border-cyan-400 shadow-[0_0_30px_rgba(6,182,212,0.4)]"
+        >
+          <Swords className="text-cyan-300" size={40} />
+          {combo > 1 && (
+            <span className="absolute -top-3 -right-3 bg-yellow-400 text-black font-mono font-black text-xs px-2 py-0.5 rounded-full shadow-lg">
+              {combo}x COMBO
+            </span>
+          )}
+        </motion.div>
+
+        {/* Center FX Overlay */}
+        <AnimatePresence>
+          {fxText && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.5, y: 10 }}
+              animate={{ opacity: 1, scale: 1.2, y: -20 }}
+              exit={{ opacity: 0 }}
+              className="font-mono font-black text-xl sm:text-2xl text-yellow-300 drop-shadow-[0_0_15px_rgba(234,179,8,0.8)] text-center"
+            >
+              {fxText}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Boss Sprite Avatar */}
+        <motion.div
+          animate={attackAnim === "boss" ? { x: [0, -120, 0], scale: [1, 1.3, 1] } : attackAnim === "player" ? { x: [10, -10, 10, 0] } : { y: [0, 8, 0] }}
+          transition={{ duration: 0.5, repeat: attackAnim ? 0 : Infinity }}
+          className="relative flex items-center justify-center w-24 h-24 rounded-3xl bg-red-500/20 border-2 border-red-500 shadow-[0_0_30px_rgba(239,68,68,0.4)]"
+        >
+          <Flame className="text-red-500" size={44} />
+        </motion.div>
+      </div>
+
+      {/* Battle Question Box */}
+      <div className="relative z-10 max-w-3xl mx-auto w-full bg-black/80 border border-white/10 rounded-3xl p-5 backdrop-blur-2xl">
+        <p className="text-xs font-mono text-red-400 font-bold mb-2">BATTLE STAGE {qIndex + 1} / {questions.length}</p>
+        <h3 className="text-lg sm:text-xl font-mono font-bold text-white mb-4">{currentQ.question}</h3>
+        {currentQ.code && <div className="mb-4"><CodeBlock code={currentQ.code} /></div>}
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {currentQ.options.map((opt, idx) => (
+            <button
+              key={idx}
+              disabled={selected !== null}
+              onClick={() => handleAnswer(idx)}
+              className={`p-4 rounded-xl text-left font-mono text-sm border transition-all ${
+                selected === idx
+                  ? idx === currentQ.answer
+                    ? "bg-green-500/30 border-green-400 text-white"
+                    : "bg-red-500/30 border-red-400 text-white"
+                  : "bg-white/5 border-white/10 text-white/80 hover:bg-white/10 hover:border-red-400/50"
+              }`}
+            >
+              {opt}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── HIGH-VOLTAGE 1V1 DUEL ARENA ─────────────────────────────────────────────
+
+function DuelArenaScreen({
+  p1Name,
+  p2Name,
+  langId,
+  onFinish,
+}: {
+  p1Name: string;
+  p2Name: string;
+  langId: string;
+  onFinish: (winner: string, p1Score: number, p2Score: number) => void;
+}) {
+  const questions = QUESTIONS[langId] || QUESTIONS.javascript;
+  const [turn, setTurn] = useState<1 | 2>(1);
+  const [qIndex, setQIndex] = useState(0);
+  const [p1HP, setP1HP] = useState(100);
+  const [p2HP, setP2HP] = useState(100);
+  const [selected, setSelected] = useState<number | null>(null);
+  const [fx, setFx] = useState<string | null>(null);
+
+  const currentQ = questions[qIndex];
+
+  const handleSelect = (idx: number) => {
+    if (selected !== null) return;
+    setSelected(idx);
+
+    const isCorrect = idx === currentQ.answer;
+
+    if (turn === 1) {
+      if (isCorrect) {
+        globalSound.playSfx("correct");
+        setP2HP((hp) => Math.max(0, hp - 20));
+        setFx(`${p1Name} STRIKES FOR 20 DMG!`);
+      } else {
+        globalSound.playSfx("wrong");
+        setP1HP((hp) => Math.max(0, hp - 10));
+        setFx(`${p1Name} MISSED! 10 BACKFIRE DMG!`);
+      }
+    } else {
+      if (isCorrect) {
+        globalSound.playSfx("correct");
+        setP1HP((hp) => Math.max(0, hp - 20));
+        setFx(`${p2Name} STRIKES FOR 20 DMG!`);
+      } else {
+        globalSound.playSfx("wrong");
+        setP2HP((hp) => Math.max(0, hp - 10));
+        setFx(`${p2Name} MISSED! 10 BACKFIRE DMG!`);
+      }
+    }
+
+    setTimeout(() => {
+      setSelected(null);
+      setFx(null);
+
+      if (p1HP <= 0 || p2HP <= 0 || qIndex >= questions.length - 1) {
+        const winner = p1HP > p2HP ? p1Name : p2HP > p1HP ? p2Name : "DRAW";
+        onFinish(winner, p1HP, p2HP);
+      } else {
+        setTurn(turn === 1 ? 2 : 1);
+        if (turn === 2) setQIndex((i) => i + 1);
+      }
+    }, 1200);
+  };
+
+  return (
+    <div className="cq-screen p-4 sm:p-6 relative bg-zinc-950 flex flex-col justify-between">
+      {/* 1v1 Status Header */}
+      <div className="grid grid-cols-2 gap-4 max-w-4xl mx-auto w-full border border-purple-500/30 bg-black/80 rounded-3xl p-4 backdrop-blur-2xl">
+        {/* Player 1 Status */}
+        <div className={`p-3 rounded-2xl border transition-all ${turn === 1 ? "border-cyan-400 bg-cyan-500/10 shadow-[0_0_20px_rgba(6,182,212,0.3)]" : "border-white/5 opacity-60"}`}>
+          <div className="flex justify-between items-center text-xs font-mono text-cyan-300 font-bold mb-1">
+            <span>P1: {p1Name}</span>
+            <span>{p1HP} HP</span>
+          </div>
+          <div className="w-full h-2.5 bg-white/10 rounded-full overflow-hidden">
+            <div className="h-full bg-cyan-400" style={{ width: `${p1HP}%` }} />
+          </div>
+        </div>
+
+        {/* Player 2 Status */}
+        <div className={`p-3 rounded-2xl border transition-all ${turn === 2 ? "border-pink-400 bg-pink-500/10 shadow-[0_0_20px_rgba(236,72,153,0.3)]" : "border-white/5 opacity-60"}`}>
+          <div className="flex justify-between items-center text-xs font-mono text-pink-300 font-bold mb-1">
+            <span>P2: {p2Name}</span>
+            <span>{p2HP} HP</span>
+          </div>
+          <div className="w-full h-2.5 bg-white/10 rounded-full overflow-hidden">
+            <div className="h-full bg-pink-400" style={{ width: `${p2HP}%` }} />
+          </div>
+        </div>
+      </div>
+
+      {/* Turn Indicator & FX */}
+      <div className="text-center my-4">
+        <span className={`inline-block px-4 py-1.5 rounded-full text-xs font-mono font-black ${turn === 1 ? "bg-cyan-500/20 text-cyan-300 border border-cyan-400" : "bg-pink-500/20 text-pink-300 border border-pink-400"}`}>
+          {turn === 1 ? `${p1Name.toUpperCase()}'S TURN` : `${p2Name.toUpperCase()}'S TURN`}
+        </span>
+        {fx && <p className="mt-2 text-yellow-300 font-mono font-bold text-sm animate-bounce">{fx}</p>}
+      </div>
+
+      {/* Question Arena */}
+      <div className="max-w-3xl mx-auto w-full bg-black/80 border border-white/10 rounded-3xl p-5">
+        <p className="text-xs font-mono text-white/40 mb-2">ROUND {qIndex + 1}</p>
+        <h3 className="text-lg font-mono font-bold text-white mb-4">{currentQ.question}</h3>
+        {currentQ.code && <div className="mb-4"><CodeBlock code={currentQ.code} /></div>}
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {currentQ.options.map((opt, idx) => (
+            <button
+              key={idx}
+              disabled={selected !== null}
+              onClick={() => handleSelect(idx)}
+              className={`p-4 rounded-xl text-left font-mono text-sm border transition-all ${
+                selected === idx
+                  ? idx === currentQ.answer
+                    ? "bg-green-500/30 border-green-400 text-white"
+                    : "bg-red-500/30 border-red-400 text-white"
+                  : "bg-white/5 border-white/10 text-white/80 hover:bg-white/10"
+              }`}
+            >
+              {opt}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Standard Game Screen (Practice, Speed, Bug Hunter, etc.) ────────────────
+
+function StandardGameScreen({
   langId,
   mode,
-  battleDifficulty = "normal",
   onFinish,
 }: {
   langId: string;
   mode: GameMode;
-  battleDifficulty?: "easy" | "normal" | "hard";
   onFinish: (score: number, xp: number, correct: number) => void;
 }) {
   const allQuestions = QUESTIONS[langId] ?? [];
   const debugQuestions = DEBUG_QUESTIONS_BY_LANGUAGE[langId] ?? DEBUG_QUESTIONS;
   const questions = mode === "debug" ? expandTo20(debugQuestions, langId) : allQuestions.slice(0, 20);
-  const lang = LANGUAGES.find((l) => l.id === langId)!;
+
   const [qIndex, setQIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [answerState, setAnswerState] = useState<AnswerState>("idle");
   const [totalXP, setTotalXP] = useState(0);
   const [correctCount, setCorrectCount] = useState(0);
   const [streak, setStreak] = useState(0);
-  const [showParticles, setShowParticles] = useState(false);
-  const [particleCorrect, setParticleCorrect] = useState(false);
   const [showExplanation, setShowExplanation] = useState(false);
-  const [xpLevel, setXpLevel] = useState(1);
-  const [enemyHP, setEnemyHP] = useState(100);
-  const [playerHP, setPlayerHP] = useState(100);
-  const [battleMessage, setBattleMessage] = useState("Choose your attack.");
-  const [attackFx, setAttackFx] = useState<"player" | "enemy" | null>(null);
-  const [hitFx, setHitFx] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(mode === "speed" ? 60 : 0);
-  const [soundEnabled, setSoundEnabled] = useState(true);
-  const finishedRef = useRef(false);
-  const battleSkills = ["Code Slash", "Logic Strike", "Debug Blast", "Syntax Smash", "Algorithm Beam", "Quantum Break", "Neon Compile", "Final Function"];
-
-  const playSfx = useCallback((kind: "correct" | "wrong" | "click" | "timer" | "finish") => {
-    if (!soundEnabled || typeof window === "undefined") return;
-    try {
-      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
-      const ctx = new AudioCtx();
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      const frequencies = {
-        correct: [660, 880, 1046], wrong: [220, 160], click: [420], timer: [740, 520], finish: [523, 659, 784],
-      }[kind];
-      osc.type = kind === "wrong" ? "sawtooth" : "sine";
-      osc.frequency.setValueAtTime(frequencies[0], ctx.currentTime);
-      frequencies.slice(1).forEach((f, i) => osc.frequency.setValueAtTime(f, ctx.currentTime + (i + 1) * 0.08));
-      gain.gain.setValueAtTime(0.0001, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(kind === "wrong" ? 0.05 : 0.08, ctx.currentTime + 0.01);
-      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.25);
-      osc.connect(gain); gain.connect(ctx.destination); osc.start(); osc.stop(ctx.currentTime + 0.27);
-      setTimeout(() => ctx.close(), 350);
-    } catch {}
-  }, [soundEnabled]);
 
   const currentQ = questions[qIndex];
-  const isLast = qIndex === questions.length - 1;
 
-  const finishGame = useCallback(() => {
-    if (finishedRef.current) return;
-    finishedRef.current = true;
-    playSfx("finish");
-    onFinish(Math.round((correctCount / questions.length) * 100), totalXP, correctCount);
-  }, [correctCount, onFinish, playSfx, questions.length, totalXP]);
-
-  useEffect(() => {
-    if (mode !== "speed") return;
-    if (timeLeft <= 0) {
-      finishGame();
-      return;
-    }
-    const timer = window.setInterval(() => setTimeLeft((t) => t - 1), 1000);
-    return () => window.clearInterval(timer);
-  }, [mode, timeLeft, finishGame]);
-
-  useEffect(() => {
-    if (mode === "speed" && timeLeft > 0 && timeLeft <= 10) playSfx("timer");
-  }, [timeLeft, mode, playSfx]);
-
-  const handleSelect = useCallback((idx: number) => {
-    if (answerState !== "idle" || finishedRef.current) return;
+  const handleSelect = (idx: number) => {
+    if (selected !== null) return;
     setSelected(idx);
-    const correct = idx === currentQ.answer;
-    setAnswerState(correct ? "correct" : "wrong");
-    setShowExplanation(true);
-    setParticleCorrect(correct);
-    setShowParticles(true);
-    setTimeout(() => setShowParticles(false), 900);
-    playSfx(correct ? "correct" : "wrong");
 
-    if (correct) {
-      const bonus = streak >= 2 ? Math.round(currentQ.xp * 0.5) : 0;
-      const earned = currentQ.xp + bonus;
-      setTotalXP((prev) => {
-        const next = prev + earned;
-        setXpLevel(Math.floor(next / 50) + 1);
-        return next;
-      });
+    if (idx === currentQ.answer) {
+      setAnswerState("correct");
+      globalSound.playSfx("correct");
       setCorrectCount((c) => c + 1);
       setStreak((s) => s + 1);
+      setTotalXP((x) => x + currentQ.xp);
     } else {
+      setAnswerState("wrong");
+      globalSound.playSfx("wrong");
       setStreak(0);
     }
-
-    if (mode === "battle") {
-      setHitFx(true);
-      setAttackFx(correct ? "player" : "enemy");
-      window.setTimeout(() => { setHitFx(false); setAttackFx(null); }, 650);
-      if (correct) {
-        const difficultyMultiplier = battleDifficulty === "hard" ? 1.35 : battleDifficulty === "easy" ? 0.85 : 1;
-        const damage = Math.round((18 + Math.min(streak * 2, 18)) * difficultyMultiplier);
-        setEnemyHP((hp) => Math.max(0, hp - damage));
-        setBattleMessage(`⚡ ${battleSkills[qIndex % battleSkills.length]}! CRITICAL -${damage} HP`);
-      } else {
-        const counter = battleDifficulty === "hard" ? 22 : battleDifficulty === "easy" ? 10 : 15;
-        setPlayerHP((hp) => Math.max(0, hp - counter));
-        setBattleMessage(`💥 CODE BEAST COUNTERATTACK! -${counter} HP`);
-      }
-    }
-    if (mode === "survival" && !correct) {
-      setPlayerHP((hp) => Math.max(0, hp - 20));
-      if (playerHP <= 20) {
-        window.setTimeout(() => finishGame(), 700);
-      }
-    }
-  }, [answerState, currentQ, mode, battleDifficulty, playSfx, qIndex, streak, battleSkills, playerHP, finishGame]);
+    setShowExplanation(true);
+  };
 
   const handleNext = () => {
-    if (isLast) { finishGame(); return; }
-    playSfx("click");
-    setQIndex((i) => i + 1);
     setSelected(null);
     setAnswerState("idle");
     setShowExplanation(false);
+
+    if (qIndex < questions.length - 1) {
+      setQIndex((i) => i + 1);
+    } else {
+      globalSound.playSfx("finish");
+      onFinish(Math.round((correctCount / questions.length) * 100), totalXP, correctCount);
+    }
   };
 
-  const progress = ((qIndex) / questions.length) * 100;
-
   return (
-    <div className="w-full cq-screen px-3 sm:px-5 lg:px-7 py-4 sm:py-6 overflow-x-hidden">
-      <ParticleEffect active={showParticles} correct={particleCorrect} />
-      <div className={`w-full mx-auto ${mode === "battle" ? "max-w-[1500px]" : "max-w-5xl"}`}>
-        <div className="mb-4 sm:mb-6">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <div className="flex items-center gap-2 min-w-0">
-              <span className="text-2xl">{lang.icon}</span>
-              <span className="font-mono font-bold text-white truncate">{lang.name}</span>
-              <span className="hidden sm:inline text-xs font-mono text-white/30">· {mode.toUpperCase()}</span><span className="hidden md:inline text-[10px] font-mono text-green-300/60">· 🎵 GLOBAL SOUNDTRACK</span>
-            </div>
-            <div className="flex items-center gap-2">
-              {mode === "speed" && (
-                <motion.div animate={{ scale: timeLeft <= 10 ? [1, 1.08, 1] : 1 }} className={`flex items-center gap-2 px-3 py-1.5 rounded-full border font-mono font-black text-xs ${timeLeft <= 10 ? "border-red-500/60 bg-red-500/15 text-red-300" : "border-amber-400/30 bg-amber-400/10 text-amber-300"}`}>
-                  <span>⏱</span> {timeLeft}s
-                </motion.div>
-              )}
-              {mode === "survival" && <div className={`flex items-center gap-1 px-3 py-1 rounded-full border ${playerHP <= 30 ? "border-red-500/60 bg-red-500/15 text-red-300" : "border-cyan-400/30 bg-cyan-400/10 text-cyan-300"}`}><Heart size={12}/><span className="font-mono font-bold text-xs">{playerHP} HP</span></div>}
-              {streak >= 2 && <div className="flex items-center gap-1 bg-orange-500/20 border border-orange-500/30 rounded-full px-3 py-1"><Flame size={12} className="text-orange-400" /><span className="text-orange-400 font-mono font-bold text-xs">{streak}x</span></div>}
-              <span className="text-xs sm:text-sm font-mono text-white/40">{qIndex + 1}/{questions.length}</span>
-              <button onClick={() => setSoundEnabled((v) => !v)} className="p-2 rounded-xl border border-white/10 bg-white/5 text-white/60 hover:text-white" title="Toggle sound effects">
-                <Volume2 size={15} className={soundEnabled ? "text-cyan-300" : "text-white/30"} />
-              </button>
-            </div>
-          </div>
-          <div className="mt-3"><XPBar current={totalXP} max={xpLevel * 50} level={xpLevel} /></div>
-          <div className="mt-3 h-1 bg-white/10 rounded-full overflow-hidden">
-            <motion.div className="h-full rounded-full" style={{ background: lang.color }} animate={{ width: `${progress}%` }} transition={{ duration: 0.4 }} />
-          </div>
+    <div className="cq-screen p-4 sm:p-6 max-w-3xl mx-auto flex flex-col justify-between">
+      {/* Header Info */}
+      <div className="flex justify-between items-center bg-white/5 border border-white/10 rounded-2xl p-4 mb-6">
+        <div>
+          <span className="text-xs font-mono text-purple-400 font-bold uppercase">{mode} MODE</span>
+          <p className="text-white font-mono font-bold text-sm">Question {qIndex + 1} of {questions.length}</p>
         </div>
-
-        <div className={`${mode === "battle" ? "grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_330px] gap-5 lg:items-start" : ""}`}>
-          <main className="min-w-0">
-            {mode === "battle" && (
-              <>
-              <motion.div animate={{ boxShadow: ["0 0 0 rgba(239,68,68,0)", "0 0 35px rgba(168,85,247,.16)", "0 0 0 rgba(239,68,68,0)"] }} transition={{ repeat: Infinity, duration: 2.5 }}
-                className="cq-battle-arena rounded-3xl border border-purple-500/20 bg-gradient-to-br from-red-500/10 via-purple-500/10 to-cyan-500/10 p-3 sm:p-4 mb-5 overflow-hidden relative">
-                <div className="absolute inset-0 pointer-events-none opacity-40">
-                  {[0,1,2,3,4,5].map((n) => <motion.div key={n} className="absolute w-2 h-2 rounded-full bg-fuchsia-400"
-                    animate={{ x: [20 + n * 18, 80 + n * 100, 20 + n * 18], y: [30 + (n % 3) * 70, 10 + n * 40, 30 + (n % 3) * 70], opacity: [0, .9, 0], scale: [0.5, 1.7, .5] }}
-                    transition={{ duration: 2.2 + n * .25, repeat: Infinity, delay: n * .15 }} />)}
-                </div>
-                <div className="flex items-center justify-center gap-3 sm:gap-8 relative">
-                  <motion.div animate={attackFx === "enemy" ? { x: [0,-14,14,0], rotate: [0,-3,3,0] } : {}} transition={{ duration: .42 }}>
-                    <AnimeCoderAvatar side="enemy" large attacking={attackFx === "enemy"} hit={hitFx && attackFx === "player"} />
-                  </motion.div>
-                  <div className="text-center min-w-0">
-                    <p className="text-[9px] font-mono text-red-300 tracking-[0.25em]">BATTLE DIFFICULTY · {battleDifficulty.toUpperCase()}</p>
-                    <motion.p animate={{ scale: attackFx ? [1,1.18,1] : 1 }} className="text-xs sm:text-sm font-mono font-black text-purple-300">YOUR SKILL IS YOUR WEAPON</motion.p>
-                    <div className="mt-3 text-xs font-mono font-black text-white/80">{battleMessage}</div>
-                    <div className="mt-2 flex justify-center gap-1">
-                      {[0,1,2,3,4].map((n) => <motion.span key={n} animate={streak > n ? { scale: [1,1.35,1], opacity: [0.5,1,0.5] } : {}} className={`w-2 h-2 rounded-full ${streak > n ? "bg-yellow-300 shadow-[0_0_12px_rgba(253,224,71,.8)]" : "bg-white/10"}`} />)}
-                    </div>
-                  </div>
-                  <motion.div animate={attackFx === "player" ? { x: [0,14,-14,0], rotate: [0,3,-3,0] } : {}} transition={{ duration: .42 }}>
-                    <AnimeCoderAvatar side="player" character={ANIME_CHARACTERS[0]} large attacking={attackFx === "player"} hit={hitFx && attackFx === "enemy"} />
-                  </motion.div>
-                </div>
-                <div className="grid grid-cols-2 gap-3 sm:gap-5 mt-3">
-                  <div><div className="flex justify-between mb-1"><span className="text-[10px] font-mono text-red-300">CODE BEAST</span><span className="text-[10px] font-mono text-red-300">{enemyHP} HP</span></div><div className="h-3 bg-black/20 rounded-full overflow-hidden"><motion.div className="h-full bg-gradient-to-r from-red-600 to-pink-500" animate={{ width: `${enemyHP}%` }} /></div></div>
-                  <div><div className="flex justify-between mb-1"><span className="text-[10px] font-mono text-cyan-300">YOU</span><span className="text-[10px] font-mono text-cyan-300">{playerHP} HP</span></div><div className="h-3 bg-black/20 rounded-full overflow-hidden"><motion.div className="h-full bg-gradient-to-r from-cyan-500 to-blue-500" animate={{ width: `${playerHP}%` }} /></div></div>
-                </div>
-              </motion.div>
-              <AnimatePresence>
-                {hitFx && (
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: [0, .9, 0] }} className="fixed inset-0 z-[70] pointer-events-none overflow-hidden">
-                    <motion.div initial={{ x: "-120%", rotate: -18 }} animate={{ x: "120%" }} transition={{ duration: .42 }}
-                      className={`absolute top-[45%] left-0 w-[150%] h-3 blur-md ${attackFx === "player" ? "bg-cyan-300" : "bg-red-400"}`} />
-                    <motion.div initial={{ scale: .2, opacity: 0 }} animate={{ scale: [0.2, 1.4, 2.2], opacity: [0, .9, 0] }}
-                      className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 rounded-full border-[3px] ${attackFx === "player" ? "border-cyan-300" : "border-red-400"}`} />
-                  </motion.div>
-                )}
-              </AnimatePresence>
-              </>
-            )}
-
-            <AnimatePresence mode="wait">
-              <motion.div key={qIndex} initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} transition={{ duration: 0.25 }} className="min-w-0">
-                <div className="flex flex-wrap items-center gap-2 mb-3">
-                  <div className="flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-mono font-bold border" style={{ color: lang.color, borderColor: `${lang.color}40`, backgroundColor: `${lang.color}15` }}>
-                    <Target size={11} /> {mode === "debug" ? `${lang.name} Bug Fix` : currentQ.type === "multiple" ? "Multiple Choice" : currentQ.type === "code" ? "Code Challenge" : "True or False"}
-                  </div>
-                  <span className="text-xs font-mono text-yellow-400/70">+{currentQ.xp} XP</span>
-                  {mode === "battle" && <span className="text-xs font-mono text-red-300/70">⚔ {battleSkills[qIndex % battleSkills.length]}</span>}
-                </div>
-
-                <h3 className="text-lg sm:text-xl md:text-2xl font-mono font-bold text-white mb-4 leading-snug">{currentQ.question}</h3>
-                {currentQ.code && <div className="mb-4"><CodeBlock code={currentQ.code} /></div>}
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-4">
-                  {currentQ.options.map((opt, i) => {
-                    const isCorrect = i === currentQ.answer;
-                    const isSelected = i === selected;
-                    let borderColor = "border-white/10"; let bg = "bg-white/5 hover:bg-white/10"; let textColor = "text-white/80"; let icon = null;
-                    if (answerState !== "idle") {
-                      if (isCorrect) { borderColor = "border-green-500/60"; bg = "bg-green-500/15"; textColor = "text-green-300"; icon = <CheckCircle2 size={18} className="text-green-400 shrink-0" />; }
-                      else if (isSelected) { borderColor = "border-red-500/60"; bg = "bg-red-500/15"; textColor = "text-red-300"; icon = <XCircle size={18} className="text-red-400 shrink-0" />; }
-                      else { bg = "bg-white/3"; textColor = "text-white/30"; }
-                    }
-                    return (
-                      <motion.button key={i} onClick={() => handleSelect(i)} disabled={answerState !== "idle"}
-                        className={`w-full min-w-0 text-left flex items-center gap-3 p-3.5 sm:p-4 rounded-2xl border transition-all ${borderColor} ${bg} ${textColor} disabled:cursor-default`}
-                        whileHover={answerState === "idle" ? { scale: 1.01 } : {}} whileTap={answerState === "idle" ? { scale: .99 } : {}}>
-                        <span className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center text-xs font-mono font-bold shrink-0">{String.fromCharCode(65 + i)}</span>
-                        <span className="font-mono text-sm break-words flex-1">{opt}</span>{icon}
-                      </motion.button>
-                    );
-                  })}
-                </div>
-
-                <AnimatePresence>
-                  {showExplanation && (
-                    <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
-                      <div className={`rounded-2xl p-4 border mb-4 ${answerState === "correct" ? "bg-green-500/10 border-green-500/30" : "bg-red-500/10 border-red-500/30"}`}>
-                        <div className="flex items-start gap-3">
-                          {answerState === "correct" ? <CheckCircle2 size={18} className="text-green-400 shrink-0" /> : <XCircle size={18} className="text-red-400 shrink-0" />}
-                          <div><p className={`font-mono font-bold text-sm mb-1 ${answerState === "correct" ? "text-green-300" : "text-red-300"}`}>{answerState === "correct" ? "Correct!" : "Not quite!"}</p><p className="text-white/60 text-sm font-mono leading-relaxed">{currentQ.explanation}</p></div>
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-
-                {answerState !== "idle" && (
-                  <motion.button initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} onClick={handleNext}
-                    className="w-full py-3.5 rounded-2xl font-mono font-bold text-white flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-cyan-600 shadow-lg shadow-purple-500/20">
-                    {isLast ? "See Results" : "Next Question"} <ArrowRight size={18} />
-                  </motion.button>
-                )}
-              </motion.div>
-            </AnimatePresence>
-          </main>
+        <div className="text-right">
+          <span className="text-xs font-mono text-yellow-400 font-bold">STREAK: {streak} 🔥</span>
+          <p className="text-cyan-400 font-mono font-bold text-sm">XP: {totalXP}</p>
         </div>
       </div>
-    </div>
-  );
-}
 
+      {/* Main Question Box */}
+      <div className="bg-black/60 border border-white/10 rounded-3xl p-6 backdrop-blur-xl">
+        <h3 className="text-xl font-mono font-bold text-white mb-4">{currentQ.question}</h3>
+        {currentQ.code && <div className="mb-4"><CodeBlock code={currentQ.code} /></div>}
 
-function BugHunterGameScreen({ langId, onFinish }: { langId: string; onFinish: (score: number, xp: number, correct: number) => void }) {
-  const qs = expandTo20(DEBUG_QUESTIONS_BY_LANGUAGE[langId] ?? DEBUG_QUESTIONS, langId);
-  const lang = LANGUAGES.find(l => l.id === langId)!;
-  const [index,setIndex]=useState(0); const [selected,setSelected]=useState<number|null>(null); const [locked,setLocked]=useState(false); const [correct,setCorrect]=useState(0); const [xp,setXp]=useState(0); const [fixed,setFixed]=useState(false);
-  const q=qs[index];
-  const choose=(i:number)=>{ if(locked)return; setSelected(i); setLocked(true); const ok=i===q.answer; if(ok){setCorrect(c=>c+1);setXp(x=>x+q.xp);setFixed(true);} window.setTimeout(()=>{if(index===qs.length-1){onFinish(Math.round(((correct+(ok?1:0))/qs.length)*100),xp+(ok?q.xp:0),correct+(ok?1:0));}else{setIndex(n=>n+1);setSelected(null);setLocked(false);setFixed(false);}},900); };
-  return <div className="cq-screen p-3 sm:p-6 bg-gradient-to-br from-emerald-950/40 via-black/30 to-cyan-950/30">
-    <div className="max-w-6xl mx-auto">
-      <div className="flex items-center justify-between mb-4"><div><p className="text-emerald-300 text-[10px] font-mono font-black tracking-[.3em]">BUG HUNTER // LIVE DEBUGGER</p><h1 className="text-2xl sm:text-4xl text-white font-mono font-black">FIX THE BUG</h1></div><div className="text-right"><p className="text-white/40 text-[10px] font-mono">{lang.icon} {lang.name}</p><p className="text-emerald-300 font-mono font-black">{index+1}/{qs.length}</p></div></div>
-      <div className="grid lg:grid-cols-[1.2fr_.8fr] gap-4">
-        <div className="rounded-3xl border border-emerald-400/20 bg-[#07130f]/90 overflow-hidden shadow-2xl"><div className="px-4 py-2 border-b border-white/10 flex items-center gap-2"><Bug size={14} className="text-emerald-300"/><span className="text-[10px] font-mono text-white/40">/workspace/{lang.id}/bug-{q.id}</span><span className="ml-auto text-red-300 text-[9px] font-mono">● ERROR DETECTED</span></div><pre className="p-5 text-xs sm:text-sm leading-7 font-mono text-emerald-200 overflow-x-auto whitespace-pre-wrap">{q.code}</pre><div className="border-t border-white/10 p-4 bg-black/20"><p className="text-red-300 font-mono text-xs font-black">Compiler: syntax / logic fault found</p><p className="text-white/40 font-mono text-[10px] mt-1">{q.question}</p></div></div>
-        <div className="rounded-3xl border border-white/10 bg-white/5 p-4 sm:p-5"><div className="flex items-center justify-between mb-4"><span className="text-emerald-300 font-mono text-xs font-black">SELECT THE FIX</span><span className="text-yellow-300 font-mono text-xs">+{q.xp} XP</span></div><div className="space-y-2">{q.options.map((o,i)=><motion.button key={i} disabled={locked} onClick={()=>choose(i)} whileTap={{scale:.98}} className={`w-full text-left p-3 rounded-2xl border font-mono text-xs sm:text-sm ${selected===i?(i===q.answer?'border-emerald-400 bg-emerald-500/15 text-emerald-200':'border-red-400 bg-red-500/15 text-red-200'):'border-white/10 bg-black/10 text-white/70 hover:bg-white/10'}`}><span className="inline-flex w-7 h-7 rounded-lg bg-white/10 items-center justify-center mr-2">{String.fromCharCode(65+i)}</span>{o}</motion.button>)}</div>{locked&&<div className={`mt-4 rounded-2xl p-3 border ${selected===q.answer?'border-emerald-400/30 bg-emerald-500/10':'border-red-400/30 bg-red-500/10'}`}><p className="font-mono font-black text-sm">{selected===q.answer?'✓ BUG FIXED':'✕ FIX FAILED'}</p><p className="text-white/50 font-mono text-[10px] mt-1">{q.explanation}</p></div>}{fixed&&<motion.div initial={{scale:.7,opacity:0}} animate={{scale:1,opacity:1}} className="mt-4 text-center text-emerald-300 font-mono font-black">PATCH APPLIED ✓</motion.div>}</div>
-      </div>
-    </div>
-  </div>;
-}
-
-function SurvivalGameScreen({ langId, onFinish }: { langId: string; onFinish: (score: number, xp: number, correct: number) => void }) {
-  const base=QUESTIONS[langId]??[]; const qs=Array.from({length:20},(_,i)=>({...base[i%Math.max(1,base.length)], id:i+1})); const lang=LANGUAGES.find(l=>l.id===langId)!;
-  const [i,setI]=useState(0); const [hp,setHp]=useState(100); const [combo,setCombo]=useState(0); const [xp,setXp]=useState(0); const [correct,setCorrect]=useState(0); const [locked,setLocked]=useState(false); const [selected,setSelected]=useState<number|null>(null);
-  const q=qs[i];
-  const answer=(n:number)=>{if(locked)return; const ok=n===q.answer; setSelected(n);setLocked(true); if(ok){setCorrect(c=>c+1);setCombo(c=>c+1);setXp(x=>x+q.xp+Math.min(combo*3,15));}else{setCombo(0);setHp(h=>Math.max(0,h-25));} window.setTimeout(()=>{const nextHp=ok?hp:Math.max(0,hp-25); if(i===qs.length-1||nextHp<=0){onFinish(Math.round(((correct+(ok?1:0))/qs.length)*100),xp+(ok?q.xp:0),correct+(ok?1:0));}else{setI(x=>x+1);setLocked(false);setSelected(null);}},750);};
-  return <div className="cq-screen p-3 sm:p-6 bg-gradient-to-br from-slate-950/80 via-cyan-950/20 to-black"><div className="max-w-5xl mx-auto"><div className="rounded-3xl border border-cyan-400/20 bg-black/50 p-4 mb-4 shadow-[0_0_50px_rgba(6,182,212,.1)]"><div className="flex items-center justify-between"><div><p className="text-cyan-300 text-[10px] font-mono font-black tracking-[.3em]">CODE SURVIVAL // RUNTIME</p><h1 className="text-2xl sm:text-4xl text-white font-mono font-black">STAY ALIVE</h1></div><div className="text-right"><p className="text-red-300 font-mono font-black text-xl">♥ {hp}</p><p className="text-white/35 font-mono text-[9px]">WAVE {i+1}/20</p></div></div><div className="mt-3 h-2 rounded-full bg-white/10 overflow-hidden"><motion.div className="h-full bg-gradient-to-r from-red-500 via-yellow-400 to-cyan-400" animate={{width:`${hp}%`}}/></div></div><div className="rounded-3xl border border-white/10 bg-white/5 p-4 sm:p-7"><div className="flex justify-between text-[10px] font-mono text-white/40 mb-3"><span>{lang.icon} {lang.name} SURVIVAL</span><span>{combo}x COMBO</span></div><h2 className="text-xl sm:text-3xl font-mono font-black text-white leading-snug mb-5">{q.question}</h2>{q.code&&<CodeBlock code={q.code}/>}<div className="grid sm:grid-cols-2 gap-3 mt-5">{q.options.map((o,n)=><button key={n} disabled={locked} onClick={()=>answer(n)} className={`p-4 rounded-2xl border text-left font-mono text-sm ${selected===n?(n===q.answer?'border-green-400 bg-green-500/15 text-green-200':'border-red-400 bg-red-500/15 text-red-200'):'border-white/10 bg-black/10 text-white/70 hover:bg-white/10'}`}>{String.fromCharCode(65+n)}. {o}</button>)}</div></div></div></div>;
-}
-
-function CompilerGameScreen({ langId, onFinish }: { langId: string; onFinish: (score: number, xp: number, correct: number) => void }) {
-  const lang=LANGUAGES.find(l=>l.id===langId)!; const compilerBase=COMPILER_CHALLENGES[langId]??COMPILER_CHALLENGES.javascript; const qs=Array.from({length:20},(_,i)=>({...compilerBase[i%Math.max(1,compilerBase.length)]})); const [i,setI]=useState(0); const [value,setValue]=useState(''); const [status,setStatus]=useState<'idle'|'ok'|'fail'>('idle'); const [correct,setCorrect]=useState(0); const [xp,setXp]=useState(0); const q=qs[i];
-  const run=()=>{if(status!=='idle')return; const ok=value.trim()===q.expected.trim();setStatus(ok?'ok':'fail');if(ok){setCorrect(c=>c+1);setXp(x=>x+35);}window.setTimeout(()=>{if(i===qs.length-1){onFinish(Math.round(((correct+(ok?1:0))/qs.length)*100),xp+(ok?35:0),correct+(ok?1:0));}else{setI(n=>n+1);setValue('');setStatus('idle');}},900);};
-  const rendered=q.code.replace('____',value||'____');
-  return <div className="cq-screen p-3 sm:p-6 bg-[#03050a]"><div className="max-w-6xl mx-auto"><div className="flex items-center justify-between mb-4"><div><p className="text-cyan-300 text-[10px] font-mono font-black tracking-[.3em]">CODEQUEST COMPILER // TERMINAL</p><h1 className="text-2xl sm:text-4xl text-white font-mono font-black">COMPILE & RUN</h1></div><div className="text-right"><p className="text-cyan-300 font-mono font-black">{lang.icon} {lang.name}</p><p className="text-white/35 font-mono text-[9px]">CHALLENGE {i+1}/{qs.length}</p></div></div><div className="grid lg:grid-cols-[1.25fr_.75fr] gap-4"><div className="rounded-3xl border border-cyan-400/20 bg-[#071018] overflow-hidden shadow-[0_0_60px_rgba(6,182,212,.1)]"><div className="flex items-center gap-2 px-4 py-3 border-b border-white/10"><Terminal size={14} className="text-cyan-300"/><span className="text-[10px] font-mono text-white/40">compiler://codequest/{lang.id}</span><span className="ml-auto text-[9px] font-mono text-green-300">READY</span></div><pre className="p-5 text-xs sm:text-sm font-mono leading-7 text-cyan-200 whitespace-pre-wrap overflow-x-auto">{rendered}</pre><div className="border-t border-white/10 p-3 font-mono text-[10px] text-white/35">$ codequest --compile --run<br/><span className={status==='ok'?'text-green-300':status==='fail'?'text-red-300':'text-white/30'}>{status==='ok'?'BUILD SUCCESSFUL ✓':status==='fail'?`BUILD FAILED ✕ Expected: ${q.expected}`:'Waiting for source code...'}</span></div></div><div className="rounded-3xl border border-white/10 bg-white/5 p-4"><p className="text-purple-300 font-mono text-xs font-black mb-2">TYPE YOUR ANSWER</p><p className="text-white/60 font-mono text-sm mb-4">{q.prompt}</p><textarea autoFocus value={value} onChange={e=>setValue(e.target.value)} disabled={status!=='idle'} spellCheck={false} className="w-full h-36 rounded-2xl border border-cyan-400/20 bg-[#02050a] text-green-300 p-4 font-mono text-sm outline-none focus:border-cyan-400/60 resize-none" placeholder="Type the missing code here..."/><p className="text-white/30 font-mono text-[9px] mt-2">HINT: {q.hint}</p><button onClick={run} disabled={!value.trim()||status!=='idle'} className="w-full mt-4 py-3.5 rounded-2xl bg-gradient-to-r from-cyan-600 to-purple-600 text-white font-mono font-black disabled:opacity-30">▶ COMPILE & RUN</button></div></div></div></div>;
-}
-
-function DuelSetupScreen({
-  profile,
-  totalXP,
-  selectedLang,
-  onSelectLanguage,
-  onStart,
-  onBack,
-}: {
-  profile: StudentProfile;
-  totalXP: number;
-  selectedLang: string | null;
-  onSelectLanguage: (lang: string) => void;
-  onStart: (friendName: string, friendRank: string, friendPhoto: string) => void;
-  onBack: () => void;
-}) {
-  const [friendName, setFriendName] = useState("");
-  const [friendRank, setFriendRank] = useState(RANKS[2].name);
-  const [friendPhoto, setFriendPhoto] = useState("");
-
-  return (
-    <div className="cq-screen cq-duel-setup px-5 py-10">
-      <div className="max-w-5xl mx-auto">
-        <button onClick={onBack} className="flex items-center gap-2 text-white/40 hover:text-white font-mono text-sm mb-7"><ArrowLeft size={16}/> Back</button>
-        <div className="text-center mb-9">
-          <motion.div animate={{ scale: [1, 1.06, 1] }} transition={{ repeat: Infinity, duration: 2 }}
-            className="inline-flex w-16 h-16 rounded-2xl bg-gradient-to-br from-pink-600 to-purple-600 items-center justify-center shadow-2xl shadow-pink-500/20 mb-4">
-            <Swords size={30} className="text-white"/>
-          </motion.div>
-          <p className="text-pink-300 text-xs font-mono font-bold tracking-[0.3em]">DUEL ARENA</p>
-          <h2 className="text-4xl md:text-6xl font-mono font-black text-white mt-2">1V1 FRIEND BATTLE</h2>
-          <p className="text-white/35 font-mono text-sm mt-3">Two players. One question. Your coding skill decides the winner.</p>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-5 mb-7">
-          <div className="rounded-3xl border border-cyan-500/20 bg-gradient-to-br from-cyan-500/10 to-white/5 p-6">
-            <p className="text-cyan-300 text-[10px] font-mono font-black tracking-widest mb-4">YOUR PROFILE</p>
-            <div className="flex items-center gap-4">
-              {profile.photo ? <img src={profile.photo} className="w-20 h-20 rounded-2xl object-cover border border-cyan-400/30" alt="Your profile"/> :
-                <div className="w-20 h-20 rounded-2xl bg-cyan-500/10 border border-cyan-400/20 flex items-center justify-center text-3xl">👨‍💻</div>}
-              <div className="min-w-0">
-                <h3 className="text-white font-mono font-black text-xl truncate">{profile.username}</h3>
-                <p className="text-white/40 font-mono text-xs">{profile.yearLevel} · {profile.course}</p>
-                <div className="mt-2"><RankBadge totalXP={totalXP} compact /></div>
-              </div>
-            </div>
-          </div>
-
-          <div className="rounded-3xl border border-pink-500/20 bg-gradient-to-br from-pink-500/10 to-white/5 p-6">
-            <p className="text-pink-300 text-[10px] font-mono font-black tracking-widest mb-4">FRIEND PROFILE</p>
-            <input value={friendName} onChange={(e) => setFriendName(e.target.value)} placeholder="Enter friend's username"
-              className="w-full rounded-xl border border-white/10 bg-black/20 text-white placeholder:text-white/25 px-4 py-3 outline-none focus:border-pink-500/50 mb-3"/>
-            <select value={friendRank} onChange={(e) => setFriendRank(e.target.value)}
-              className="w-full rounded-xl border border-white/10 bg-[#11111f] text-white px-4 py-3 outline-none focus:border-pink-500/50">
-              {RANKS.map((r) => <option key={r.name}>{r.name}</option>)}
-            </select>
-            <label className="mt-3 cursor-pointer flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-white/10 bg-white/5 text-white/60 text-xs font-mono">
-              <Camera size={14}/> {friendPhoto ? "Friend Photo Added" : "Add Friend Photo"}
-              <input type="file" accept="image/*" className="hidden" onChange={(e) => {
-                const file = e.target.files?.[0]; if (!file) return;
-                if (file.size > 2 * 1024 * 1024) { alert("Please choose an image smaller than 2MB."); return; }
-                const reader = new FileReader(); reader.onload = () => setFriendPhoto(String(reader.result)); reader.readAsDataURL(file);
-              }} />
-            </label>
-            <p className="text-white/25 font-mono text-[10px] mt-3">This version is local/pass-and-play. Connect it to Supabase Realtime later for true online 1v1.</p>
-          </div>
-        </div>
-
-        <div className="rounded-3xl border border-pink-500/20 bg-gradient-to-r from-pink-500/10 via-purple-500/10 to-cyan-500/10 p-5 mb-7 overflow-hidden relative">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(236,72,153,.18),transparent_45%)] pointer-events-none" />
-          <div className="relative flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="text-center sm:text-left">
-              <p className="text-pink-300 text-[10px] font-mono font-black tracking-[.3em]">NO CHARACTER SELECT</p>
-              <h3 className="text-white font-mono font-black text-xl">PURE 1V1 CODE WAR</h3>
-              <p className="text-white/35 text-[10px] font-mono mt-1">Your profile becomes your fighter. No menus. No character picking. Just skill vs skill.</p>
-            </div>
-            <div className="flex items-center gap-2 font-mono font-black">
-              <span className="px-3 py-2 rounded-xl border border-cyan-400/30 bg-cyan-400/10 text-cyan-300 text-xs">{profile.username || "YOU"}</span>
-              <span className="text-pink-300 text-lg">VS</span>
-              <span className="px-3 py-2 rounded-xl border border-pink-400/30 bg-pink-400/10 text-pink-300 text-xs">{friendName || "FRIEND"}</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 mb-7">
-          <div className="flex items-center gap-3 mb-5"><Code2 className="text-purple-400"/><div><h3 className="text-white font-mono font-black text-lg">Choose the Duel Language</h3><p className="text-white/30 text-xs font-mono">Five questions per duel.</p></div></div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {LANGUAGES.map((lang) => (
-              <button key={lang.id} onClick={() => onSelectLanguage(lang.id)}
-                className={`text-left rounded-2xl border p-4 transition-all ${selectedLang === lang.id ? "border-purple-400/60 bg-purple-500/15 shadow-lg shadow-purple-500/10" : "border-white/10 bg-white/5 hover:bg-white/10"}`}>
-                <div className="text-2xl mb-2">{lang.icon}</div><p className="text-white font-mono font-bold text-sm">{lang.name}</p>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <button disabled={!selectedLang || !friendName.trim()} onClick={() => onStart(friendName.trim(), friendRank, friendPhoto)}
-          className="w-full py-4 rounded-2xl bg-gradient-to-r from-pink-600 via-purple-600 to-cyan-600 text-white font-mono font-black text-lg disabled:opacity-30 disabled:cursor-not-allowed shadow-xl shadow-purple-500/20">
-          Enter the Arena <Swords size={19} className="inline ml-2"/>
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function DuelScreen({
-  langId,
-  profile,
-  totalXP,
-  friendName,
-  friendRankName,
-  friendPhoto,
-  onFinish,
-}: {
-  langId: string;
-  profile: StudentProfile;
-  totalXP: number;
-  friendName: string;
-  friendRankName: string;
-  friendPhoto: string;
-  onFinish: () => void;
-}) {
-  const baseQuestions = QUESTIONS[langId] ?? [];
-  const questions = Array.from({ length: 20 }, (_, i) => ({ ...baseQuestions[i % Math.max(baseQuestions.length, 1)], id: i + 1 })).filter(Boolean);
-  const lang = LANGUAGES.find((l) => l.id === langId)!;
-  const [qIndex, setQIndex] = useState(0);
-  const [turn, setTurn] = useState<"you" | "friend">("you");
-  const [selected, setSelected] = useState<number | null>(null);
-  const [youScore, setYouScore] = useState(0);
-  const [friendScore, setFriendScore] = useState(0);
-  const [locked, setLocked] = useState(false);
-  const [attackFx, setAttackFx] = useState<"you" | "friend" | null>(null);
-  const [hitFx, setHitFx] = useState(false);
-  const [battleText, setBattleText] = useState("READY!");
-  const [showDuelClaps, setShowDuelClaps] = useState(false);
-  const currentQ = questions[qIndex];
-
-  const playDuelSfx = (correct: boolean) => {
-    try {
-      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
-      const ctx = new AudioCtx();
-      const osc = ctx.createOscillator(); const gain = ctx.createGain();
-      osc.type = correct ? "sine" : "sawtooth";
-      osc.frequency.setValueAtTime(correct ? 880 : 180, ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(correct ? 1320 : 90, ctx.currentTime + .22);
-      gain.gain.setValueAtTime(.0001, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(.09, ctx.currentTime + .02);
-      gain.gain.exponentialRampToValueAtTime(.0001, ctx.currentTime + .28);
-      osc.connect(gain); gain.connect(ctx.destination); osc.start(); osc.stop(ctx.currentTime + .3);
-      setTimeout(() => ctx.close(), 400);
-    } catch {}
-  };
-
-  const answer = (index: number) => {
-    if (locked) return;
-    setSelected(index);
-    const correct = index === currentQ.answer;
-    setLocked(true);
-    playDuelSfx(correct);
-    setHitFx(true);
-    setAttackFx(correct ? turn : turn === "you" ? "friend" : "you");
-    setBattleText(correct ? (turn === "you" ? "NEON CODE SLASH!" : "SYNTAX NOVA!") : "COUNTER ATTACK!");
-    window.setTimeout(() => { setHitFx(false); setAttackFx(null); }, 650);
-
-    if (turn === "you" && correct) setYouScore((s) => s + 1);
-    if (turn === "friend" && correct) setFriendScore((s) => s + 1);
-
-    setTimeout(() => {
-      setSelected(null);
-      setLocked(false);
-      if (turn === "you") setTurn("friend");
-      else if (qIndex < questions.length - 1) {
-        setQIndex((i) => i + 1);
-        setTurn("you");
-      } else {
-        setShowDuelClaps(true);
-        window.setTimeout(() => onFinish(), 3200);
-      }
-    }, 1500);
-  };
-
-  const friendRank = RANKS.find((r) => r.name === friendRankName) ?? RANKS[2];
-
-  return (
-    <div className="cq-screen cq-duel-arena px-4 py-6 relative overflow-hidden">
-      {showDuelClaps && <ClapCelebration />}
-      <div className="absolute inset-0 bg-gradient-to-br from-cyan-950/20 via-purple-950/20 to-pink-950/20 pointer-events-none"/>
-      <div className="max-w-6xl mx-auto relative">
-        <div className="absolute inset-x-0 top-16 h-64 pointer-events-none">
-          <motion.div animate={{ opacity: [.25,.65,.25], scaleX: [0.8,1.15,0.8] }} transition={{ duration: 2.2, repeat: Infinity }}
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 w-[70%] h-1 bg-gradient-to-r from-transparent via-fuchsia-400 to-transparent blur-sm" />
-          <motion.div animate={{ rotate: [0,360] }} transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 rounded-full border border-pink-400/10 border-dashed" />
-        </div>
-        <div className="flex items-center justify-between mb-5 relative z-10">
-          <div><p className="text-purple-300 text-xs font-mono font-black">1V1 CODE ARENA</p><p className="text-white/30 text-xs font-mono mt-1">{lang.icon} {lang.name} · Round {qIndex + 1}/{questions.length}</p></div>
-          <button onClick={onFinish} className="text-white/30 hover:text-white text-xs font-mono">Leave Arena</button>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-4 mb-5">
-          <motion.div animate={{ scale: turn === "you" ? 1.02 : 1 }} className={`rounded-3xl border p-4 ${turn === "you" ? "border-cyan-400/60 bg-cyan-500/10 shadow-lg shadow-cyan-500/10" : "border-white/10 bg-white/5"}`}>
-            <div className="flex items-center gap-3">
-              {profile.photo ? <img src={profile.photo} className="w-14 h-14 rounded-2xl object-cover" alt="You"/> : <div className="w-14 h-14 rounded-2xl bg-cyan-500/10 flex items-center justify-center"><AnimeCoderAvatar side="player" /></div>}
-              <div className="min-w-0 flex-1"><p className="text-white font-mono font-black truncate">{profile.username} <span className="text-cyan-300 text-[10px]">YOU</span></p><RankBadge totalXP={totalXP} compact/></div>
-              <div className="text-right"><div className="text-3xl font-mono font-black text-cyan-300">{youScore}</div><div className="w-20 h-1.5 mt-2 rounded-full bg-white/10 overflow-hidden"><motion.div className="h-full bg-cyan-400" animate={{width:`${Math.min(100,youScore/questions.length*100)}%`}} /></div></div>
-            </div>
-          </motion.div>
-
-          <motion.div animate={{ scale: turn === "friend" ? 1.02 : 1 }} className={`rounded-3xl border p-4 ${turn === "friend" ? "border-pink-400/60 bg-pink-500/10 shadow-lg shadow-pink-500/10" : "border-white/10 bg-white/5"}`}>
-            <div className="flex items-center gap-3">
-              <div className="w-14 h-14 rounded-2xl bg-pink-500/10 flex items-center justify-center overflow-hidden">{friendPhoto ? <img src={friendPhoto} className="w-full h-full object-cover" alt="Friend"/> : <AnimeCoderAvatar side="enemy" />}</div>
-              <div className="min-w-0 flex-1">
-                <p className="text-white font-mono font-black truncate">{friendName} <span className="text-pink-300 text-[10px]">FRIEND</span></p>
-                <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl border bg-black/10" style={{borderColor: `${friendRank.color}55`}}>
-                  <span>{friendRank.icon}</span><div><p className="font-mono font-black text-[10px]" style={{color: friendRank.color}}>{friendRank.name}</p><p className="text-white/30 font-mono text-[8px]">RANK</p></div><Trophy size={12} style={{color: friendRank.color}}/>
-                </div>
-              </div>
-              <div className="text-right"><div className="text-3xl font-mono font-black text-pink-300">{friendScore}</div><div className="w-20 h-1.5 mt-2 rounded-full bg-white/10 overflow-hidden"><motion.div className="h-full bg-pink-400" animate={{width:`${Math.min(100,friendScore/questions.length*100)}%`}} /></div></div>
-            </div>
-          </motion.div>
-        </div>
-
-        <div className="text-center mb-5">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-purple-500/20 bg-purple-500/10 text-purple-300 font-mono text-xs font-bold">
-            {turn === "you" ? <><Sparkles size={13}/> {profile.username}'s turn — your answer is your weapon.</> : <><Heart size={13}/> Pass the device to {friendName}</>}
-          </div>
-        </div>
-
-        <div className="flex items-center justify-center gap-4 sm:gap-10 mb-5">
-          <AnimeCoderAvatar side="player" character={ANIME_CHARACTERS[0]} large attacking={attackFx === "you"} hit={hitFx && attackFx === "friend"} />
-          <div className="text-center min-w-[80px]">
-            <motion.div animate={hitFx ? { scale: [1, 1.35, 1], rotate: [0, 8, -8, 0] } : {}} className="text-3xl sm:text-5xl font-mono font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-white to-pink-300">VS</motion.div>
-            <p className="text-[9px] sm:text-[10px] font-mono text-yellow-300 tracking-[0.25em] mt-1">{battleText}</p>
-          </div>
-          <AnimeCoderAvatar side="enemy" character={ANIME_CHARACTERS[1]} large attacking={attackFx === "friend"} hit={hitFx && attackFx === "you"} />
-        </div>
-
-        <AnimatePresence>
-          {hitFx && (
-            <motion.div initial={{ opacity: 0, scale: .3 }} animate={{ opacity: [0, 1, 0], scale: [0.3, 1.2, 1.7] }} exit={{ opacity: 0 }}
-              className={`fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none text-4xl sm:text-7xl font-mono font-black ${
-                attackFx === "you" ? "text-cyan-300" : "text-pink-300"
-              }`} style={{ textShadow: "0 0 30px currentColor" }}>
-              {battleText}
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-
-        <div className="max-w-3xl mx-auto rounded-3xl border border-white/10 bg-white/5 p-5 md:p-7 shadow-2xl">
-          <div className="flex items-center justify-between mb-4"><span className="text-xs font-mono text-white/35">Question {qIndex + 1}</span><span className="text-xs font-mono text-yellow-300">+{currentQ.xp} XP</span></div>
-          <h2 className="text-xl md:text-2xl font-mono font-black text-white leading-relaxed mb-5">{currentQ.question}</h2>
-          {currentQ.code && <div className="mb-5"><CodeBlock code={currentQ.code}/></div>}
-          <div className="grid md:grid-cols-2 gap-3">
-            {currentQ.options.map((option, index) => (
-              <button key={option} disabled={locked} onClick={() => answer(index)}
-                className={`text-left p-4 rounded-2xl border font-mono text-sm transition-all ${
-                  selected === index
-                    ? index === currentQ.answer ? "border-green-400/60 bg-green-500/10 text-green-300" : "border-red-400/60 bg-red-500/10 text-red-300"
-                    : "border-white/10 bg-black/10 text-white/70 hover:bg-white/10"
-                }`}>
-                <span className="inline-flex w-7 h-7 rounded-lg bg-white/5 items-center justify-center mr-2 text-xs">{String.fromCharCode(65 + index)}</span>{option}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ClapCelebration() {
-  const [show, setShow] = useState(true);
-  useEffect(() => {
-    const timer = window.setTimeout(() => setShow(false), 4200);
-    try {
-      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
-      const ctx = new AudioCtx();
-      [0, .22, .44, .66, .88].forEach((delay, index) => {
-        const osc = ctx.createOscillator(); const gain = ctx.createGain();
-        osc.type = "square"; osc.frequency.setValueAtTime(index % 2 ? 210 : 150, ctx.currentTime + delay);
-        gain.gain.setValueAtTime(.0001, ctx.currentTime + delay);
-        gain.gain.exponentialRampToValueAtTime(.07, ctx.currentTime + delay + .015);
-        gain.gain.exponentialRampToValueAtTime(.0001, ctx.currentTime + delay + .12);
-        osc.connect(gain); gain.connect(ctx.destination); osc.start(ctx.currentTime + delay); osc.stop(ctx.currentTime + delay + .13);
-      });
-      window.setTimeout(() => ctx.close(), 1500);
-    } catch {}
-    return () => window.clearTimeout(timer);
-  }, []);
-  if (!show) return null;
-  return <div className="fixed inset-0 z-[80] pointer-events-none overflow-hidden">
-    <motion.div initial={{opacity:0, y:30, scale:.8}} animate={{opacity:[0,1,1,0], y:[30,0,-10,-50], scale:[.8,1,1.08,1]}} transition={{duration:2.6}} className="absolute left-1/2 top-1/3 -translate-x-1/2 text-5xl sm:text-7xl font-mono font-black text-yellow-300" style={{textShadow:"0 0 30px rgba(250,204,21,.7)"}}>👏 GREAT JOB! 👏</motion.div>
-    {Array.from({length:18},(_,i)=><motion.div key={i} initial={{opacity:1,x:"50vw",y:"42vh",scale:.5}} animate={{opacity:0,x:`${8+(i*47)%84}vw`,y:`${20+(i*31)%65}vh`,rotate:360,scale:1.2}} transition={{duration:1.8+i*.03, ease:"easeOut"}} className="absolute text-2xl sm:text-4xl">{i%3===0?"👏":i%3===1?"🎉":"✨"}</motion.div>)}
-  </div>;
-}
-
-function ResultsScreen({
-  langId,
-  score,
-  xp,
-  correct,
-  total,
-  profile,
-  totalXP,
-  onPhotoUpdate,
-  onReplay,
-  onHome,
-}: {
-  langId: string;
-  score: number;
-  xp: number;
-  correct: number;
-  total: number;
-  profile: StudentProfile;
-  totalXP: number;
-  onPhotoUpdate: (photo: string) => void;
-  onReplay: () => void;
-  onHome: () => void;
-}) {
-  const lang = LANGUAGES.find((l) => l.id === langId)!;
-  const [showClaps, setShowClaps] = useState(true);
-  const grade =
-    score >= 90 ? { label: "MASTER", color: "#f59e0b", icon: "🏆" } :
-    score >= 70 ? { label: "SKILLED", color: "#a78bfa", icon: "⭐" } :
-    score >= 50 ? { label: "LEARNING", color: "#06b6d4", icon: "📚" } :
-    { label: "KEEP GOING", color: "#f97316", icon: "💪" };
-
-  return (
-    <div className="cq-screen flex flex-col items-center justify-center px-6 py-12">
-      {showClaps && <ClapCelebration />}
-      <button onClick={() => setShowClaps(false)} className="fixed top-4 right-4 z-[90] text-[10px] font-mono text-white/40 border border-white/10 rounded-full px-3 py-2 bg-black/20">Skip celebration</button>
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl pointer-events-none" />
-
-      <motion.div
-        initial={{ opacity: 0, scale: 0.85 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5, type: "spring" }}
-        className="max-w-md w-full text-center relative"
-      >
-        <motion.div
-          className="text-7xl mb-4"
-          animate={{ rotate: [0, -10, 10, -5, 5, 0] }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-        >
-          {grade.icon}
-        </motion.div>
-
-        <div
-          className="inline-block font-mono font-black text-4xl mb-2 tracking-widest"
-          style={{ color: grade.color }}
-        >
-          {grade.label}
-        </div>
-
-        <div className="text-8xl font-mono font-black text-white mb-1">{score}%</div>
-        <p className="text-white/40 font-mono text-sm mb-8">
-          {correct} of {total} correct · {xp} XP earned
-        </p>
-
-
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-4 mb-8 text-left">
-          <div className="flex items-center gap-4">
-            {profile.photo ? <img src={profile.photo} className="w-20 h-20 rounded-2xl object-cover border border-white/10" alt="Student profile" /> :
-              <label className="w-20 h-20 rounded-2xl border border-dashed border-purple-500/50 bg-purple-500/10 flex flex-col items-center justify-center cursor-pointer">
-                <Camera size={20} className="text-purple-300"/>
-                <span className="text-[9px] text-purple-300 font-mono mt-1">Add Photo</span>
-                <input type="file" accept="image/*" className="hidden" onChange={(e) => {
-                  const file = e.target.files?.[0]; if (!file) return;
-                  if (file.size > 2 * 1024 * 1024) { alert("Please choose an image smaller than 2MB."); return; }
-                  const reader = new FileReader(); reader.onload = () => onPhotoUpdate(String(reader.result)); reader.readAsDataURL(file);
-                }} />
-              </label>}
-            <div className="flex-1 min-w-0">
-              <p className="text-white font-mono font-black">{profile.username}</p>
-              <p className="text-white/50 text-xs font-mono mt-1">{profile.yearLevel} · {profile.course}</p>
-              <p className="text-white/40 text-xs font-mono truncate">{profile.school}</p>
-              {score >= 70 && !profile.photo && <p className="text-purple-300 text-xs font-mono mt-2">🏆 Add your photo to complete your winning profile.</p>}
-            </div>
-            <RankBadge totalXP={totalXP} compact />
-          </div>
-        </div>
-
-        <div className="mb-6"><RankBadge totalXP={totalXP} /></div>
-
-        {/* Stat cards */}
-        <div className="grid grid-cols-3 gap-3 mb-8">
-          {[
-            { label: "Correct", value: correct, color: "#22c55e" },
-            { label: "Wrong", value: total - correct, color: "#ef4444" },
-            { label: "XP Gained", value: `+${xp}`, color: "#f59e0b" },
-          ].map((s) => (
-            <div key={s.label} className="bg-white/5 border border-white/10 rounded-xl p-4">
-              <div className="text-2xl font-mono font-black mb-1" style={{ color: s.color }}>
-                {s.value}
-              </div>
-              <div className="text-xs font-mono text-white/40">{s.label}</div>
-            </div>
+        <div className="space-y-3">
+          {currentQ.options.map((opt, idx) => (
+            <button
+              key={idx}
+              disabled={selected !== null}
+              onClick={() => handleSelect(idx)}
+              className={`w-full p-4 rounded-xl text-left font-mono text-sm border transition-all ${
+                selected === idx
+                  ? idx === currentQ.answer
+                    ? "bg-green-500/30 border-green-400 text-white"
+                    : "bg-red-500/30 border-red-400 text-white"
+                  : selected !== null && idx === currentQ.answer
+                  ? "bg-green-500/20 border-green-500/50 text-white"
+                  : "bg-white/5 border-white/10 text-white/80 hover:bg-white/10"
+              }`}
+            >
+              {opt}
+            </button>
           ))}
         </div>
 
-        {/* Language badge */}
-        <div className="flex items-center justify-center gap-2 mb-8">
-          <span className="text-xl">{lang.icon}</span>
-          <span className="font-mono text-white/60">{lang.name} complete</span>
+        {showExplanation && (
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-6 p-4 rounded-2xl bg-white/5 border border-white/10">
+            <p className="text-xs font-mono text-cyan-300 font-bold mb-1">EXPLANATION</p>
+            <p className="text-xs font-mono text-white/70 leading-relaxed">{currentQ.explanation}</p>
+            <button onClick={handleNext} className="mt-4 w-full py-3 rounded-xl bg-purple-600 text-white font-mono font-bold hover:bg-purple-500 transition-all">
+              {qIndex < questions.length - 1 ? "Next Challenge" : "Complete Quest"}
+            </button>
+          </motion.div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── Results Screen ───────────────────────────────────────────────────────────
+
+function ResultsScreen({
+  score,
+  xp,
+  correct,
+  onHome,
+}: {
+  score: number;
+  xp: number;
+  correct: number;
+  onHome: () => void;
+}) {
+  return (
+    <div className="cq-screen p-6 flex items-center justify-center">
+      <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="max-w-md w-full bg-black/80 border border-white/10 rounded-3xl p-8 text-center backdrop-blur-2xl">
+        <Trophy size={50} className="mx-auto text-yellow-400 mb-4" />
+        <h2 className="text-3xl font-mono font-black text-white mb-2">QUEST COMPLETE!</h2>
+        <p className="text-white/40 font-mono text-sm mb-6">Here is how you performed in the arena.</p>
+
+        <div className="grid grid-cols-2 gap-3 mb-6">
+          <div className="p-4 rounded-2xl bg-white/5 border border-white/10">
+            <p className="text-xs font-mono text-white/40">ACCURACY</p>
+            <p className="text-2xl font-mono font-black text-green-400">{score}%</p>
+          </div>
+          <div className="p-4 rounded-2xl bg-white/5 border border-white/10">
+            <p className="text-xs font-mono text-white/40">TOTAL XP</p>
+            <p className="text-2xl font-mono font-black text-cyan-400">+{xp}</p>
+          </div>
         </div>
 
-        <div className="flex gap-3">
-          <motion.button
-            onClick={onReplay}
-            className="flex-1 flex items-center justify-center gap-2 py-4 rounded-xl border border-white/20 font-mono font-bold text-white/70 bg-white/5"
-            whileHover={{ scale: 1.02, backgroundColor: "rgba(255,255,255,0.1)" }}
-            whileTap={{ scale: 0.98 }}
-          >
-            <RotateCcw size={16} />
-            Retry
-          </motion.button>
-          <motion.button
-            onClick={onHome}
-            className="flex-1 flex items-center justify-center gap-2 py-4 rounded-xl font-mono font-bold text-white bg-gradient-to-r from-purple-600 to-cyan-600 shadow-lg shadow-purple-500/20"
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            <Code2 size={16} />
-            New Language
-          </motion.button>
-        </div>
+        <button onClick={onHome} className="w-full py-4 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-600 text-white font-mono font-bold">
+          Return to Arena
+        </button>
       </motion.div>
     </div>
   );
 }
 
-
-function GlobalMusicController({
-  selectedTrack,
-}: {
-  selectedTrack: MusicTrack;
-}) {
-  const audioContextRef = useRef<AudioContext | null>(null);
-  const masterGainRef = useRef<GainNode | null>(null);
-  const intervalRef = useRef<number | null>(null);
-  const activeNodesRef = useRef<Array<{ oscillator: OscillatorNode; gain: GainNode }>>([]);
-  const selectedTrackRef = useRef(selectedTrack);
-  const [playing, setPlaying] = useState(false);
-
-  useEffect(() => {
-    selectedTrackRef.current = selectedTrack;
-  }, [selectedTrack]);
-
-  const stopPlayback = useCallback(() => {
-    if (intervalRef.current !== null) {
-      window.clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-
-    activeNodesRef.current.forEach(({ oscillator, gain }) => {
-      try {
-        gain.gain.cancelScheduledValues(0);
-        gain.gain.setValueAtTime(0.0001, 0);
-        oscillator.stop(0);
-      } catch {}
-    });
-    activeNodesRef.current = [];
-
-    if (masterGainRef.current) {
-      try {
-        masterGainRef.current.gain.cancelScheduledValues(0);
-        masterGainRef.current.gain.setValueAtTime(0.0001, 0);
-      } catch {}
-    }
-  }, []);
-
-  const startPlayback = useCallback((track: MusicTrack) => {
-    if (typeof window === "undefined") return;
-
-    const AudioContextCtor = window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-    if (!AudioContextCtor) return;
-
-    stopPlayback();
-    setPlaying(true);
-
-    const context = audioContextRef.current ?? new AudioContextCtor();
-    audioContextRef.current = context;
-
-    if (context.state === "suspended") {
-      void context.resume();
-    }
-
-    if (!masterGainRef.current) {
-      const masterGain = context.createGain();
-      masterGain.gain.setValueAtTime(0.0001, context.currentTime);
-      masterGain.connect(context.destination);
-      masterGain.gain.exponentialRampToValueAtTime(0.035, context.currentTime + 0.25);
-      masterGainRef.current = masterGain;
-    }
-
-    const style = getMusicStyle(track);
-    let noteIndex = 0;
-
-    const playNote = () => {
-      const now = context.currentTime;
-      const [baseFreq, nextFreq] = style.notes[noteIndex % style.notes.length];
-      const oscillator = context.createOscillator();
-      const gain = context.createGain();
-
-      oscillator.type = style.wave;
-      oscillator.frequency.setValueAtTime(baseFreq, now);
-      oscillator.frequency.exponentialRampToValueAtTime(nextFreq, now + 0.25);
-      gain.gain.setValueAtTime(0.0001, now);
-      gain.gain.exponentialRampToValueAtTime(0.03, now + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.4);
-
-      oscillator.connect(gain);
-      gain.connect(masterGainRef.current!);
-      oscillator.start(now);
-      oscillator.stop(now + 0.42);
-
-      oscillator.onended = () => {
-        activeNodesRef.current = activeNodesRef.current.filter((item) => item.oscillator !== oscillator);
-      };
-
-      activeNodesRef.current.push({ oscillator, gain });
-      noteIndex = (noteIndex + 1) % style.notes.length;
-    };
-
-    playNote();
-    intervalRef.current = window.setInterval(playNote, 700);
-  }, [stopPlayback]);
-
-  useEffect(() => {
-    const beginPlayback = () => {
-      void startPlayback(selectedTrackRef.current);
-      window.removeEventListener("pointerdown", beginPlayback);
-      window.removeEventListener("keydown", beginPlayback);
-    };
-
-    window.addEventListener("pointerdown", beginPlayback);
-    window.addEventListener("keydown", beginPlayback);
-
-    return () => {
-      window.removeEventListener("pointerdown", beginPlayback);
-      window.removeEventListener("keydown", beginPlayback);
-    };
-  }, [startPlayback]);
-
-  useEffect(() => {
-    void startPlayback(selectedTrack);
-    return () => stopPlayback();
-  }, [selectedTrack, startPlayback, stopPlayback]);
-
-  return (
-    <div className="cq-music-dock">
-      <div className="cq-music-dot"><Music size={14}/></div>
-      <div className="min-w-0"><p className="cq-music-label">GLOBAL SOUNDTRACK</p><p className="cq-music-track">{selectedTrack.title}</p></div>
-      <span className={`cq-music-live ${playing ? "is-live" : ""}`}>{playing ? "LIVE" : "READY"}</span>
-    </div>
-  );
-}
-
-// ─── App ─────────────────────────────────────────────────────────────────────
+// ─── Main App Router ──────────────────────────────────────────────────────────
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>("welcome");
+  const [selectedLang, setSelectedLang] = useState<string>("javascript");
   const [gameMode, setGameMode] = useState<GameMode>("practice");
-  const [selectedLang, setSelectedLang] = useState<string | null>(null);
-  const [selectedTrack, setSelectedTrack] = useState<(typeof SPOTIFY_TRACKS)[number]>(() => {
-    try {
-      const savedId = localStorage.getItem("codequest-selected-track");
-      return SPOTIFY_TRACKS.find((track) => track.id === savedId) ?? SPOTIFY_TRACKS[0];
-    } catch { return SPOTIFY_TRACKS[0]; }
-  });
-  const [musicReturn, setMusicReturn] = useState<"profile">("profile");
-  const [results, setResults] = useState<{ score: number; xp: number; correct: number } | null>(null);
-  const [lifetimeXP, setLifetimeXP] = useState(() => Number(localStorage.getItem("codequest-total-xp") || 0));
-  const [duelLang, setDuelLang] = useState<string | null>(null);
-  const [battleDifficulty, setBattleDifficulty] = useState<"easy" | "normal" | "hard">(() => { try { return (localStorage.getItem("codequest-battle-difficulty") as "easy" | "normal" | "hard") || "normal"; } catch { return "normal"; } });
-  const [friendName, setFriendName] = useState("");
-  const [friendRankName, setFriendRankName] = useState(RANKS[2].name);
-  const [friendPhoto, setFriendPhoto] = useState("");
-  const [darkMode, setDarkMode] = useState(() => {
-    try {
-      const saved = localStorage.getItem("codequest-theme-mode");
-      if (saved) return saved === "dark";
-      return window.matchMedia("(prefers-color-scheme: dark)").matches;
-    } catch {
-      return true;
-    }
-  });
-  const [profile, setProfile] = useState<StudentProfile>(() => {
-    try {
-      return JSON.parse(localStorage.getItem("codequest-profile") || '{"username":"","yearLevel":"","course":"","school":"","photo":""}');
-    } catch {
-      return { username: "", yearLevel: "", course: "", school: "", photo: "" };
-    }
+  const [battleDifficulty, setBattleDifficulty] = useState<"easy" | "normal" | "hard">("normal");
+  const [selectedTrack, setSelectedTrack] = useState<MusicTrack>(SPOTIFY_TRACKS[0]);
+  const [darkMode, setDarkMode] = useState(true);
+
+  const [profile, setProfile] = useState<StudentProfile>({
+    username: "Code Warrior",
+    yearLevel: "1st Year",
+    course: "BS Information Technology",
+    school: "Tech University",
+    photo: "",
   });
 
-  const totalQs = selectedLang ? (QUESTIONS[selectedLang]?.length ?? 0) : 0;
+  const [totalXP, setTotalXP] = useState(150);
+  const [lastResults, setLastResults] = useState({ score: 0, xp: 0, correct: 0 });
 
-  useEffect(() => {
-    localStorage.setItem("codequest-selected-track", selectedTrack.id);
-  }, [selectedTrack]);
+  // 1v1 Setup state
+  const [p1Name, setP1Name] = useState("Player 1");
+  const [p2Name, setP2Name] = useState("Player 2");
 
-  useEffect(() => {
-    localStorage.setItem("codequest-theme-mode", darkMode ? "dark" : "light");
-    document.documentElement.style.colorScheme = darkMode ? "dark" : "light";
-  }, [darkMode]);
-
-  const saveProfile = (next: StudentProfile) => {
-    const firstProfile = !profile.username;
-    setProfile(next);
-    localStorage.setItem("codequest-profile", JSON.stringify(next));
-    setScreen(firstProfile ? "guidelines" : "home");
-  };
-
-  const continueFromWelcome = () => {
-    if (!profile.username || !profile.yearLevel || !profile.course || !profile.school) {
-      setScreen("profile");
-    } else {
-      setScreen("home");
-    }
-  };
-
-  const startQuest = () => setScreen("modes");
-
-  const addLifetimeXP = (earned: number) => {
-    setLifetimeXP((prev) => {
-      const next = prev + earned;
-      localStorage.setItem("codequest-total-xp", String(next));
-      return next;
-    });
-  };
-
-  const updatePhoto = (photo: string) => {
-    const next = { ...profile, photo };
-    setProfile(next);
-    localStorage.setItem("codequest-profile", JSON.stringify(next));
+  const handleFinishGame = (score: number, xp: number, correct: number) => {
+    setLastResults({ score, xp, correct });
+    setTotalXP((prev) => prev + xp);
+    setScreen("results");
   };
 
   return (
-    <div className={`cq-shell cq-neo ${darkMode ? "dark-mode" : "light-mode"} cq-screen text-foreground overflow-x-hidden`}
-      style={{ fontFamily: "'JetBrains Mono', 'Inter', monospace" }}>
-      <style>{`
-        html, body, #root { width: 100%; min-height: 100%; margin: 0; }
-
-        /* CODEQUEST NEO EDITORIAL SYSTEM */
-
-        .cq-battle-arena { position:relative; min-height:300px; background:radial-gradient(circle at 50% 48%,rgba(201,255,77,.22),transparent 22%),linear-gradient(135deg,#f8fafc 0%,#e8e8e8 48%,#d8d8d8 100%) !important; border:2px solid rgba(17,24,39,.08) !important; box-shadow:inset 0 0 0 1px rgba(255,255,255,.8),0 28px 75px rgba(0,0,0,.13) !important; }
-        .cq-battle-arena:before { content:""; position:absolute; inset:0; background:linear-gradient(rgba(17,24,39,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(17,24,39,.055) 1px,transparent 1px); background-size:32px 32px; mask-image:linear-gradient(to bottom,transparent 0%,black 25%,black 75%,transparent 100%); pointer-events:none; }
-        .cq-battle-arena:after { content:""; position:absolute; left:50%; top:50%; width:62%; height:12px; transform:translate(-50%,-50%) rotate(-8deg); background:linear-gradient(90deg,transparent,#c9ff4d,#111827,#c9ff4d,transparent); filter:blur(10px); opacity:.42; pointer-events:none; }
-        .cq-battle-arena > * { position:relative; z-index:2; }
-        .cq-battle-arena .text-white\/80 { color:#111827 !important; }
-        .cq-duel-arena { background:#cfcfcf !important; }
-        .cq-duel-arena > .max-w-6xl { background:#fff; border-radius:28px; padding:clamp(14px,2.2vw,30px); min-height:calc(100svh - 28px); box-shadow:0 25px 80px rgba(0,0,0,.12); }
-        .cq-duel-arena:before { content:""; position:absolute; inset:12%; border-radius:50%; background:radial-gradient(circle,rgba(201,255,77,.14),transparent 62%); pointer-events:none; }
-        .cq-duel-arena .text-white { color:#111827 !important; }
-        .cq-duel-arena .bg-white\/5 { background:rgba(17,24,39,.035) !important; }
-        .cq-duel-arena .border-white\/10 { border-color:rgba(17,24,39,.12) !important; }
-        .cq-duel-arena .bg-black\/10 { background:#f5f5f5 !important; }
-        .cq-duel-arena .cq-duel-beam { height:3px; background:linear-gradient(90deg,transparent,#111827,#c9ff4d,#111827,transparent); box-shadow:0 0 24px rgba(201,255,77,.8); }
-        .cq-duel-setup { background:#cfcfcf !important; }
-        .cq-duel-setup > .max-w-5xl { background:#fff; border-radius:28px; padding:clamp(18px,2.5vw,34px); min-height:calc(100svh - 28px); box-shadow:0 25px 80px rgba(0,0,0,.12); }
-        .cq-duel-setup .text-white { color:#111827 !important; }
-        .cq-duel-setup .text-white\/35,.cq-duel-setup .text-white\/30,.cq-duel-setup .text-white\/25,.cq-duel-setup .text-white\/40 { color:#64748b !important; }
-        @media (max-width:640px){ .cq-battle-arena{min-height:260px}.cq-duel-arena > .max-w-6xl,.cq-duel-setup > .max-w-5xl{min-height:calc(100svh - 16px);border-radius:20px;padding:14px}.cq-battle-arena:before{background-size:24px 24px} }
-
-        html, body, #root { width:100%; min-height:100%; margin:0; }
-        body { background:#cfcfcf !important; color:#111827; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important; }
-        .cq-neo { background:#cfcfcf !important; color:#111827 !important; }
-        .cq-neo .dark-mode, .cq-neo .light-mode { background:#cfcfcf !important; color:#111827 !important; }
-        .cq-neo .cq-page { background:#cfcfcf; }
-        .cq-neo .cq-screen { min-height:100svh; height:100svh; overflow:hidden; }
-        .cq-neo .cq-hero-card, .cq-neo .cq-editorial-card { background:#fff; border:1px solid rgba(255,255,255,.9); border-radius:28px; box-shadow:0 22px 70px rgba(0,0,0,.10); }
-        .cq-topbar { height:74px; display:flex; align-items:center; justify-content:space-between; padding:0 34px; }
-        .cq-brand { display:flex; align-items:center; gap:10px; font-weight:900; letter-spacing:-.04em; color:#111827; font-size:15px; }
-        .cq-brand-mark { width:30px; height:30px; border-radius:10px; display:grid; place-items:center; background:#111827; color:#c9ff4d; font-size:9px; letter-spacing:.04em; }
-        .cq-pill-button { display:inline-flex; align-items:center; gap:8px; padding:12px 17px; border-radius:11px; background:#f4f4f4; color:#111827; border:1px solid #ececec; font-weight:800; font-size:12px; transition:.2s; }
-        .cq-pill-button:hover { transform:translateY(-2px); background:#c9ff4d; border-color:#c9ff4d; }
-        .cq-kicker { font-size:10px; letter-spacing:.28em; font-weight:900; color:#64748b; margin-bottom:15px; }
-        .cq-mega-title { font-size:clamp(5rem, 13vw, 11rem); line-height:.78; letter-spacing:-.095em; font-weight:950; color:#111827; margin:0; }
-        .cq-mega-title span { color:#aeb4bb; }
-        .cq-primary-button { display:inline-flex; align-items:center; gap:10px; border:0; background:#111827; color:#fff; border-radius:13px; padding:15px 21px; font-weight:900; font-size:13px; box-shadow:0 14px 35px rgba(17,24,39,.18); transition:.2s; }
-        .cq-primary-button:hover { transform:translateY(-3px); background:#c9ff4d; color:#111827; }
-        .cq-stat { display:flex; align-items:center; gap:8px; padding:10px 14px; border-radius:13px; background:#f3f3f3; color:#64748b; font-size:10px; text-transform:uppercase; letter-spacing:.12em; }
-        .cq-stat strong { color:#111827; font-size:20px; letter-spacing:-.06em; }
-        .cq-chip { border:1px solid #e7e7e7; background:#fafafa; padding:7px 10px; border-radius:999px; }
-        .cq-core-3d { width:min(34vw,330px); aspect-ratio:1; border-radius:43% 57% 51% 49% / 49% 43% 57% 51%; transform:rotate(14deg); background:radial-gradient(circle at 32% 25%,#efffb0 0 8%,#c9ff4d 22%,#8aa900 48%,#111827 78%); box-shadow:inset -32px -35px 60px rgba(0,0,0,.32), inset 22px 18px 38px rgba(255,255,255,.42), 0 35px 80px rgba(0,0,0,.22); display:grid; place-items:center; position:relative; z-index:3; }
-        .cq-core-3d:before,.cq-core-3d:after { content:""; position:absolute; border-radius:50%; border:2px solid rgba(17,24,39,.32); width:122%; height:28%; transform:rotate(-24deg); }
-        .cq-core-3d:after { width:136%; height:36%; transform:rotate(20deg); border-color:rgba(201,255,77,.8); }
-        .cq-core-inner { width:34%; aspect-ratio:1; border-radius:30%; background:#111827; color:#c9ff4d; display:grid; place-items:center; transform:rotate(-14deg); box-shadow:0 15px 35px rgba(0,0,0,.3); }
-        .cq-orbit { position:absolute; border:1px solid rgba(17,24,39,.18); border-radius:50%; z-index:1; }
-        .cq-orbit-a { width:min(48vw,480px); aspect-ratio:1; }
-        .cq-orbit-b { width:min(40vw,390px); aspect-ratio:1; border-style:dashed; }
-        .cq-music-dock { position:fixed; left:18px; bottom:18px; z-index:90; display:flex; align-items:center; gap:10px; max-width:min(360px,calc(100vw - 36px)); padding:10px 12px; border-radius:15px; background:rgba(255,255,255,.92); border:1px solid rgba(255,255,255,.9); box-shadow:0 16px 40px rgba(0,0,0,.14); backdrop-filter:blur(18px); }
-        .cq-music-dot { width:32px; height:32px; display:grid; place-items:center; border-radius:10px; background:#111827; color:#c9ff4d; flex:none; }
-        .cq-music-label { font-size:8px; font-weight:900; letter-spacing:.18em; color:#94a3b8; }
-        .cq-music-track { max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:11px; font-weight:900; color:#111827; }
-        .cq-music-live { margin-left:auto; font-size:8px; font-weight:900; letter-spacing:.14em; color:#94a3b8; }
-        .cq-music-live.is-live { color:#6d8b00; }
-        .cq-neo .text-white { color:#111827 !important; }
-        .cq-neo .text-white\/80,.cq-neo .text-white\/70 { color:#334155 !important; }
-        .cq-neo .text-white\/60,.cq-neo .text-white\/55,.cq-neo .text-white\/50,.cq-neo .text-white\/45,.cq-neo .text-white\/40 { color:#64748b !important; }
-        .cq-neo .text-white\/35,.cq-neo .text-white\/30,.cq-neo .text-white\/25,.cq-neo .text-white\/20 { color:#94a3b8 !important; }
-        .cq-neo .border-white\/10 { border-color:rgba(15,23,42,.12) !important; }
-        .cq-neo .border-white\/20 { border-color:rgba(15,23,42,.18) !important; }
-        .cq-neo .bg-white\/5 { background:rgba(15,23,42,.035) !important; }
-        .cq-neo .bg-white\/10 { background:rgba(15,23,42,.06) !important; }
-        .cq-neo .bg-black\/10,.cq-neo .bg-black\/15,.cq-neo .bg-black\/20,.cq-neo .bg-black\/25,.cq-neo .bg-black\/30,.cq-neo .bg-black\/35 { background:rgba(248,250,252,.88) !important; }
-        .cq-neo input,.cq-neo select,.cq-neo textarea { background:#fff !important; color:#111827 !important; border-color:#dfe3e7 !important; }
-        .cq-neo .cq-screen > .max-w-6xl, .cq-neo .cq-screen > .max-w-5xl { background:#fff; border-radius:28px; padding:clamp(16px,2.2vw,32px); box-shadow:0 22px 70px rgba(0,0,0,.10); min-height:calc(100svh - 28px); }
-        .cq-neo .cq-screen > div.max-w-6xl, .cq-neo .cq-screen > div.max-w-5xl { border:1px solid rgba(255,255,255,.85); }
-        .cq-neo button { -webkit-tap-highlight-color:transparent; }
-        .cq-neo .font-mono { font-family:Inter,ui-sans-serif,system-ui,sans-serif !important; }
-        .cq-neo pre,.cq-neo code { font-family:"SFMono-Regular",Consolas,monospace !important; }
-        .cq-neo [class*="bg-gradient-to-br"], .cq-neo [class*="bg-gradient-to-r"] { background-color:#fff; }
-        .cq-neo .shadow-2xl,.cq-neo .shadow-xl { box-shadow:0 18px 55px rgba(0,0,0,.09) !important; }
-        .cq-neo .cq-screen .rounded-3xl { border-radius:24px; }
-        .cq-neo .cq-screen .rounded-2xl { border-radius:18px; }
-        .cq-neo .cq-screen .rounded-xl { border-radius:14px; }
-        .cq-neo .cq-screen .bg-gradient-to-r.from-purple-600,.cq-neo .cq-screen .bg-gradient-to-r.from-pink-600 { background:#111827 !important; }
-        .cq-neo .cq-screen .bg-gradient-to-r.from-cyan-600 { background:#c9ff4d !important; color:#111827 !important; }
-        .cq-neo .cq-screen .bg-gradient-to-r.from-purple-600:hover,.cq-neo .cq-screen .bg-gradient-to-r.from-pink-600:hover { background:#c9ff4d !important; color:#111827 !important; }
-        .cq-neo .cq-screen [class*="text-purple-300"] { color:#6b7280 !important; }
-        .cq-neo .cq-screen [class*="text-cyan-300"] { color:#516600 !important; }
-        .cq-neo .cq-screen [class*="text-pink-300"] { color:#111827 !important; }
-        .cq-neo .cq-screen [class*="text-red-300"] { color:#b42318 !important; }
-        .cq-neo .cq-screen [class*="text-yellow-300"] { color:#667500 !important; }
-        .cq-neo .cq-screen [class*="text-green-300"] { color:#477000 !important; }
-        .cq-neo .cq-screen [class*="bg-purple-500\/10"],[class*="bg-purple-500\/15"] { background:rgba(201,255,77,.12) !important; }
-        .cq-neo .cq-screen [class*="bg-cyan-500\/10"],[class*="bg-cyan-500\/15"] { background:rgba(201,255,77,.10) !important; }
-        .cq-neo .cq-screen [class*="bg-pink-500\/10"],[class*="bg-pink-500\/15"] { background:rgba(17,24,39,.055) !important; }
-        .cq-neo .cq-screen [class*="bg-red-500\/10"] { background:rgba(180,35,24,.06) !important; }
-        .cq-neo .cq-screen [class*="bg-green-500\/10"] { background:rgba(71,112,0,.08) !important; }
-        @media (orientation: landscape) and (min-width: 900px) {
-          .cq-hero-card { max-height: calc(100vh - 18px); }
-          .cq-neo .cq-screen { overflow-y: auto; }
-          .cq-hero-card > .grid { gap: 0.75rem; }
-          .cq-topbar { padding: 0 20px; }
-        }
-        @media (max-width: 900px) {
-          .cq-topbar { padding:0 18px; }
-          .cq-hero-card { border-radius:22px; }
-          .cq-mega-title { font-size:clamp(4.6rem,18vw,8rem); }
-          .cq-core-3d { width:min(52vw,290px); }
-          .cq-orbit-a { width:min(70vw,400px); }
-          .cq-orbit-b { width:min(60vw,340px); }
-        }
-        @media (max-width: 640px) {
-          .cq-neo .cq-screen { height:100svh; min-height:100svh; }
-          .cq-hero-card { height:100%; border-radius:18px; }
-          .cq-topbar { height:60px; }
-          .cq-topbar .cq-brand span:last-child { font-size:12px; }
-          .cq-hero-card > .grid { height:calc(100% - 60px); grid-template-rows:auto 1fr; overflow:hidden; }
-          .cq-core-3d { width:210px; }
-          .cq-neo .cq-screen > .max-w-6xl, .cq-neo .cq-screen > .max-w-5xl { min-height:calc(100svh - 16px); padding:14px; border-radius:20px; overflow:hidden; }
-          .cq-music-dock { left:10px; bottom:10px; }
-        }
-
-        * { box-sizing: border-box; }
-        body { overflow-x: hidden; }
-        .dark-mode { background: #070711; min-height: 100vh; }
-        .light-mode { background: linear-gradient(135deg,#f8fafc,#eef2ff 45%,#ecfeff); color: #111827; min-height: 100vh; }
-        .light-mode .text-white { color: #111827 !important; }
-        .light-mode .text-white\\/80 { color: #374151 !important; }
-        .light-mode .text-white\\/70 { color: #4b5563 !important; }
-        .light-mode .text-white\\/60 { color: #6b7280 !important; }
-        .light-mode .text-white\\/50 { color: #6b7280 !important; }
-        .light-mode .text-white\\/40 { color: #6b7280 !important; }
-        .light-mode .text-white\\/30 { color: #9ca3af !important; }
-        .light-mode .text-white\\/20 { color: #9ca3af !important; }
-        .light-mode .bg-white\\/5 { background-color: rgba(17,24,39,.045) !important; }
-        .light-mode .bg-white\\/10 { background-color: rgba(17,24,39,.08) !important; }
-        .light-mode .border-white\\/10 { border-color: rgba(17,24,39,.12) !important; }
-        .light-mode .border-white\\/20 { border-color: rgba(17,24,39,.18) !important; }
-        .light-mode .bg-black\\/20 { background-color: rgba(255,255,255,.85) !important; }
-        .light-mode input, .light-mode select { color: #111827 !important; }
-        .light-mode .text-white\/35 { color: #6b7280 !important; }
-        .light-mode .text-white\/25 { color: #9ca3af !important; }
-        .light-mode .bg-black\/10 { background-color: rgba(255,255,255,.72) !important; }
-        .light-mode .bg-black\/15 { background-color: rgba(255,255,255,.72) !important; }
-        .light-mode .bg-black\/20 { background-color: rgba(255,255,255,.9) !important; }
-        .light-mode .border-white\/10 { border-color: rgba(15,23,42,.14) !important; }
-        .light-mode .border-white\/20 { border-color: rgba(15,23,42,.2) !important; }
-        .light-mode .text-purple-300 { color: #7c3aed !important; }
-        .light-mode .text-cyan-300 { color: #0891b2 !important; }
-        .light-mode .text-pink-300 { color: #db2777 !important; }
-        .light-mode .text-yellow-300 { color: #b45309 !important; }
-        .light-mode .text-green-300 { color: #15803d !important; }
-        .light-mode .text-red-300 { color: #dc2626 !important; }
-        .light-mode .text-orange-400 { color: #c2410c !important; }
-        .light-mode .text-white\/40 { color: #6b7280 !important; }
-        .light-mode .text-white\/30 { color: #9ca3af !important; }
-        .light-mode input::placeholder { color: #9ca3af !important; }
-        .light-mode .text-white\/10 { color: rgba(17,24,39,.15) !important; }
-        .light-mode iframe { filter: none; }
-        .light-mode { text-shadow: none; }
-        .light-mode button, .light-mode input, .light-mode select, .light-mode textarea { filter: contrast(1.05) saturate(1.05); }
-        button { -webkit-tap-highlight-color: transparent; }
-        .light-mode { background: #f4f7fb !important; color: #111827 !important; }
-        .light-mode .bg-black\/35, .light-mode .bg-black\/30, .light-mode .bg-black\/25, .light-mode .bg-black\/20, .light-mode .bg-black\/15 { background-color: rgba(255,255,255,.96) !important; }
-        .light-mode .text-white { color: #111827 !important; }
-        .light-mode .text-white\/75 { color: #334155 !important; }
-        .light-mode .text-white\/55 { color: #475569 !important; }
-        .light-mode .text-white\/50, .light-mode .text-white\/45, .light-mode .text-white\/40 { color: #64748b !important; }
-        .light-mode .text-white\/35, .light-mode .text-white\/30, .light-mode .text-white\/25 { color: #64748b !important; }
-        .light-mode .border-white\/10 { border-color: rgba(15,23,42,.16) !important; }
-        .light-mode .border-white\/20 { border-color: rgba(15,23,42,.22) !important; }
-        .light-mode .bg-white\/5 { background-color: rgba(15,23,42,.045) !important; }
-        .light-mode .bg-white\/10 { background-color: rgba(15,23,42,.075) !important; }
-        .light-mode input, .light-mode textarea, .light-mode select { background-color: #ffffff !important; color: #111827 !important; border-color: rgba(15,23,42,.2) !important; }
-        .light-mode input::placeholder, .light-mode textarea::placeholder { color: #64748b !important; }
-        .cq-shell { width: 100%; max-width: 100vw; overflow-x: clip; }
-        .cq-screen { height: 100svh; min-height: 100svh; overflow: hidden; }
-        .cq-touch { min-height: 44px; }
-        .light-mode .text-purple-200 { color: #6d28d9 !important; }
-        .light-mode .text-cyan-200 { color: #0e7490 !important; }
-        .light-mode .text-pink-200 { color: #be185d !important; }
-        .light-mode .text-green-200 { color: #166534 !important; }
-        .light-mode .text-yellow-200 { color: #92400e !important; }
-        .light-mode .text-white\/15 { color: rgba(15,23,42,.28) !important; }
-        .light-mode .bg-purple-500\/10 { background-color: rgba(124,58,237,.10) !important; }
-        .light-mode .bg-cyan-500\/10 { background-color: rgba(8,145,178,.10) !important; }
-        .light-mode .bg-pink-500\/10 { background-color: rgba(219,39,119,.10) !important; }
-        .light-mode .bg-green-500\/10 { background-color: rgba(22,163,74,.10) !important; }
-        .light-mode .bg-yellow-500\/10 { background-color: rgba(217,119,6,.10) !important; }
-        .light-mode .bg-purple-500\/15 { background-color: rgba(124,58,237,.14) !important; }
-        .light-mode .bg-cyan-500\/15 { background-color: rgba(8,145,178,.14) !important; }
-        .light-mode .bg-pink-500\/15 { background-color: rgba(219,39,119,.14) !important; }
-        .light-mode .bg-green-500\/15 { background-color: rgba(22,163,74,.14) !important; }
-        .light-mode .bg-black\/35 { background-color: rgba(255,255,255,.98) !important; }
-        .light-mode .bg-black\/25 { background-color: rgba(255,255,255,.98) !important; }
-        .light-mode .bg-black\/15 { background-color: rgba(255,255,255,.96) !important; }
-        .light-mode .bg-black\/10 { background-color: rgba(255,255,255,.94) !important; }
-        .light-mode [class*="shadow-purple"] { box-shadow: 0 12px 35px rgba(99,102,241,.12) !important; }
-        .light-mode button:hover { filter: brightness(1.02) saturate(1.08); }
-        @media (max-width: 768px) {
-          body { min-width: 0; overflow-x: hidden; }
-          .cq-shell { padding-left: max(.75rem, env(safe-area-inset-left)); padding-right: max(.75rem, env(safe-area-inset-right)); }
-        }
-        @media (max-width: 480px) {
-          .cq-shell { padding-top: .75rem; padding-bottom: 1rem; }
-          button, input, select, textarea { max-width: 100%; }
-        }
-      `}</style>
-
-      <div className="fixed inset-0 pointer-events-none"
-        style={{
-          backgroundImage: darkMode
-            ? `linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)`
-            : `linear-gradient(rgba(17,24,39,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(17,24,39,0.04) 1px, transparent 1px)`,
-          backgroundSize: "40px 40px",
-        }}
+    <div className={`cq-app min-h-screen ${darkMode ? "bg-slate-950 text-white" : "bg-slate-100 text-slate-900"}`}>
+      {/* Global Soundtrack Floating Controller */}
+      <GlobalMusicControlBar
+        currentTrack={selectedTrack}
+        onOpenMusic={() => setScreen("music")}
       />
 
-      <>
-        <GlobalMusicController selectedTrack={selectedTrack} />
-      </>
-
       <AnimatePresence mode="wait">
-
         {screen === "welcome" && (
-          <motion.div key="welcome" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <WelcomeScreen onContinue={continueFromWelcome} />
-          </motion.div>
+          <WelcomeScreen key="welcome" onContinue={() => setScreen("home")} />
         )}
 
         {screen === "home" && (
-          <motion.div key="home" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <HomeScreen
-              profile={profile}
-              darkMode={darkMode}
-              onToggleTheme={() => setDarkMode((v) => !v)}
-              onProfile={() => setScreen("profile")}
-              onGuidelines={() => setScreen("guidelines")}
-              onStart={startQuest}
-              totalXP={lifetimeXP}
-              onDuel={() => setScreen("duel-setup")}
-            />
-          </motion.div>
+          <HomeScreen
+            key="home"
+            profile={profile}
+            totalXP={totalXP}
+            darkMode={darkMode}
+            onStart={() => setScreen("modes")}
+            onProfile={() => setScreen("profile")}
+            onGuidelines={() => setScreen("guidelines")}
+            onToggleTheme={() => setDarkMode(!darkMode)}
+            onDuel={() => setScreen("duel-setup")}
+          />
         )}
 
         {screen === "profile" && (
-          <motion.div key="profile" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <ProfileScreen
-              profile={profile}
-              totalXP={lifetimeXP}
-              onSave={saveProfile}
-              onBack={() => setScreen("home")}
-              darkMode={darkMode}
-              onToggleTheme={() => setDarkMode((v) => !v)}
-              onMusic={() => { setMusicReturn("profile"); setScreen("music"); }}
-              selectedTrack={selectedTrack}
-            />
-          </motion.div>
-        )}
-
-        {screen === "guidelines" && (
-          <motion.div key="guidelines" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <GuidelinesScreen onBack={() => setScreen("home")} onContinue={() => setScreen("language")} />
-          </motion.div>
-        )}
-
-
-        {screen === "modes" && (
-          <motion.div key="modes" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <ModesScreen battleDifficulty={battleDifficulty} onDifficultyChange={(d) => { setBattleDifficulty(d); try { localStorage.setItem("codequest-battle-difficulty", d); } catch {} }} onBack={() => setScreen("home")} onSelect={(mode) => { setGameMode(mode); setScreen("language"); }} />
-          </motion.div>
-        )}
-
-        {screen === "language" && (
-          <motion.div key="language" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <LanguageScreen
-              onSelect={(lang) => {
-                setSelectedLang(lang);
-                setResults(null);
-                setScreen("game");
-              }}
-            />
-          </motion.div>
+          <ProfileScreen
+            key="profile"
+            profile={profile}
+            totalXP={totalXP}
+            darkMode={darkMode}
+            selectedTrack={selectedTrack}
+            onSave={(p) => { setProfile(p); setScreen("home"); }}
+            onBack={() => setScreen("home")}
+            onToggleTheme={() => setDarkMode(!darkMode)}
+            onMusic={() => setScreen("music")}
+          />
         )}
 
         {screen === "music" && (
-          <motion.div key="music" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <MusicSelectionScreen
-              selectedTrack={selectedTrack}
-              onSelect={(track) => {
-                setSelectedTrack(track);
-                try { localStorage.setItem("codequest-selected-track", track.id); } catch {}
-                // The global music controller restarts the current soundtrack and the menu disappears immediately.
-                setScreen(musicReturn);
-              }}
-              onBack={() => setScreen("profile")}
-            />
-          </motion.div>
+          <MusicSelectionScreen
+            key="music"
+            selectedTrack={selectedTrack}
+            onSelect={(t) => { setSelectedTrack(t); setScreen("home"); }}
+            onBack={() => setScreen("home")}
+          />
         )}
 
-        {screen === "game" && selectedLang && (
-          <motion.div key={`game-${selectedLang}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            {gameMode === "compiler" ? (
-              <CompilerGameScreen langId={selectedLang} onFinish={(score, xp, correct) => { setResults({ score, xp, correct }); addLifetimeXP(xp); setScreen("results"); }} />
-            ) : gameMode === "debug" ? (
-              <BugHunterGameScreen langId={selectedLang} onFinish={(score, xp, correct) => { setResults({ score, xp, correct }); addLifetimeXP(xp); setScreen("results"); }} />
-            ) : gameMode === "survival" ? (
-              <SurvivalGameScreen langId={selectedLang} onFinish={(score, xp, correct) => { setResults({ score, xp, correct }); addLifetimeXP(xp); setScreen("results"); }} />
-            ) : (
-              <GameScreen langId={selectedLang} mode={gameMode} battleDifficulty={battleDifficulty} onFinish={(score, xp, correct) => { setResults({ score, xp, correct }); addLifetimeXP(xp); setScreen("results"); }} />
-            )}
-          </motion.div>
+        {screen === "modes" && (
+          <ModesScreen
+            key="modes"
+            battleDifficulty={battleDifficulty}
+            onDifficultyChange={setBattleDifficulty}
+            onSelect={(mode) => {
+              setGameMode(mode);
+              setScreen("language");
+            }}
+            onBack={() => setScreen("home")}
+          />
+        )}
+
+        {screen === "language" && (
+          <LanguageScreen
+            key="language"
+            onSelect={(lang) => {
+              setSelectedLang(lang);
+              setScreen("game");
+            }}
+            onBack={() => setScreen("modes")}
+          />
+        )}
+
+        {screen === "guidelines" && (
+          <GuidelinesScreen
+            key="guidelines"
+            onContinue={() => setScreen("language")}
+            onBack={() => setScreen("home")}
+          />
+        )}
+
+        {screen === "game" && gameMode === "battle" && (
+          <BattleGameScreen
+            key="battle-game"
+            langId={selectedLang}
+            onFinish={handleFinishGame}
+          />
+        )}
+
+        {screen === "game" && gameMode !== "battle" && (
+          <StandardGameScreen
+            key="standard-game"
+            langId={selectedLang}
+            mode={gameMode}
+            onFinish={handleFinishGame}
+          />
         )}
 
         {screen === "duel-setup" && (
-          <motion.div key="duel-setup" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <DuelSetupScreen
-              profile={profile}
-              totalXP={lifetimeXP}
-              selectedLang={duelLang}
-              onSelectLanguage={setDuelLang}
-              onBack={() => setScreen("home")}
-              onStart={(name, rank, photo) => {
-                setFriendName(name);
-                setFriendRankName(rank);
-                setFriendPhoto(photo);
-                setScreen("duel");
-              }}
-            />
-          </motion.div>
+          <div key="duel-setup" className="cq-screen p-6 flex items-center justify-center">
+            <div className="max-w-md w-full bg-black/80 border border-white/10 rounded-3xl p-6 backdrop-blur-2xl">
+              <h2 className="text-2xl font-mono font-black text-white mb-4">1v1 Local Arena Setup</h2>
+              <div className="space-y-4">
+                <label className="block">
+                  <span className="text-xs font-mono text-white/50">Player 1 Name</span>
+                  <input value={p1Name} onChange={(e) => setP1Name(e.target.value)} className="w-full mt-1 p-3 rounded-xl bg-white/5 border border-white/10 font-mono text-sm text-white" />
+                </label>
+                <label className="block">
+                  <span className="text-xs font-mono text-white/50">Player 2 Name</span>
+                  <input value={p2Name} onChange={(e) => setP2Name(e.target.value)} className="w-full mt-1 p-3 rounded-xl bg-white/5 border border-white/10 font-mono text-sm text-white" />
+                </label>
+                <button
+                  onClick={() => setScreen("duel")}
+                  className="w-full py-4 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 text-white font-mono font-bold"
+                >
+                  Start 1v1 Battle
+                </button>
+              </div>
+            </div>
+          </div>
         )}
 
-        {screen === "duel" && duelLang && (
-          <motion.div key={`duel-${duelLang}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <DuelScreen
-              langId={duelLang}
-              profile={profile}
-              totalXP={lifetimeXP}
-              friendName={friendName}
-              friendRankName={friendRankName}
-              friendPhoto={friendPhoto}
-              onFinish={() => setScreen("home")}
-            />
-          </motion.div>
+        {screen === "duel" && (
+          <DuelArenaScreen
+            key="duel"
+            p1Name={p1Name}
+            p2Name={p2Name}
+            langId={selectedLang}
+            onFinish={(winner, p1, p2) => {
+              setLastResults({ score: 100, xp: 100, correct: p1 > p2 ? 10 : 5 });
+              setScreen("results");
+            }}
+          />
         )}
 
-        {screen === "results" && selectedLang && results && (
-          <motion.div key="results" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <ResultsScreen
-              langId={selectedLang}
-              score={results.score}
-              xp={results.xp}
-              correct={results.correct}
-              total={20}
-              profile={profile}
-              totalXP={lifetimeXP}
-              onPhotoUpdate={updatePhoto}
-              onReplay={() => {
-                setResults(null);
-                setScreen("game");
-              }}
-              onHome={() => {
-                setSelectedLang(null);
-                setScreen("home");
-              }}
-            />
-          </motion.div>
+        {screen === "results" && (
+          <ResultsScreen
+            key="results"
+            score={lastResults.score}
+            xp={lastResults.xp}
+            correct={lastResults.correct}
+            onHome={() => setScreen("home")}
+          />
         )}
       </AnimatePresence>
-
     </div>
   );
 }
