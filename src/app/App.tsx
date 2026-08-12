@@ -674,9 +674,9 @@ const ANIME_CHARACTERS: AnimeCharacter[] = [
 
 
 const SPOTIFY_TRACKS = [
+  { id: "palagi-neo", title: "Palagi", artist: "TJ Monterde-inspired OPM", category: "OPM" },
   { id: "2nbotE8GMs2IYte7WgtZBa", title: "Multo", artist: "Cup of Joe", category: "OPM" },
   { id: "61vyXXtY7OSYFRtSzv5ehw", title: "Mundo", artist: "IV OF SPADES", category: "OPM" },
-  { id: "4rwsFa82o2Bqo5DEj0wUKr", title: "Palagi", artist: "TJ Monterde", category: "OPM" },
   { id: "73yag1G1OoegdWZAtMxY5D", title: "Blinding Lights", artist: "The Weeknd", category: "The Weeknd" },
   { id: "38JOdzBE9kPj5UhKtqIIqQ", title: "Starboy", artist: "The Weeknd", category: "The Weeknd" },
   { id: "4m0q0xQ2BNl9SCAGKyfiGZ", title: "Somebody Else", artist: "The 1975", category: "Rock / Alt" },
@@ -704,6 +704,9 @@ const getMusicStyle = (track: MusicTrack): MusicStyle => {
   }
   if (track.category === "Rock / Alt") {
     return { wave: "sawtooth", notes: [[196, 246], [246, 293], [329, 392], [392, 329]] };
+  }
+  if (track.category === "OPM") {
+    return { wave: "triangle", notes: [[220, 247], [294, 330], [392, 440], [330, 294]] };
   }
   return { wave: "square", notes: [[261, 329], [329, 392], [392, 440], [440, 523]] };
 };
@@ -2315,8 +2318,13 @@ export default function App() {
   const [friendRankName, setFriendRankName] = useState(RANKS[2].name);
   const [friendPhoto, setFriendPhoto] = useState("");
   const [darkMode, setDarkMode] = useState(() => {
-    const saved = localStorage.getItem("codequest-theme-mode");
-    return saved === "dark" ? false : false;
+    try {
+      const saved = localStorage.getItem("codequest-theme-mode");
+      if (saved) return saved === "dark";
+      return window.matchMedia("(prefers-color-scheme: dark)").matches;
+    } catch {
+      return true;
+    }
   });
   const [profile, setProfile] = useState<StudentProfile>(() => {
     try {
@@ -2462,6 +2470,12 @@ export default function App() {
         .cq-neo .cq-screen [class*="bg-pink-500\/10"],[class*="bg-pink-500\/15"] { background:rgba(17,24,39,.055) !important; }
         .cq-neo .cq-screen [class*="bg-red-500\/10"] { background:rgba(180,35,24,.06) !important; }
         .cq-neo .cq-screen [class*="bg-green-500\/10"] { background:rgba(71,112,0,.08) !important; }
+        @media (orientation: landscape) and (min-width: 900px) {
+          .cq-hero-card { max-height: calc(100vh - 18px); }
+          .cq-neo .cq-screen { overflow-y: auto; }
+          .cq-hero-card > .grid { gap: 0.75rem; }
+          .cq-topbar { padding: 0 20px; }
+        }
         @media (max-width: 900px) {
           .cq-topbar { padding:0 18px; }
           .cq-hero-card { border-radius:22px; }
