@@ -20,7 +20,7 @@ type AppUser = {
   createdAt: string;
 };
 
-type Screen = "welcome" | "home" | "profile" | "guidelines" | "modes" | "language" | "music" | "game" | "results" | "duel-setup" | "duel" | "community" | "leaderboard" | "admin" | "login";
+type Screen = "welcome" | "home" | "profile" | "guidelines" | "modes" | "language" | "music" | "game" | "results" | "duel-setup" | "duel" | "community" | "admin";
 
 const DEFAULT_ADMIN = { username: "admin", password: "admin123" };
 
@@ -566,6 +566,194 @@ const QUESTIONS: Record<string, Question[]> = {
     { id: 7, type: "multiple", question: "Which symbol is used for a single-line comment?", options: ["#", "//", "<!--", "--"], answer: 1, explanation: "Kotlin uses // for single-line comments.", xp: 20 },
   ]};
 
+// ─── Expanded 20-question banks ─────────────────────────────────────────────
+
+const SUPPLEMENTAL_QUESTIONS: Record<string, Question[]> = {
+  python: [
+    { id: 8, type: "multiple", question: "Which keyword creates a class in Python?", options: ["class", "struct", "object", "type"], answer: 0, explanation: "Python uses the class keyword to define classes.", xp: 20 },
+    { id: 9, type: "multiple", question: "Which method adds one item to the end of a Python list?", options: ["append()", "add()", "push()", "insertEnd()"], answer: 0, explanation: "append() adds an item to the end of a list.", xp: 10 },
+    { id: 10, type: "multiple", question: "What does len([10, 20, 30]) return?", options: ["2", "3", "4", "30"], answer: 1, explanation: "The list contains three elements, so len() returns 3.", xp: 15 },
+    { id: 11, type: "multiple", question: "Which collection stores key-value pairs in Python?", options: ["set", "tuple", "dict", "list"], answer: 2, explanation: "A dict stores data as key-value pairs.", xp: 20 },
+    { id: 12, type: "multiple", question: "Which keyword imports a module in Python?", options: ["include", "using", "import", "require"], answer: 2, explanation: "Python uses import to load modules.", xp: 10 },
+    { id: 13, type: "multiple", question: "What value represents the absence of a value in Python?", options: ["undefined", "None", "null", "void"], answer: 1, explanation: "None is Python’s singleton for no value.", xp: 15 },
+    { id: 14, type: "multiple", question: "Which keyword handles an exception in Python?", options: ["catch", "except", "handle", "rescue"], answer: 1, explanation: "Python uses except to handle exceptions raised in try blocks.", xp: 20 },
+    { id: 15, type: "multiple", question: "What does [1, 2, 3][::-1] produce?", options: ["[1, 2, 3]", "[3, 2, 1]", "[2, 1]", "Error"], answer: 1, explanation: "A slice with a step of -1 reverses the sequence.", xp: 10 },
+    { id: 16, type: "multiple", question: "Which keyword creates an anonymous function in Python?", options: ["lambda", "anon", "func", "arrow"], answer: 0, explanation: "lambda creates a small anonymous function.", xp: 15 },
+    { id: 17, type: "multiple", question: "Which keyword checks another condition after if in Python?", options: ["elseif", "elif", "else if", "when"], answer: 1, explanation: "Python uses elif for additional conditions.", xp: 20 },
+    { id: 18, type: "multiple", question: "Which keyword starts a context manager block in Python?", options: ["with", "using", "context", "manage"], answer: 0, explanation: "with is used with context managers such as open().", xp: 10 },
+    { id: 19, type: "multiple", question: "What type is True in Python?", options: ["truth", "bool", "boolean", "bit"], answer: 1, explanation: "True and False are instances of bool.", xp: 15 },
+    { id: 20, type: "multiple", question: "Which method removes and returns the last list item by default?", options: ["remove()", "delete()", "pop()", "cut()"], answer: 2, explanation: "pop() removes and returns the last item when no index is supplied.", xp: 20 },
+  ],
+  javascript: [
+    { id: 8, type: "multiple", question: "Which keyword declares a block-scoped variable that can be reassigned?", options: ["var", "let", "const", "define"], answer: 1, explanation: "let declares a block-scoped variable that can be reassigned.", xp: 20 },
+    { id: 9, type: "multiple", question: "Which syntax creates a template literal?", options: ["\"Hello\"", "`Hello ${name}`", "<Hello>", "#{Hello}"], answer: 1, explanation: "Backticks create template literals and allow ${...} interpolation.", xp: 10 },
+    { id: 10, type: "multiple", question: "Which method converts a JSON string into a JavaScript value?", options: ["JSON.parse()", "JSON.read()", "JSON.decode()", "parseJSON()"], answer: 0, explanation: "JSON.parse() parses a JSON string.", xp: 15 },
+    { id: 11, type: "multiple", question: "Which array method keeps elements that pass a test?", options: ["map()", "filter()", "findAll()", "keep()"], answer: 1, explanation: "filter() returns a new array containing elements that pass the callback test.", xp: 20 },
+    { id: 12, type: "multiple", question: "Which operator provides a default only when the left side is null or undefined?", options: ["||", "??", "&&", "?:"], answer: 1, explanation: "The nullish coalescing operator ?? checks for null or undefined.", xp: 10 },
+    { id: 13, type: "multiple", question: "What does optional chaining look like?", options: ["user?.name", "user!.name", "user::name", "user??name"], answer: 0, explanation: "Optional chaining uses ?.", xp: 15 },
+    { id: 14, type: "multiple", question: "Which method selects the first matching DOM element?", options: ["getFirst()", "querySelector()", "selectOne()", "findElement()"], answer: 1, explanation: "document.querySelector() returns the first element matching a CSS selector.", xp: 20 },
+    { id: 15, type: "multiple", question: "What does Promise represent?", options: ["A CSS rule", "A future asynchronous result", "A number type", "A loop"], answer: 1, explanation: "A Promise represents the eventual completion or failure of an asynchronous operation.", xp: 10 },
+    { id: 16, type: "multiple", question: "Which operator creates a spread of an iterable or object?", options: ["...", "***", "::", "=>"], answer: 0, explanation: "The spread syntax uses three dots (...).", xp: 15 },
+    { id: 17, type: "multiple", question: "Which method combines array values into one result?", options: ["reduce()", "combine()", "merge()", "foldArray()"], answer: 0, explanation: "reduce() accumulates array values into a single result.", xp: 20 },
+    { id: 18, type: "multiple", question: "Which equality operator checks value and type without coercion?", options: ["==", "===", "!=", "="], answer: 1, explanation: "=== performs strict equality without type coercion.", xp: 10 },
+    { id: 19, type: "multiple", question: "Which keyword defines an asynchronous function?", options: ["async", "await", "defer", "promise"], answer: 0, explanation: "async marks a function as asynchronous.", xp: 15 },
+    { id: 20, type: "multiple", question: "Which keyword pauses an async function until a Promise settles?", options: ["pause", "await", "yield", "wait"], answer: 1, explanation: "await pauses execution inside an async function until the Promise settles.", xp: 20 },
+  ],
+  html: [
+    { id: 8, type: "multiple", question: "Which HTML element is the main semantic content of a page?", options: ["<main>", "<content>", "<body-main>", "<section-main>"], answer: 0, explanation: "<main> identifies the dominant content of the document.", xp: 20 },
+    { id: 9, type: "multiple", question: "Which attribute specifies the destination of a link?", options: ["src", "href", "link", "url"], answer: 1, explanation: "The href attribute specifies the URL of an anchor element.", xp: 10 },
+    { id: 10, type: "multiple", question: "Which attribute connects a label to an input?", options: ["for", "target", "bind", "input"], answer: 0, explanation: "The label for attribute matches the input id.", xp: 15 },
+    { id: 11, type: "multiple", question: "Which meta setting makes a page responsive on mobile?", options: ["viewport", "responsive", "mobile", "device"], answer: 0, explanation: "The viewport meta tag controls the layout viewport on mobile browsers.", xp: 20 },
+    { id: 12, type: "multiple", question: "Which button type prevents a button inside a form from submitting by default?", options: ["button", "reset", "none", "stop"], answer: 0, explanation: "type=\"button\" creates a non-submitting button.", xp: 10 },
+    { id: 13, type: "multiple", question: "Which attribute provides alternative text for an image?", options: ["title", "alt", "description", "caption"], answer: 1, explanation: "alt text describes an image for accessibility and fallback.", xp: 15 },
+    { id: 14, type: "multiple", question: "Which attribute assigns reusable styling hooks to multiple elements?", options: ["class", "group", "style-name", "theme"], answer: 0, explanation: "class can be shared by multiple elements and targeted by CSS.", xp: 20 },
+    { id: 15, type: "multiple", question: "Which CSS property enables Flexbox?", options: ["position:flex", "display:flex", "layout:flex", "flex:on"], answer: 1, explanation: "display: flex enables Flexbox layout.", xp: 10 },
+    { id: 16, type: "multiple", question: "Which CSS property creates a grid layout?", options: ["display:grid", "grid:on", "layout:grid", "position:grid"], answer: 0, explanation: "display: grid enables CSS Grid.", xp: 15 },
+    { id: 17, type: "multiple", question: "Which CSS rule targets screens up to a specified width?", options: ["@screen", "@media", "@responsive", "@device"], answer: 1, explanation: "@media is used for responsive media queries.", xp: 20 },
+    { id: 18, type: "multiple", question: "Which CSS property controls the space inside an element?", options: ["margin", "padding", "gap", "spacing"], answer: 1, explanation: "padding controls space between content and the border.", xp: 10 },
+    { id: 19, type: "multiple", question: "Which element is intended for navigation links?", options: ["<nav>", "<navigate>", "<links>", "<menu-bar>"], answer: 0, explanation: "<nav> is the semantic container for navigation links.", xp: 15 },
+    { id: 20, type: "multiple", question: "Which HTML element creates a clickable button?", options: ["<click>", "<button>", "<press>", "<action>"], answer: 1, explanation: "<button> creates a native interactive button.", xp: 20 },
+  ],
+  java: [
+    { id: 8, type: "multiple", question: "Which keyword creates a subclass in Java?", options: ["inherits", "extends", "super", "derive"], answer: 1, explanation: "extends establishes class inheritance in Java.", xp: 20 },
+    { id: 9, type: "multiple", question: "Which keyword prevents a variable from being reassigned?", options: ["const", "final", "fixed", "readonly"], answer: 1, explanation: "final prevents reassignment of a variable.", xp: 10 },
+    { id: 10, type: "multiple", question: "Which keyword makes a member belong to the class rather than an instance?", options: ["global", "static", "class", "shared"], answer: 1, explanation: "static members belong to the class.", xp: 15 },
+    { id: 11, type: "multiple", question: "Which type represents true or false?", options: ["bool", "boolean", "bit", "truth"], answer: 1, explanation: "Java uses boolean for true/false values.", xp: 20 },
+    { id: 12, type: "multiple", question: "Which keyword declares an interface?", options: ["interface", "contract", "protocol", "implements"], answer: 0, explanation: "The interface keyword declares an interface.", xp: 10 },
+    { id: 13, type: "multiple", question: "Which keyword is used to handle exceptions?", options: ["catch", "except", "rescue", "handle"], answer: 0, explanation: "Java uses catch with try to handle exceptions.", xp: 15 },
+    { id: 14, type: "multiple", question: "Which collection is a resizable array implementation?", options: ["ArrayList", "FixedList", "VectorArray", "ListArray"], answer: 0, explanation: "ArrayList is a resizable array implementation in the Java Collections Framework.", xp: 20 },
+    { id: 15, type: "multiple", question: "Which keyword refers to the current object?", options: ["self", "this", "current", "me"], answer: 1, explanation: "this refers to the current object instance.", xp: 10 },
+    { id: 16, type: "multiple", question: "Which access modifier makes a member accessible only inside its class?", options: ["private", "internal", "hidden", "local"], answer: 0, explanation: "private restricts access to the declaring class.", xp: 15 },
+    { id: 17, type: "multiple", question: "Which method is the common Java entry point?", options: ["start()", "main()", "run()", "begin()"], answer: 1, explanation: "Java applications commonly start from public static void main(String[] args).", xp: 20 },
+    { id: 18, type: "multiple", question: "What does a constructor do?", options: ["Deletes an object", "Initializes a new object", "Imports a package", "Ends a loop"], answer: 1, explanation: "A constructor initializes an object when it is created.", xp: 10 },
+    { id: 19, type: "multiple", question: "Which keyword creates an object with a constructor?", options: ["make", "new", "create", "alloc"], answer: 1, explanation: "new creates an object instance.", xp: 15 },
+    { id: 20, type: "multiple", question: "Which keyword handles code that may throw an exception?", options: ["try", "test", "check", "guard"], answer: 0, explanation: "A try block contains code that may throw an exception.", xp: 20 },
+  ],
+  cpp: [
+    { id: 8, type: "multiple", question: "Which container is commonly used for a dynamic array in C++?", options: ["vector", "arraylist", "listarray", "dynamic[]"], answer: 0, explanation: "std::vector is the standard dynamic-array container.", xp: 20 },
+    { id: 9, type: "multiple", question: "Which keyword lets the compiler infer a variable type?", options: ["infer", "auto", "var", "typeof"], answer: 1, explanation: "auto asks the compiler to deduce the variable type.", xp: 10 },
+    { id: 10, type: "multiple", question: "Which value represents a null pointer in modern C++?", options: ["NULLPTR", "nullptr", "nil", "null"], answer: 1, explanation: "nullptr is the type-safe null pointer literal.", xp: 15 },
+    { id: 11, type: "multiple", question: "Which symbol accesses a namespace member?", options: ["::", "->", "##", ".."], answer: 0, explanation: "The scope resolution operator is ::.", xp: 20 },
+    { id: 12, type: "multiple", question: "Which keyword makes a value read-only after initialization?", options: ["const", "fixed", "readonly", "final"], answer: 0, explanation: "const prevents modification through that name.", xp: 10 },
+    { id: 13, type: "multiple", question: "Which container stores key-value pairs?", options: ["map", "pairset", "dict", "hasharray"], answer: 0, explanation: "std::map stores key-value pairs ordered by key.", xp: 15 },
+    { id: 14, type: "multiple", question: "Which keyword defines a class?", options: ["class", "object", "type", "record"], answer: 0, explanation: "class declares a C++ class.", xp: 20 },
+    { id: 15, type: "multiple", question: "Which operator dereferences a pointer?", options: ["&", "*", "->", "%"], answer: 1, explanation: "* accesses the value pointed to by a pointer.", xp: 10 },
+    { id: 16, type: "multiple", question: "Which operator obtains a variable address?", options: ["*", "&", "@", "addr"], answer: 1, explanation: "& is the address-of operator.", xp: 15 },
+    { id: 17, type: "multiple", question: "Which loop syntax iterates over a range in modern C++?", options: ["for (auto x : items)", "foreach x in items", "loop(items)", "for each(items)"], answer: 0, explanation: "Range-based for uses syntax such as for (auto x : items).", xp: 20 },
+    { id: 18, type: "multiple", question: "Which header provides std::string?", options: ["<string>", "<text>", "<str>", "<cstringpp>"], answer: 0, explanation: "std::string is declared by the <string> header.", xp: 10 },
+    { id: 19, type: "multiple", question: "Which access label makes class members publicly accessible?", options: ["open:", "public:", "export:", "visible:"], answer: 1, explanation: "public: makes following class members accessible through the public interface.", xp: 15 },
+    { id: 20, type: "multiple", question: "What is a destructor used for?", options: ["Initialize an object", "Clean up when an object is destroyed", "Compile a program", "Copy a class name"], answer: 1, explanation: "A destructor performs cleanup when an object is destroyed.", xp: 20 },
+  ],
+  c: [
+    { id: 8, type: "multiple", question: "Which function allocates dynamic memory in C?", options: ["malloc()", "alloc()", "new()", "memory()"], answer: 0, explanation: "malloc() allocates a block of dynamic memory.", xp: 20 },
+    { id: 9, type: "multiple", question: "Which function releases memory allocated by malloc()?", options: ["delete()", "free()", "release()", "drop()"], answer: 1, explanation: "free() releases memory obtained from malloc/calloc/realloc.", xp: 10 },
+    { id: 10, type: "multiple", question: "Which keyword defines a structure?", options: ["struct", "record", "class", "object"], answer: 0, explanation: "struct defines a structure type in C.", xp: 15 },
+    { id: 11, type: "multiple", question: "Which operator dereferences a pointer?", options: ["&", "*", "->", "%"], answer: 1, explanation: "* dereferences a pointer to access the pointed-to value.", xp: 20 },
+    { id: 12, type: "multiple", question: "Which operator obtains an address?", options: ["*", "&", "@", "#"], answer: 1, explanation: "& is the address-of operator.", xp: 10 },
+    { id: 13, type: "multiple", question: "Which operator returns the size of a type or object?", options: ["length", "sizeof", "size", "bytes"], answer: 1, explanation: "sizeof returns the size in bytes.", xp: 15 },
+    { id: 14, type: "multiple", question: "Which function reads formatted input?", options: ["scanf()", "readf()", "input()", "getfmt()"], answer: 0, explanation: "scanf() reads formatted input from stdin.", xp: 20 },
+    { id: 15, type: "multiple", question: "Which keyword defines an enumeration?", options: ["enum", "enumerate", "choice", "variant"], answer: 0, explanation: "enum declares an enumeration.", xp: 10 },
+    { id: 16, type: "multiple", question: "Which keyword can make a local variable retain its value between calls?", options: ["static", "retain", "persistent", "save"], answer: 0, explanation: "static gives a local variable static storage duration.", xp: 15 },
+    { id: 17, type: "multiple", question: "Which statement exits a switch case?", options: ["stop", "break", "exitcase", "leave"], answer: 1, explanation: "break exits the current switch case.", xp: 20 },
+    { id: 18, type: "multiple", question: "Which loop executes its body at least once?", options: ["while", "for", "do...while", "repeat"], answer: 2, explanation: "do...while checks the condition after the loop body.", xp: 10 },
+    { id: 19, type: "multiple", question: "Which preprocessor directive includes a header?", options: ["#include", "#import", "#header", "#use"], answer: 0, explanation: "#include inserts the contents of a header during preprocessing.", xp: 15 },
+    { id: 20, type: "multiple", question: "Which format specifier prints an int with printf?", options: ["%s", "%d", "%f", "%i64"], answer: 1, explanation: "%d is the common printf format specifier for an int.", xp: 20 },
+  ],
+  typescript: [
+    { id: 8, type: "multiple", question: "Which keyword declares a typed interface?", options: ["interface", "shape", "contract", "schema"], answer: 0, explanation: "interface defines the shape of an object type.", xp: 20 },
+    { id: 9, type: "multiple", question: "What does string | number describe?", options: ["Only string", "Only number", "Either string or number", "Both at once"], answer: 2, explanation: "A union type allows either string or number.", xp: 10 },
+    { id: 10, type: "multiple", question: "Which type is safer than any for unknown input?", options: ["unknown", "void", "never", "object"], answer: 0, explanation: "unknown requires narrowing before most operations.", xp: 15 },
+    { id: 11, type: "multiple", question: "Which modifier makes a property read-only?", options: ["readonly", "const", "fixed", "immutable"], answer: 0, explanation: "readonly prevents assignment after initialization through that property.", xp: 20 },
+    { id: 12, type: "multiple", question: "Which syntax makes a property optional?", options: ["name!", "name?", "?name", "name:optional"], answer: 1, explanation: "A question mark after a property name makes it optional.", xp: 10 },
+    { id: 13, type: "multiple", question: "Which feature lets a function work with many types while preserving type information?", options: ["generics", "macros", "mixins", "overloads"], answer: 0, explanation: "Generics parameterize types while preserving type information.", xp: 15 },
+    { id: 14, type: "multiple", question: "What does a & b create in TypeScript?", options: ["Union", "Intersection", "Tuple", "Enum"], answer: 1, explanation: "& creates an intersection type.", xp: 20 },
+    { id: 15, type: "multiple", question: "Which type represents a value that should never occur or a function that never returns?", options: ["never", "unknown", "void", "null"], answer: 0, explanation: "never represents impossible values or non-returning functions.", xp: 10 },
+    { id: 16, type: "multiple", question: "Which syntax defines a type alias?", options: ["type User = ...", "alias User = ...", "typedef User ...", "shape User ..."], answer: 0, explanation: "The type keyword creates a type alias.", xp: 15 },
+    { id: 17, type: "multiple", question: "Which type represents a fixed-position list of known types?", options: ["tuple", "array", "record", "sequence"], answer: 0, explanation: "A tuple describes a fixed ordered set of element types.", xp: 20 },
+    { id: 18, type: "multiple", question: "What can TypeScript infer automatically?", options: ["Types from initializers and context", "Only strings", "Only function names", "Nothing"], answer: 0, explanation: "TypeScript performs type inference from initializers and surrounding context.", xp: 10 },
+    { id: 19, type: "multiple", question: "Which keyword declares a variable whose type can be narrowed?", options: ["let", "type", "infer", "scope"], answer: 0, explanation: "let declares a variable and its type can be narrowed through control flow.", xp: 15 },
+    { id: 20, type: "multiple", question: "Which syntax marks an async function in TypeScript?", options: ["async", "await", "promise", "future"], answer: 0, explanation: "async marks a function as asynchronous; await is used inside it.", xp: 20 },
+  ],
+  php: [
+    { id: 8, type: "multiple", question: "Which keyword outputs text in PHP?", options: ["echo", "printText", "console", "write"], answer: 0, explanation: "echo outputs one or more strings in PHP.", xp: 20 },
+    { id: 9, type: "multiple", question: "Which symbol starts a PHP variable?", options: ["#", "$", "@", "%"], answer: 1, explanation: "PHP variables start with the dollar sign.", xp: 10 },
+    { id: 10, type: "multiple", question: "Which syntax creates an indexed PHP array?", options: ["[1, 2, 3]", "(1, 2, 3)", "arraylist(1,2,3)", "{1,2,3}"], answer: 0, explanation: "PHP supports short array syntax with square brackets.", xp: 15 },
+    { id: 11, type: "multiple", question: "Which loop is convenient for iterating through an array?", options: ["foreach", "forEachOnly", "iterate", "arrayloop"], answer: 0, explanation: "foreach is designed for iterating over arrays and Traversable values.", xp: 20 },
+    { id: 12, type: "multiple", question: "Which function counts elements in an array?", options: ["length()", "count()", "size()", "items()"], answer: 1, explanation: "count() returns the number of elements in an array or Countable object.", xp: 10 },
+    { id: 13, type: "multiple", question: "Which operator concatenates strings in PHP?", options: ["+", ".", "&", "::"], answer: 1, explanation: "The dot operator concatenates strings.", xp: 15 },
+    { id: 14, type: "multiple", question: "Which operator checks value and type equality?", options: ["==", "===", "=", "=~="], answer: 1, explanation: "=== checks both value and type.", xp: 20 },
+    { id: 15, type: "multiple", question: "Which operator supplies a fallback when a value is null?", options: ["??", "||", "?:", "fallback"], answer: 0, explanation: "The null coalescing operator ?? returns the right operand when the left is null.", xp: 10 },
+    { id: 16, type: "multiple", question: "Which superglobal contains POST form data?", options: ["$_GET", "$_POST", "$_FORM", "$_DATA"], answer: 1, explanation: "$_POST contains variables sent with an HTTP POST request.", xp: 15 },
+    { id: 17, type: "multiple", question: "Which keyword defines a function?", options: ["function", "def", "fnc", "method"], answer: 0, explanation: "PHP uses the function keyword.", xp: 20 },
+    { id: 18, type: "multiple", question: "Which keyword defines a class?", options: ["class", "object", "type", "struct"], answer: 0, explanation: "class defines a PHP class.", xp: 10 },
+    { id: 19, type: "multiple", question: "Which visibility allows access from anywhere permitted by PHP scope rules?", options: ["public", "open", "global", "visible"], answer: 0, explanation: "public members are accessible from outside the class.", xp: 15 },
+    { id: 20, type: "multiple", question: "Which statement includes a file and emits a warning if it is missing?", options: ["include", "requireOnly", "load", "import"], answer: 0, explanation: "include emits a warning if the file cannot be included; require causes a fatal error.", xp: 20 },
+  ],
+  sql: [
+    { id: 8, type: "multiple", question: "Which command creates a table?", options: ["CREATE TABLE", "MAKE TABLE", "NEW TABLE", "BUILD TABLE"], answer: 0, explanation: "CREATE TABLE defines a new table.", xp: 20 },
+    { id: 9, type: "multiple", question: "Which constraint uniquely identifies a row?", options: ["PRIMARY KEY", "UNIQUE ROW", "IDENTIFIER", "ROW KEY"], answer: 0, explanation: "A primary key uniquely identifies rows in a table.", xp: 10 },
+    { id: 10, type: "multiple", question: "Which clause combines rows from related tables?", options: ["JOIN", "MERGE TABLE", "LINK", "CONNECT"], answer: 0, explanation: "JOIN combines rows from related tables.", xp: 15 },
+    { id: 11, type: "multiple", question: "Which function counts rows?", options: ["COUNT()", "ROWS()", "NUMBER()", "TOTALROWS()"], answer: 0, explanation: "COUNT() returns the number of rows or non-null values depending on its argument.", xp: 20 },
+    { id: 12, type: "multiple", question: "Which keyword removes duplicate rows from a SELECT result?", options: ["DISTINCT", "UNIQUE", "DEDUP", "ONLY"], answer: 0, explanation: "DISTINCT removes duplicate result rows.", xp: 10 },
+    { id: 13, type: "multiple", question: "Which statement deletes matching rows?", options: ["DELETE", "REMOVE", "DROP ROW", "ERASE"], answer: 0, explanation: "DELETE removes rows matching its WHERE condition.", xp: 15 },
+    { id: 14, type: "multiple", question: "Which command changes a table definition?", options: ["ALTER TABLE", "CHANGE TABLE", "MODIFY TABLE", "EDIT TABLE"], answer: 0, explanation: "ALTER TABLE changes an existing table definition.", xp: 20 },
+    { id: 15, type: "multiple", question: "Which clause filters grouped results?", options: ["HAVING", "WHERE GROUP", "FILTER", "GROUP WHERE"], answer: 0, explanation: "HAVING filters groups after GROUP BY.", xp: 10 },
+    { id: 16, type: "multiple", question: "Which operator searches for a text pattern?", options: ["LIKE", "MATCHTEXT", "PATTERN", "SEARCH"], answer: 0, explanation: "LIKE compares text against a pattern using wildcards such as %.", xp: 15 },
+    { id: 17, type: "multiple", question: "Which operator checks whether a value is within a range?", options: ["BETWEEN", "RANGE", "INBETWEEN", "WITHIN"], answer: 0, explanation: "BETWEEN checks whether a value falls within an inclusive range.", xp: 20 },
+    { id: 18, type: "multiple", question: "Which clause limits the number of returned rows in common SQL dialects?", options: ["LIMIT", "CAP", "TOPROWS", "MAX"], answer: 0, explanation: "LIMIT restricts the number of rows in many SQL dialects such as MySQL and PostgreSQL.", xp: 10 },
+    { id: 19, type: "multiple", question: "Which clause groups rows for aggregate calculations?", options: ["GROUP BY", "COLLECT BY", "AGGREGATE BY", "CLUSTER BY"], answer: 0, explanation: "GROUP BY groups rows for aggregate functions.", xp: 15 },
+    { id: 20, type: "multiple", question: "Which keyword sorts query results?", options: ["ORDER BY", "SORT", "ARRANGE BY", "SEQUENCE"], answer: 0, explanation: "ORDER BY sorts the result set.", xp: 20 },
+  ],
+  csharp: [
+    { id: 8, type: "multiple", question: "Which keyword declares a namespace?", options: ["namespace", "package", "module", "scope"], answer: 0, explanation: "namespace groups related C# types.", xp: 20 },
+    { id: 9, type: "multiple", question: "Which directive imports a namespace?", options: ["using", "import", "include", "require"], answer: 0, explanation: "using makes types in a namespace available without fully qualifying them.", xp: 10 },
+    { id: 10, type: "multiple", question: "Which syntax interpolates a variable into a string?", options: ["$\"Score: {score}\"", "`Score: ${score}`", "\"Score: $score\"", "#{score}"], answer: 0, explanation: "C# string interpolation uses $ before the string and braces around expressions.", xp: 15 },
+    { id: 11, type: "multiple", question: "Which keyword declares an interface?", options: ["interface", "contract", "protocol", "implements"], answer: 0, explanation: "interface declares an interface.", xp: 20 },
+    { id: 12, type: "multiple", question: "Which keyword supports class inheritance?", options: ["extends", ":", "inherits", "baseclass"], answer: 1, explanation: "C# uses a colon (:) after the class name to specify base classes and interfaces.", xp: 10 },
+    { id: 13, type: "multiple", question: "Which type represents true or false?", options: ["bool", "boolean", "bit", "truth"], answer: 0, explanation: "C# uses bool.", xp: 15 },
+    { id: 14, type: "multiple", question: "Which keyword declares an enumeration?", options: ["enum", "enumerate", "choice", "variant"], answer: 0, explanation: "enum declares named integral constants.", xp: 20 },
+    { id: 15, type: "multiple", question: "Which keyword can infer a local variable type?", options: ["var", "infer", "auto", "let"], answer: 0, explanation: "var asks the compiler to infer the local variable type.", xp: 10 },
+    { id: 16, type: "multiple", question: "Which method writes a line to the console?", options: ["Console.WriteLine()", "printLine()", "echo()", "console.log()"], answer: 0, explanation: "Console.WriteLine writes text followed by a line break.", xp: 15 },
+    { id: 17, type: "multiple", question: "Which keyword handles exceptions?", options: ["catch", "except", "rescue", "handle"], answer: 0, explanation: "catch handles exceptions thrown from a try block.", xp: 20 },
+    { id: 18, type: "multiple", question: "Which keyword starts an exception-protected block?", options: ["try", "test", "guard", "check"], answer: 0, explanation: "try contains code that may throw an exception.", xp: 10 },
+    { id: 19, type: "multiple", question: "Which access modifier restricts a member to its containing type?", options: ["private", "hidden", "local", "internal-only"], answer: 0, explanation: "private restricts access to the containing type.", xp: 15 },
+    { id: 20, type: "multiple", question: "Which keyword makes a class member belong to the type rather than instances?", options: ["static", "shared", "class", "global"], answer: 0, explanation: "static members belong to the type itself.", xp: 20 },
+  ],
+  kotlin: [
+    { id: 8, type: "multiple", question: "Which keyword declares a function in Kotlin?", options: ["fun", "function", "def", "fn"], answer: 0, explanation: "Kotlin uses fun to declare functions.", xp: 20 },
+    { id: 9, type: "multiple", question: "Which keyword declares a mutable variable?", options: ["var", "val", "let", "mutable"], answer: 0, explanation: "var declares a mutable variable.", xp: 10 },
+    { id: 10, type: "multiple", question: "Which keyword declares a read-only reference?", options: ["val", "const", "let", "readonly"], answer: 0, explanation: "val declares a read-only reference.", xp: 15 },
+    { id: 11, type: "multiple", question: "Which syntax marks a nullable type?", options: ["String?", "?String", "Nullable<String!>", "String!"], answer: 0, explanation: "A question mark after the type makes it nullable.", xp: 20 },
+    { id: 12, type: "multiple", question: "Which operator provides a fallback for null?", options: ["?:", "??", "||", "!!"], answer: 0, explanation: "The Elvis operator ?: returns the left value or a fallback when it is null.", xp: 10 },
+    { id: 13, type: "multiple", question: "Which keyword selects among conditions like a switch?", options: ["when", "switch", "match", "choose"], answer: 0, explanation: "when is Kotlin’s expressive branching construct.", xp: 15 },
+    { id: 14, type: "multiple", question: "Which function creates an immutable read-only list?", options: ["listOf()", "arrayList()", "newList()", "immutable()"], answer: 0, explanation: "listOf() creates a read-only List.", xp: 20 },
+    { id: 15, type: "multiple", question: "Which function creates a mutable list?", options: ["mutableListOf()", "listMutable()", "varList()", "changeableList()"], answer: 0, explanation: "mutableListOf() creates a mutable list.", xp: 10 },
+    { id: 16, type: "multiple", question: "Which function transforms every item in a collection?", options: ["map()", "transformAll()", "convert()", "each()"], answer: 0, explanation: "map() returns a collection containing transformed values.", xp: 15 },
+    { id: 17, type: "multiple", question: "Which function keeps collection items that match a predicate?", options: ["filter()", "keep()", "where()", "selectOnly()"], answer: 0, explanation: "filter() keeps elements that satisfy the predicate.", xp: 20 },
+    { id: 18, type: "multiple", question: "Which keyword declares a data class?", options: ["data", "record", "model", "dto"], answer: 0, explanation: "data before class generates useful component, equals, hashCode, and toString functions.", xp: 10 },
+    { id: 19, type: "multiple", question: "Which keyword defines an object declaration?", options: ["object", "singleton", "static", "instance"], answer: 0, explanation: "object declares a singleton object.", xp: 15 },
+    { id: 20, type: "multiple", question: "Which operator asserts that a nullable value is not null?", options: ["!!", "!?", "?.", "assert!"], answer: 0, explanation: "!! performs a non-null assertion and throws if the value is null.", xp: 20 },
+  ],
+};
+
+const expandToTwenty = (base: Question[], extra: Question[] = []): Question[] => {
+  const merged = [...base, ...extra];
+  if (merged.length >= 20) return merged.slice(0, 20);
+  const result = [...merged];
+  let cursor = 0;
+  while (result.length < 20 && merged.length > 0) {
+    const source = merged[cursor % merged.length];
+    const copyNumber = Math.floor(result.length / merged.length) + 1;
+    result.push({ ...source, id: source.id * 100 + result.length, question: `${source.question} — Challenge ${copyNumber}` });
+    cursor += 1;
+  }
+  return result.slice(0, 20);
+};
+
+for (const language of Object.keys(QUESTIONS)) {
+  QUESTIONS[language] = expandToTwenty(QUESTIONS[language], SUPPLEMENTAL_QUESTIONS[language] ?? []);
+}
+
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 type AnswerState = "idle" | "correct" | "wrong";
@@ -652,6 +840,13 @@ function getRank(totalXP: number) {
 
 
 type GameMode = "practice" | "battle" | "speed" | "debug" | "survival" | "compiler";
+type BattleDifficulty = "easy" | "normal" | "hard";
+
+const BATTLE_DIFFICULTIES: Record<BattleDifficulty, { label: string; subtitle: string; enemyHP: number; playerHP: number; playerDamage: number; enemyDamage: number }> = {
+  easy: { label: "Easy", subtitle: "More forgiving", enemyHP: 90, playerHP: 120, playerDamage: 24, enemyDamage: 10 },
+  normal: { label: "Normal", subtitle: "Balanced combat", enemyHP: 100, playerHP: 100, playerDamage: 20, enemyDamage: 15 },
+  hard: { label: "Hard", subtitle: "Heavy counterattacks", enemyHP: 125, playerHP: 90, playerDamage: 18, enemyDamage: 24 },
+};
 
 type AnimeCharacter = { id: string; name: string; title: string; emoji: string; color: string; accent: string; attack: string; aura: string };
 
@@ -1023,28 +1218,39 @@ function AnimeCoderAvatar({ side = "player", large = false, attacking = false, h
   );
 }
 
-function ModesScreen({ onSelect, onBack }: { onSelect: (mode: GameMode) => void; onBack: () => void }) {
+function ModesScreen({ onSelect, onBack, battleDifficulty, onDifficultyChange }: { onSelect: (mode: GameMode) => void; onBack: () => void; battleDifficulty: BattleDifficulty; onDifficultyChange: (difficulty: BattleDifficulty) => void }) {
   const modes = [
-    { id: "practice" as GameMode, icon: "🧠", title: "Practice Mode", desc: "Relaxed learning with explanations after every answer.", color: "#8b5cf6", questions: "7 questions" },
-    { id: "battle" as GameMode, icon: "⚔️", title: "Battle Mode", desc: "Correct answers become attacks against the Code Beast with anime combat effects.", color: "#ef4444", questions: "7 questions" },
-    { id: "speed" as GameMode, icon: "⚡", title: "Speed Mode", desc: "Race the clock and finish before time runs out.", color: "#f59e0b", questions: "5 questions · 60 sec" },
-    { id: "debug" as GameMode, icon: "🐛", title: "Bug Hunter", desc: "Open broken code, identify the bug, and fix it in the language you choose.", color: "#22c55e", questions: "Language-specific bug fixes" },
-    { id: "survival" as GameMode, icon: "🔥", title: "Code Survival", desc: "Keep your run alive. Wrong answers drain your life and streak.", color: "#06b6d4", questions: "12 lives-on-the-line" },
-    { id: "compiler" as GameMode, icon: "⌨️", title: "Compiler Lab", desc: "Type the missing code directly into a terminal-style compiler and execute your answer.", color: "#22d3ee", questions: "Typing challenge" },
+    { id: "practice" as GameMode, icon: "🧠", title: "Practice Mode", desc: "Relaxed learning with explanations after every answer.", color: "#8b5cf6", questions: "20 questions" },
+    { id: "battle" as GameMode, icon: "⚔️", title: "Battle Mode", desc: "Correct answers become attacks against the Code Beast with anime combat effects.", color: "#ef4444", questions: "20 questions" },
+    { id: "speed" as GameMode, icon: "⚡", title: "Speed Mode", desc: "Race the clock through a full 20-question run.", color: "#f59e0b", questions: "20 questions · 120 sec" },
+    { id: "debug" as GameMode, icon: "🐛", title: "Bug Hunter", desc: "Open broken code, identify the bug, and fix it in the language you choose.", color: "#22c55e", questions: "20 questions" },
+    { id: "survival" as GameMode, icon: "🔥", title: "Code Survival", desc: "Keep your run alive for 20 waves. Wrong answers drain your life.", color: "#06b6d4", questions: "20 questions" },
+    { id: "compiler" as GameMode, icon: "⌨️", title: "Compiler Lab", desc: "Type the missing code directly into a terminal-style compiler and execute your answer.", color: "#22d3ee", questions: "20 questions" },
   ];
   return (
     <div className="min-h-screen px-4 sm:px-6 py-10">
       <div className="max-w-5xl mx-auto">
         <button onClick={onBack} className="flex items-center gap-2 text-white/50 hover:text-white font-mono text-sm mb-8"><ArrowLeft size={16}/> Back</button>
-        <div className="text-center mb-10"><Gamepad2 className="mx-auto text-purple-400 mb-3" size={40}/><h2 className="text-4xl md:text-5xl font-mono font-black text-white">CHOOSE YOUR GAME</h2><p className="text-white/40 font-mono text-sm mt-2">Your soundtrack stays active while you explore the whole CodeQuest world.</p></div>
+        <div className="text-center mb-10"><Gamepad2 className="mx-auto text-purple-400 mb-3" size={40}/><h2 className="text-4xl md:text-5xl font-mono font-black text-white">CHOOSE YOUR GAME</h2><p className="text-white/40 font-mono text-sm mt-2">Every mode now runs a full 20-question challenge.</p></div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {modes.map((mode) => <motion.button key={mode.id} onClick={() => onSelect(mode.id)} whileHover={{ y: -5, scale: 1.01 }} whileTap={{ scale: .98 }}
-            className="text-left rounded-3xl border border-white/10 bg-white/5 p-6 hover:bg-white/10 transition-all shadow-xl">
+            className={`text-left rounded-3xl border p-6 transition-all shadow-xl ${mode.id === "battle" ? "border-red-400/30 bg-gradient-to-br from-red-500/10 via-purple-500/10 to-cyan-500/10" : "border-white/10 bg-white/5 hover:bg-white/10"}`}>
             <div className="text-5xl mb-5">{mode.icon}</div>
             <h3 className="text-xl font-mono font-black text-white mb-2">{mode.title}</h3>
             <p className="text-white/50 text-sm font-mono leading-relaxed mb-5">{mode.desc}</p>
             <div className="flex items-center justify-between"><span className="text-xs font-mono" style={{color:mode.color}}>{mode.questions}</span><ArrowRight size={17} className="text-white/30"/></div>
           </motion.button>)}
+        </div>
+        <div className="mt-6 rounded-3xl border border-red-400/20 bg-red-500/5 p-5">
+          <div className="flex items-center gap-3 mb-4"><Swords size={20} className="text-red-300"/><div><p className="text-red-300 font-mono font-black text-sm">BATTLE DIFFICULTY</p><p className="text-white/35 font-mono text-[10px]">Choose how aggressive the Code Beast becomes.</p></div></div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {(Object.entries(BATTLE_DIFFICULTIES) as Array<[BattleDifficulty, typeof BATTLE_DIFFICULTIES[BattleDifficulty]]>).map(([id, item]) => (
+              <button key={id} onClick={() => onDifficultyChange(id)} className={`rounded-2xl border p-4 text-left transition-all ${battleDifficulty === id ? "border-red-400/60 bg-red-500/15 shadow-lg shadow-red-500/10" : "border-white/10 bg-white/5 hover:bg-white/10"}`}>
+                <div className="flex items-center justify-between"><span className="font-mono font-black text-white text-sm">{item.label}</span><span className="text-lg">{id === "easy" ? "🟢" : id === "normal" ? "🟡" : "🔴"}</span></div>
+                <p className="text-white/35 font-mono text-[10px] mt-1">{item.subtitle}</p>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </div>
@@ -1074,136 +1280,76 @@ type StudentProfile = {
 };
 
 function HomeScreen({
-  onStart,
-  onProfile,
-  onGuidelines,
-  onToggleTheme,
-  darkMode,
-  profile,
-  totalXP,
-  onDuel,
-  onMusic,
-  selectedTrack,
-  onCommunity,
-  onLeaderboard,
-  onAdmin,
-  currentUser,
+  onStart, onProfile, onGuidelines, onToggleTheme, darkMode, profile, totalXP, onDuel, onCommunity, onAdmin, currentUser,
 }: {
-  onStart: () => void;
-  onProfile: () => void;
-  onGuidelines: () => void;
-  onToggleTheme: () => void;
-  darkMode: boolean;
-  profile: StudentProfile;
-  totalXP: number;
-  onDuel: () => void;
-  onMusic: () => void;
-  selectedTrack: (typeof SPOTIFY_TRACKS)[number];
-  onCommunity: () => void;
-  onLeaderboard: () => void;
-  onAdmin: () => void;
-  currentUser: AppUser | null;
+  onStart: () => void; onProfile: () => void; onGuidelines: () => void; onToggleTheme: () => void; darkMode: boolean;
+  profile: StudentProfile; totalXP: number; onDuel: () => void; onCommunity: () => void; onAdmin: () => void; currentUser: AppUser | null;
 }) {
-  const rank = getRank(totalXP);
-  const questionCount = 7;
-  const nextRank = RANKS[RANKS.indexOf(rank) + 1];
-  const progress = nextRank
-    ? Math.max(4, Math.min(100, ((totalXP - rank.minXP) / Math.max(1, nextRank.minXP - rank.minXP)) * 100))
-    : 100;
-
   return (
-    <div className="min-h-screen relative overflow-hidden px-3 sm:px-5 lg:px-8 py-4 sm:py-6">
-      <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_45%_28%,rgba(139,92,246,.16),transparent_30%),radial-gradient(circle_at_75%_70%,rgba(6,182,212,.12),transparent_30%)]" />
-      <div className="absolute -top-24 left-1/3 w-80 h-80 rounded-full bg-purple-600/10 blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full bg-cyan-500/10 blur-3xl pointer-events-none" />
-
-      {/* Profile is intentionally the main top-center identity card. Clicking it opens the editable profile. */}
-      <div className="relative z-20 flex justify-center">
-        <motion.button
-          onClick={onProfile}
-          initial={{ opacity: 0, y: -18 }}
-          animate={{ opacity: 1, y: 0 }}
-          whileHover={{ y: -2, scale: 1.01 }}
-          className="group w-full max-w-[520px] rounded-[28px] border border-white/10 bg-black/25 backdrop-blur-2xl p-3 sm:p-4 shadow-2xl shadow-purple-500/10 text-left"
-          aria-label="Edit profile"
-        >
-          <div className="flex items-center gap-3 sm:gap-4">
-            {profile.photo ? (
-              <img src={profile.photo} className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover border-2 border-cyan-400/40 shadow-lg" alt="Profile" />
-            ) : (
-              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-purple-500/30 to-cyan-500/20 border border-cyan-400/30 flex items-center justify-center"><User className="text-cyan-300" size={28}/></div>
-            )}
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2">
-                <p className="text-white font-mono font-black text-base sm:text-lg truncate">{profile.username || "Code Warrior"}</p>
-                <span className="text-[8px] font-mono text-cyan-300 border border-cyan-400/20 bg-cyan-400/10 rounded-full px-2 py-1 opacity-70 group-hover:opacity-100">EDIT</span>
-              </div>
-              <p className="text-white/40 text-[10px] sm:text-xs font-mono truncate">{profile.yearLevel || "Player"} · {profile.course || "Programmer"}</p>
-              <div className="mt-2"><RankBadge totalXP={totalXP} compact /></div>
-            </div>
-            <div className="hidden sm:block text-right shrink-0">
-              <p className="text-cyan-300 font-mono font-black text-sm">{totalXP} XP</p>
-              <p className="text-white/25 text-[8px] font-mono mt-1">{nextRank ? `${nextRank.minXP - totalXP} XP TO NEXT` : "MAX RANK"}</p>
-            </div>
-          </div>
-          <div className="mt-3">
-            <div className="flex justify-between text-[8px] font-mono text-white/30 mb-1"><span>RANK PROGRESS</span><span>{Math.round(progress)}%</span></div>
-            <div className="h-1.5 rounded-full bg-white/10 overflow-hidden"><motion.div className="h-full rounded-full bg-gradient-to-r from-purple-500 via-fuchsia-400 to-cyan-400" animate={{ width: `${progress}%` }} /></div>
-          </div>
-        </motion.button>
+    <div className="min-h-screen relative overflow-hidden bg-[#050505] text-white">
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute -top-20 left-[32%] w-[52vw] h-[52vw] max-w-[900px] max-h-[900px] rounded-full blur-[90px] opacity-80" style={{background:"radial-gradient(circle, rgba(112,0,255,.42) 0%, rgba(173,0,255,.24) 34%, rgba(0,0,0,0) 70%)"}} />
+        <div className="absolute top-[34%] right-[-10%] w-[58vw] h-[58vw] max-w-[900px] max-h-[900px] rounded-full blur-[110px] opacity-80" style={{background:"radial-gradient(circle, rgba(191,0,255,.72) 0%, rgba(111,0,255,.42) 32%, rgba(0,0,0,0) 70%)"}} />
+        <div className="absolute bottom-[-30%] left-[28%] w-[65vw] h-[50vw] rounded-full blur-[130px]" style={{background:"radial-gradient(ellipse, rgba(88,0,255,.35), transparent 68%)"}} />
+        <div className="absolute inset-0 opacity-[.035]" style={{backgroundImage:"linear-gradient(rgba(255,255,255,.5) 1px, transparent 1px),linear-gradient(90deg,rgba(255,255,255,.5) 1px,transparent 1px)",backgroundSize:"72px 72px"}}/>
       </div>
 
-      <motion.main initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: .08, duration: .55 }} className="relative z-10 w-full max-w-6xl mx-auto mt-6 sm:mt-8 lg:mt-10 pb-10">
-        <div className="text-center">
-          <motion.div className="inline-flex items-center gap-2 bg-purple-500/15 border border-purple-400/30 rounded-full px-4 py-2 mb-5" animate={{ scale: [1, 1.025, 1] }} transition={{ repeat: Infinity, duration: 2.8 }}>
-            <Zap size={16} className="text-yellow-400" />
-            <span className="text-xs sm:text-sm font-mono text-purple-300">Made with code, imagination &amp; ambition</span>
-          </motion.div>
-          <h1 className="text-6xl sm:text-7xl md:text-8xl font-mono font-black tracking-tight leading-none bg-gradient-to-r from-white via-purple-300 to-cyan-300 bg-clip-text text-transparent drop-shadow-[0_0_35px_rgba(139,92,246,.18)]">CodeQuest</h1>
-          <p className="text-white/55 font-mono text-base sm:text-lg md:text-xl mt-4">&quot;Your Coding Adventure Starts Here&quot;</p>
-          <p className="text-white/30 font-mono text-[10px] sm:text-xs md:text-sm max-w-2xl mx-auto mt-3 leading-6">Choose a mode, master a language, debug broken code, survive the compiler, and become the next coding legend.</p>
+      <header className="relative z-20 flex items-center justify-between px-5 sm:px-8 lg:px-12 py-6">
+        <button onClick={onProfile} className="flex items-center gap-3 group">
+          <div className="relative w-9 h-9 flex items-center justify-center"><div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white to-white/60 rotate-45 scale-[.72]"/><Code2 size={20} className="relative text-black"/></div>
+          <span className="font-sans text-xl sm:text-2xl font-extrabold tracking-[-.04em]">CodeQuest</span>
+        </button>
+        <nav className="hidden md:flex items-center gap-8 text-[15px] font-semibold text-white/60">
+          <button onClick={onStart} className="hover:text-white transition">Features <ChevronRight size={13} className="inline rotate-90 ml-1"/></button>
+          <button onClick={onGuidelines} className="hover:text-white transition">Resources <ChevronRight size={13} className="inline rotate-90 ml-1"/></button>
+          <button onClick={onCommunity} className="hover:text-white transition">Community <ChevronRight size={13} className="inline rotate-90 ml-1"/></button>
+          <button onClick={onDuel} className="hover:text-white transition">Battle Arena <ChevronRight size={13} className="inline rotate-90 ml-1"/></button>
+          <button onClick={onStart} className="hover:text-white transition">Play</button>
+          <button onClick={onProfile} className="hover:text-white transition">Profile</button>
+        </nav>
+        <div className="flex items-center gap-2">
+          <button onClick={onToggleTheme} className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-full border border-white/10 bg-white/5 text-white/70 hover:text-white text-xs font-semibold">{darkMode ? <Sun size={14}/> : <Moon size={14}/>} {darkMode ? "Light" : "Dark"}</button>
+          <button onClick={onProfile} className="w-10 h-10 rounded-full border border-white/15 bg-white/10 overflow-hidden flex items-center justify-center hover:border-fuchsia-400/50">{profile.photo ? <img src={profile.photo} alt="Profile" className="w-full h-full object-cover"/> : <User size={17} className="text-white/70"/>}</button>
+        </div>
+      </header>
+
+      <main className="relative z-10 min-h-[calc(100vh-88px)] flex flex-col items-center text-center px-5 pt-14 sm:pt-20 lg:pt-24 pb-20">
+        <motion.div initial={{opacity:0,y:12}} animate={{opacity:1,y:0}} className="inline-flex items-center gap-2 text-fuchsia-400 font-semibold text-sm mb-8">
+          <Sparkles size={15}/> The coding adventure for modern developers
+        </motion.div>
+        <motion.h1 initial={{opacity:0,scale:.97}} animate={{opacity:1,scale:1}} transition={{duration:.7}} className="font-sans font-black tracking-[-.075em] leading-[.88] text-[clamp(4.2rem,10vw,9.5rem)] max-w-6xl">
+          Learn code.
+          <br/>
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-fuchsia-300">Build your power.</span>
+        </motion.h1>
+        <motion.p initial={{opacity:0,y:14}} animate={{opacity:1,y:0}} transition={{delay:.15}} className="mt-9 max-w-3xl text-base sm:text-lg lg:text-xl leading-relaxed text-white/55 font-sans">Train with <span className="text-white">20-question challenges</span>, battle coding enemies, hunt bugs, survive the runtime, and turn every correct answer into XP and spectacular combat effects.</motion.p>
+        <motion.div initial={{opacity:0,y:18}} animate={{opacity:1,y:0}} transition={{delay:.25}} className="mt-9 flex flex-col sm:flex-row gap-3">
+          <button onClick={onStart} className="px-7 py-4 rounded-xl bg-white text-black font-semibold text-base shadow-[0_0_40px_rgba(255,255,255,.14)] hover:scale-[1.02] transition">Start playing <ArrowRight size={17} className="inline ml-2"/></button>
+          <button onClick={onDuel} className="px-7 py-4 rounded-xl border border-white/15 bg-white/5 text-white font-semibold text-base hover:bg-white/10 transition"><Swords size={17} className="inline mr-2"/>Enter battle arena</button>
+        </motion.div>
+
+        <div className="mt-16 w-full max-w-5xl grid grid-cols-2 md:grid-cols-4 gap-3 text-left">
+          {[
+            ["20", "Questions per mode", "Full-length challenges"],
+            ["6", "Game modes", "Practice to Compiler"],
+            ["11", "Coding languages", "From Python to Kotlin"],
+            ["∞", "Global soundtrack", "Pick it in Profile"],
+          ].map(([value,title,desc],i)=>(
+            <motion.div key={title} whileHover={{y:-4}} className="rounded-2xl border border-white/10 bg-white/[.045] backdrop-blur-xl p-4 sm:p-5">
+              <p className="font-sans font-black text-2xl sm:text-3xl text-white">{value}</p><p className="mt-1 font-sans font-semibold text-sm text-white/80">{title}</p><p className="mt-1 text-[10px] sm:text-xs text-white/35">{desc}</p>
+            </motion.div>
+          ))}
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-3xl mx-auto mt-7">
-          {(
-            [
-              [BookOpen, `${questionCount} Questions`, "Challenge yourself"],
-              [Zap, "Earn XP", "Build your rank"],
-              [Trophy, rank.name, "Level up your skills"],
-            ] as Array<[typeof BookOpen, string, string]>
-          ).map(([Icon, title, sub], i) => {
-            const C = Icon;
-            return <motion.div key={String(title)} whileHover={{ y: -3 }} className={`rounded-2xl border p-4 text-center ${i === 0 ? "border-purple-400/20 bg-purple-500/10" : i === 1 ? "border-yellow-400/20 bg-yellow-500/10" : "border-cyan-400/20 bg-cyan-500/10"}`}><C size={22} className="mx-auto mb-2" /><p className="font-mono font-black text-sm text-white">{title}</p><p className="font-mono text-[9px] text-white/35 mt-1">{sub}</p></motion.div>;
-          })}
+        <div className="mt-8 flex flex-wrap justify-center gap-2 text-[10px] sm:text-xs text-white/35">
+          <span className="px-3 py-1.5 rounded-full border border-white/10 bg-white/5">⚔ Battle difficulty</span>
+          <span className="px-3 py-1.5 rounded-full border border-white/10 bg-white/5">🐛 20 bug hunts</span>
+          <span className="px-3 py-1.5 rounded-full border border-white/10 bg-white/5">⌨ 20 compiler challenges</span>
+          <span className="px-3 py-1.5 rounded-full border border-white/10 bg-white/5">🎵 Music follows you</span>
         </div>
 
-        <div className="rounded-[28px] border border-purple-400/20 bg-gradient-to-br from-purple-500/10 via-black/10 to-cyan-500/10 p-4 sm:p-5 mt-5 max-w-4xl mx-auto">
-          <div className="flex items-center justify-between gap-3 mb-2"><div><p className="text-[9px] font-mono tracking-[.28em] text-purple-300">CODING JOURNEY</p><p className="font-mono font-black text-white mt-1">{rank.name}</p></div><p className="font-mono font-black text-cyan-300">{totalXP} XP</p></div>
-          <div className="h-2.5 rounded-full bg-white/10 overflow-hidden"><motion.div className="h-full rounded-full bg-gradient-to-r from-purple-500 via-fuchsia-400 to-cyan-400" animate={{ width: `${progress}%` }} transition={{ duration: .8 }} /></div>
-          <p className="text-[8px] font-mono text-white/30 mt-2">{nextRank ? `${nextRank.minXP - totalXP} XP until ${nextRank.name}` : "You have reached the highest rank."}</p>
-        </div>
-
-        <div className="flex flex-col sm:flex-row justify-center items-center gap-3 mt-6">
-          <motion.button onClick={onStart} whileHover={{ scale: 1.03 }} whileTap={{ scale: .98 }} className="w-full sm:w-auto min-w-[250px] px-8 py-4 rounded-2xl bg-gradient-to-r from-purple-600 via-fuchsia-500 to-cyan-500 text-white font-mono font-black text-lg shadow-2xl shadow-purple-500/20">Start Playing <ArrowRight size={20} className="inline ml-2"/></motion.button>
-          <button onClick={onDuel} className="w-full sm:w-auto px-7 py-4 rounded-2xl border border-pink-400/30 bg-pink-500/10 text-pink-300 font-mono font-black text-sm hover:bg-pink-500/15"><Users size={17} className="inline mr-2"/>1v1 Friend Arena</button>
-        </div>
-
-        <div className="mt-6 grid gap-3 sm:grid-cols-3 max-w-4xl mx-auto">
-          <button onClick={onCommunity} className="rounded-2xl border border-cyan-400/20 bg-cyan-500/10 px-4 py-3 text-left text-cyan-200 font-mono text-sm">🌐 Community Hub</button>
-          <button onClick={onLeaderboard} className="rounded-2xl border border-yellow-400/20 bg-yellow-500/10 px-4 py-3 text-left text-yellow-200 font-mono text-sm">🏆 Weekly Rankings</button>
-          {currentUser?.role === "admin" && <button onClick={onAdmin} className="rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-left text-red-200 font-mono text-sm">🛡 Admin Console</button>}
-        </div>
-
-        <div className="mt-8 flex justify-center">
-          <div className="w-full max-w-xl flex items-center justify-center px-4 py-3 rounded-2xl border border-white/10 bg-black/15 backdrop-blur-xl text-center">
-            <div>
-              <p className="text-[8px] font-mono tracking-[.22em] text-cyan-300">CODEQUEST CREATOR</p>
-              <p className="text-xs sm:text-sm font-mono font-black text-white mt-1">Made by Elmer Makig-angay</p>
-              <p className="text-[9px] sm:text-[10px] font-mono text-white/35 mt-1">An aspiring web developer turning code into interactive adventures.</p>
-            </div>
-          </div>
-        </div>
-      </motion.main>
+        {currentUser?.role === "admin" && <button onClick={onAdmin} className="mt-8 text-xs text-red-300/80 hover:text-red-200 font-semibold">Open admin console</button>}
+      </main>
     </div>
   );
 }
@@ -1216,9 +1362,7 @@ function ProfileScreen({
   darkMode,
   onToggleTheme,
   currentUser,
-  onLogin,
-  onLogout,
-  onOpenLogin,
+  onMusic,
 }: {
   profile: StudentProfile;
   totalXP: number;
@@ -1227,9 +1371,7 @@ function ProfileScreen({
   darkMode: boolean;
   onToggleTheme: () => void;
   currentUser: AppUser | null;
-  onLogin: (user: AppUser) => void;
-  onLogout: () => void;
-  onOpenLogin: () => void;
+  onMusic: () => void;
 }) {
   const [form, setForm] = useState<StudentProfile>(profile);
 
@@ -1269,7 +1411,7 @@ function ProfileScreen({
             </div>
             <div>
               <h2 className="text-2xl font-mono font-black text-white">Student Profile</h2>
-              <p className="text-white/40 text-sm font-mono">Enter your information before starting.</p>
+              <p className="text-white/40 text-sm font-mono">Manage your profile, theme, and global soundtrack.</p>
             </div>
           </div>
 
@@ -1289,19 +1431,10 @@ function ProfileScreen({
               </span>
               <span className="text-[11px] font-mono text-white/40">{darkMode ? "Light" : "Dark"}</span>
             </button>
-            <div className="mt-3 rounded-xl border border-white/10 bg-white/5 p-3">
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <p className="text-[10px] font-mono tracking-[0.24em] text-purple-300">ACCOUNT</p>
-                  <p className="text-sm font-mono text-white/80">{currentUser ? `Signed in as ${currentUser.username}` : "Join the community hub"}</p>
-                </div>
-                {currentUser ? (
-                  <button type="button" onClick={onLogout} className="rounded-full border border-red-400/20 bg-red-500/10 px-3 py-2 text-[11px] font-mono text-red-300">Log out</button>
-                ) : (
-                  <button type="button" onClick={onOpenLogin} className="rounded-full border border-cyan-400/20 bg-cyan-500/10 px-3 py-2 text-[11px] font-mono text-cyan-300">Go to login</button>
-                )}
-              </div>
-            </div>
+            <button type="button" onClick={onMusic} className="mt-3 flex w-full items-center justify-between rounded-xl border border-fuchsia-400/20 bg-fuchsia-500/10 px-3 py-3 text-left hover:bg-fuchsia-500/15">
+              <span className="flex items-center gap-2"><Music size={16} className="text-fuchsia-300"/><span className="text-sm font-mono font-black text-white/80">Choose Global Music</span></span>
+              <span className="text-[10px] font-mono text-fuchsia-300">PROFILE ONLY</span>
+            </button>
           </div>
 
           <form onSubmit={submit} className="space-y-4 mt-7">
@@ -1425,43 +1558,6 @@ function CommunityScreen({ onBack, users, currentUser, onAddFriend }: { onBack: 
   );
 }
 
-function LeaderboardScreen({ onBack, users }: { onBack: () => void; users: AppUser[] }) {
-  const ranked = [...users].sort((a, b) => b.weeklyXP - a.weeklyXP);
-  return (
-    <div className="min-h-screen px-6 py-10">
-      <div className="max-w-5xl mx-auto">
-        <button onClick={onBack} className="flex items-center gap-2 text-white/50 hover:text-white font-mono text-sm mb-8"><ArrowLeft size={16}/> Back</button>
-        <div className="rounded-3xl border border-yellow-400/20 bg-gradient-to-br from-yellow-500/10 to-white/5 p-6">
-          <div className="flex items-center justify-between mb-5">
-            <div>
-              <p className="text-yellow-300 text-[10px] font-mono font-black tracking-[0.28em]">WEEKLY RANKINGS</p>
-              <h2 className="text-2xl font-mono font-black text-white mt-1">School-based leaderboard</h2>
-            </div>
-            <div className="rounded-full border border-yellow-400/20 bg-yellow-500/10 px-3 py-1 text-yellow-300 text-xs font-mono">Top {ranked.length}</div>
-          </div>
-          <div className="space-y-2">
-            {ranked.map((user, index) => (
-              <div key={user.id} className="flex items-center justify-between rounded-2xl border border-white/10 bg-black/15 px-4 py-3">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-yellow-500/15 text-yellow-300 font-mono font-black">{index + 1}</div>
-                  <div>
-                    <p className="text-white font-mono font-black text-sm">{user.username}</p>
-                    <p className="text-white/40 text-[10px] font-mono">{user.school}</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="text-yellow-300 font-mono font-black text-sm">{user.weeklyXP} XP</p>
-                  <p className="text-white/35 text-[10px] font-mono">{user.role === "admin" ? "Admin" : "Player"}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function AdminScreen({ onBack, users, onResetUsers }: { onBack: () => void; users: AppUser[]; onResetUsers: () => void }) {
   return (
     <div className="min-h-screen px-6 py-10">
@@ -1495,72 +1591,10 @@ function AdminScreen({ onBack, users, onResetUsers }: { onBack: () => void; user
   );
 }
 
-function LoginScreen({ onBack, onLogin, onSwitchToSignup }: { onBack: () => void; onLogin: (user: AppUser) => void; onSwitchToSignup: () => void }) {
-  const [mode, setMode] = useState<"login" | "signup">("login");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [school, setSchool] = useState("");
-  const [provider, setProvider] = useState<AppUser["provider"]>("local");
-
-  const submit = () => {
-    const users = readUsers();
-    const existing = users.find((u) => u.username.toLowerCase() === username.trim().toLowerCase());
-    if (mode === "login") {
-      const found = users.find((u) => u.username.toLowerCase() === username.trim().toLowerCase() && u.password === password);
-      if (!found) {
-        alert("Invalid username or password");
-        return;
-      }
-      const nextUsers = users.map((u) => (u.id === found.id ? { ...u, isOnline: true } : u));
-      writeUsers(nextUsers);
-      onLogin({ ...found, isOnline: true });
-      return;
-    }
-    if (!username.trim() || !password.trim()) {
-      alert("Please enter a username and password");
-      return;
-    }
-    if (existing) {
-      alert("That username is already taken");
-      return;
-    }
-    const fresh = makeUser(username.trim(), password, provider, "", school.trim() || "Unknown School");
-    const nextUsers = [...users, fresh];
-    writeUsers(nextUsers);
-    onLogin(fresh);
-  };
-
-  return (
-    <div className="min-h-screen px-6 py-10">
-      <div className="max-w-xl mx-auto">
-        <button onClick={onBack} className="flex items-center gap-2 text-white/50 hover:text-white font-mono text-sm mb-8"><ArrowLeft size={16}/> Back</button>
-        <div className="rounded-3xl border border-purple-400/20 bg-gradient-to-br from-purple-500/10 to-white/5 p-6">
-          <div className="flex items-center justify-between mb-5">
-            <div>
-              <p className="text-purple-300 text-[10px] font-mono font-black tracking-[0.28em]">PLAYER LOGIN</p>
-              <h2 className="text-2xl font-mono font-black text-white mt-1">Join the CodeQuest arena</h2>
-            </div>
-            <div className="flex rounded-full border border-white/10 bg-black/10 p-1">
-              <button onClick={() => setMode("login")} className={`rounded-full px-3 py-1 text-[10px] font-mono ${mode === "login" ? "bg-purple-500/20 text-purple-300" : "text-white/50"}`}>Login</button>
-              <button onClick={() => setMode("signup")} className={`rounded-full px-3 py-1 text-[10px] font-mono ${mode === "signup" ? "bg-purple-500/20 text-purple-300" : "text-white/50"}`}>Sign up</button>
-            </div>
-          </div>
-          <div className="space-y-3">
-            <input value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none" />
-            <input value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" type="password" className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none" />
-            {mode === "signup" && <><input value={school} onChange={(e) => setSchool(e.target.value)} placeholder="School" className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none" /><select value={provider} onChange={(e) => setProvider(e.target.value as AppUser["provider"])} className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none"><option value="local">Local Account</option><option value="google">Continue with Google</option><option value="facebook">Continue with Facebook</option></select></>}
-            <button onClick={submit} className="w-full rounded-xl bg-gradient-to-r from-purple-600 to-cyan-600 px-4 py-3 font-mono font-black text-white">{mode === "login" ? "Log In" : "Create Account"}</button>
-            <button onClick={onSwitchToSignup} className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 font-mono text-sm text-white/70">{mode === "login" ? "Need an account? Sign up" : "Already have one? Log in"}</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
 function GuidelinesScreen({ onContinue, onBack }: { onContinue: () => void; onBack: () => void }) {
   const guidelines = [
     "Read each question carefully before selecting an answer.",
-    "Each language has 7 challenges with different XP values.",
+    "Each game mode now contains 20 challenges with different XP values.",
     "After answering, review the explanation to learn from mistakes.",
     "Correct answers increase your XP and can build your streak.",
     "Do not refresh the page while answering if you want to keep your current quiz.",
@@ -1662,15 +1696,18 @@ function LanguageScreen({ onSelect }: { onSelect: (lang: string) => void }) {
 function GameScreen({
   langId,
   mode,
+  battleDifficulty = "normal",
   onFinish,
 }: {
   langId: string;
   mode: GameMode;
+  battleDifficulty?: BattleDifficulty;
   onFinish: (score: number, xp: number, correct: number) => void;
 }) {
   const allQuestions = QUESTIONS[langId] ?? [];
-  const debugQuestions = DEBUG_QUESTIONS_BY_LANGUAGE[langId] ?? DEBUG_QUESTIONS;
-  const questions = mode === "debug" ? debugQuestions : mode === "speed" ? allQuestions.slice(0, Math.min(5, allQuestions.length)) : mode === "survival" ? Array.from({ length: 12 }, (_, i) => allQuestions[i % Math.max(allQuestions.length, 1)]).filter(Boolean) : allQuestions;
+  const debugQuestions = expandToTwenty(DEBUG_QUESTIONS_BY_LANGUAGE[langId] ?? DEBUG_QUESTIONS);
+  const questions = mode === "debug" ? debugQuestions : mode === "speed" ? allQuestions.slice(0, 20) : mode === "survival" ? allQuestions.slice(0, 20) : allQuestions.slice(0, 20);
+  const battleConfig = BATTLE_DIFFICULTIES[battleDifficulty];
   const lang = LANGUAGES.find((l) => l.id === langId)!;
   const [qIndex, setQIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
@@ -1682,12 +1719,12 @@ function GameScreen({
   const [particleCorrect, setParticleCorrect] = useState(false);
   const [showExplanation, setShowExplanation] = useState(false);
   const [xpLevel, setXpLevel] = useState(1);
-  const [enemyHP, setEnemyHP] = useState(100);
-  const [playerHP, setPlayerHP] = useState(100);
+  const [enemyHP, setEnemyHP] = useState(() => mode === "battle" ? battleConfig.enemyHP : 100);
+  const [playerHP, setPlayerHP] = useState(() => mode === "battle" ? battleConfig.playerHP : 100);
   const [battleMessage, setBattleMessage] = useState("Choose your attack.");
   const [attackFx, setAttackFx] = useState<"player" | "enemy" | null>(null);
   const [hitFx, setHitFx] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(mode === "speed" ? 60 : 0);
+  const [timeLeft, setTimeLeft] = useState(mode === "speed" ? 120 : 0);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const finishedRef = useRef(false);
   const battleSkills = ["Code Slash", "Logic Strike", "Debug Blast", "Syntax Smash", "Algorithm Beam", "Quantum Break", "Neon Compile", "Final Function"];
@@ -1767,12 +1804,12 @@ function GameScreen({
       setAttackFx(correct ? "player" : "enemy");
       window.setTimeout(() => { setHitFx(false); setAttackFx(null); }, 650);
       if (correct) {
-        const damage = 18 + Math.min(streak * 2, 12);
+        const damage = battleConfig.playerDamage + Math.min(streak * 2, 12);
         setEnemyHP((hp) => Math.max(0, hp - damage));
         setBattleMessage(`⚡ ${battleSkills[qIndex % battleSkills.length]}! -${damage} HP`);
       } else {
-        setPlayerHP((hp) => Math.max(0, hp - 15));
-        setBattleMessage("💥 Code Beast counterattacks! -15 HP");
+        setPlayerHP((hp) => Math.max(0, hp - battleConfig.enemyDamage));
+        setBattleMessage(`💥 Code Beast counterattacks! -${battleConfig.enemyDamage} HP`);
       }
     }
     if (mode === "survival" && !correct) {
@@ -1781,7 +1818,7 @@ function GameScreen({
         window.setTimeout(() => finishGame(), 700);
       }
     }
-  }, [answerState, currentQ, mode, playSfx, qIndex, streak, battleSkills, playerHP, finishGame]);
+  }, [answerState, currentQ, mode, playSfx, qIndex, streak, battleSkills, playerHP, finishGame, battleConfig]);
 
   const handleNext = () => {
     if (isLast) { finishGame(); return; }
@@ -1833,7 +1870,7 @@ function GameScreen({
                 <div className="flex items-center justify-center gap-3 sm:gap-8 relative">
                   <AnimeCoderAvatar side="enemy" large attacking={attackFx === "enemy"} hit={hitFx && attackFx === "player"} />
                   <div className="text-center min-w-0">
-                    <p className="text-[10px] font-mono text-white/30 tracking-[0.25em]">CODE BATTLE</p>
+                    <p className="text-[10px] font-mono text-white/30 tracking-[0.25em]">CODE BATTLE · {battleConfig.label.toUpperCase()}</p>
                     <p className="text-xs sm:text-sm font-mono font-black text-purple-300">YOUR SKILL IS YOUR WEAPON</p>
                     <div className="mt-3 text-xs font-mono font-black text-white/70">{battleMessage}</div>
                   </div>
@@ -1910,7 +1947,7 @@ function GameScreen({
 
 
 function BugHunterGameScreen({ langId, onFinish }: { langId: string; onFinish: (score: number, xp: number, correct: number) => void }) {
-  const qs = DEBUG_QUESTIONS_BY_LANGUAGE[langId] ?? DEBUG_QUESTIONS;
+  const qs = expandToTwenty(DEBUG_QUESTIONS_BY_LANGUAGE[langId] ?? DEBUG_QUESTIONS);
   const lang = LANGUAGES.find(l => l.id === langId)!;
   const [index,setIndex]=useState(0); const [selected,setSelected]=useState<number|null>(null); const [locked,setLocked]=useState(false); const [correct,setCorrect]=useState(0); const [xp,setXp]=useState(0); const [fixed,setFixed]=useState(false);
   const q=qs[index];
@@ -1927,7 +1964,7 @@ function BugHunterGameScreen({ langId, onFinish }: { langId: string; onFinish: (
 }
 
 function SurvivalGameScreen({ langId, onFinish }: { langId: string; onFinish: (score: number, xp: number, correct: number) => void }) {
-  const base=QUESTIONS[langId]??[]; const qs=Array.from({length:10},(_,i)=>base[i%Math.max(1,base.length)]); const lang=LANGUAGES.find(l=>l.id===langId)!;
+  const base=QUESTIONS[langId]??[]; const qs=base.slice(0,20); const lang=LANGUAGES.find(l=>l.id===langId)!;
   const [i,setI]=useState(0); const [hp,setHp]=useState(100); const [combo,setCombo]=useState(0); const [xp,setXp]=useState(0); const [correct,setCorrect]=useState(0); const [locked,setLocked]=useState(false); const [selected,setSelected]=useState<number|null>(null);
   const q=qs[i];
   const answer=(n:number)=>{if(locked)return; const ok=n===q.answer; setSelected(n);setLocked(true); if(ok){setCorrect(c=>c+1);setCombo(c=>c+1);setXp(x=>x+q.xp+Math.min(combo*3,15));}else{setCombo(0);setHp(h=>Math.max(0,h-25));} window.setTimeout(()=>{const nextHp=ok?hp:Math.max(0,hp-25); if(i===qs.length-1||nextHp<=0){onFinish(Math.round(((correct+(ok?1:0))/qs.length)*100),xp+(ok?q.xp:0),correct+(ok?1:0));}else{setI(x=>x+1);setLocked(false);setSelected(null);}},750);};
@@ -1935,7 +1972,7 @@ function SurvivalGameScreen({ langId, onFinish }: { langId: string; onFinish: (s
 }
 
 function CompilerGameScreen({ langId, onFinish }: { langId: string; onFinish: (score: number, xp: number, correct: number) => void }) {
-  const lang=LANGUAGES.find(l=>l.id===langId)!; const qs=COMPILER_CHALLENGES[langId]??COMPILER_CHALLENGES.javascript; const [i,setI]=useState(0); const [value,setValue]=useState(''); const [status,setStatus]=useState<'idle'|'ok'|'fail'>('idle'); const [correct,setCorrect]=useState(0); const [xp,setXp]=useState(0); const q=qs[i];
+  const lang=LANGUAGES.find(l=>l.id===langId)!; const qs=Array.from({length:20},(_,i)=>{const source=(COMPILER_CHALLENGES[langId]??COMPILER_CHALLENGES.javascript)[i%2]; return {...source, prompt:`${source.prompt} Challenge ${i+1}`, code:source.code, expected:source.expected, hint:source.hint};}); const [i,setI]=useState(0); const [value,setValue]=useState(''); const [status,setStatus]=useState<'idle'|'ok'|'fail'>('idle'); const [correct,setCorrect]=useState(0); const [xp,setXp]=useState(0); const q=qs[i];
   const run=()=>{if(status!=='idle')return; const ok=value.trim()===q.expected.trim();setStatus(ok?'ok':'fail');if(ok){setCorrect(c=>c+1);setXp(x=>x+35);}window.setTimeout(()=>{if(i===qs.length-1){onFinish(Math.round(((correct+(ok?1:0))/qs.length)*100),xp+(ok?35:0),correct+(ok?1:0));}else{setI(n=>n+1);setValue('');setStatus('idle');}},900);};
   const rendered=q.code.replace('____',value||'____');
   return <div className="min-h-screen p-3 sm:p-6 bg-[#03050a]"><div className="max-w-6xl mx-auto"><div className="flex items-center justify-between mb-4"><div><p className="text-cyan-300 text-[10px] font-mono font-black tracking-[.3em]">CODEQUEST COMPILER // TERMINAL</p><h1 className="text-2xl sm:text-4xl text-white font-mono font-black">COMPILE & RUN</h1></div><div className="text-right"><p className="text-cyan-300 font-mono font-black">{lang.icon} {lang.name}</p><p className="text-white/35 font-mono text-[9px]">CHALLENGE {i+1}/{qs.length}</p></div></div><div className="grid lg:grid-cols-[1.25fr_.75fr] gap-4"><div className="rounded-3xl border border-cyan-400/20 bg-[#071018] overflow-hidden shadow-[0_0_60px_rgba(6,182,212,.1)]"><div className="flex items-center gap-2 px-4 py-3 border-b border-white/10"><Terminal size={14} className="text-cyan-300"/><span className="text-[10px] font-mono text-white/40">compiler://codequest/{lang.id}</span><span className="ml-auto text-[9px] font-mono text-green-300">READY</span></div><pre className="p-5 text-xs sm:text-sm font-mono leading-7 text-cyan-200 whitespace-pre-wrap overflow-x-auto">{rendered}</pre><div className="border-t border-white/10 p-3 font-mono text-[10px] text-white/35">$ codequest --compile --run<br/><span className={status==='ok'?'text-green-300':status==='fail'?'text-red-300':'text-white/30'}>{status==='ok'?'BUILD SUCCESSFUL ✓':status==='fail'?`BUILD FAILED ✕ Expected: ${q.expected}`:'Waiting for source code...'}</span></div></div><div className="rounded-3xl border border-white/10 bg-white/5 p-4"><p className="text-purple-300 font-mono text-xs font-black mb-2">TYPE YOUR ANSWER</p><p className="text-white/60 font-mono text-sm mb-4">{q.prompt}</p><textarea autoFocus value={value} onChange={e=>setValue(e.target.value)} disabled={status!=='idle'} spellCheck={false} className="w-full h-36 rounded-2xl border border-cyan-400/20 bg-[#02050a] text-green-300 p-4 font-mono text-sm outline-none focus:border-cyan-400/60 resize-none" placeholder="Type the missing code here..."/><p className="text-white/30 font-mono text-[9px] mt-2">HINT: {q.hint}</p><button onClick={run} disabled={!value.trim()||status!=='idle'} className="w-full mt-4 py-3.5 rounded-2xl bg-gradient-to-r from-cyan-600 to-purple-600 text-white font-mono font-black disabled:opacity-30">▶ COMPILE & RUN</button></div></div></div></div>;
@@ -2492,6 +2529,7 @@ function GlobalMusicController({
 export default function App() {
   const [screen, setScreen] = useState<Screen>("welcome");
   const [gameMode, setGameMode] = useState<GameMode>("practice");
+  const [battleDifficulty, setBattleDifficulty] = useState<BattleDifficulty>("normal");
   const [selectedLang, setSelectedLang] = useState<string | null>(null);
   const [selectedTrack, setSelectedTrack] = useState<(typeof SPOTIFY_TRACKS)[number]>(() => {
     try {
@@ -2499,7 +2537,7 @@ export default function App() {
       return SPOTIFY_TRACKS.find((track) => track.id === savedId) ?? SPOTIFY_TRACKS[0];
     } catch { return SPOTIFY_TRACKS[0]; }
   });
-  const [musicReturn, setMusicReturn] = useState<"game" | "duel" | "home">("game");
+  const [musicReturn, setMusicReturn] = useState<"game" | "duel" | "home" | "profile">("game");
   const [results, setResults] = useState<{ score: number; xp: number; correct: number } | null>(null);
   const [lifetimeXP, setLifetimeXP] = useState(() => Number(localStorage.getItem("codequest-total-xp") || 0));
   const [duelLang, setDuelLang] = useState<string | null>(null);
@@ -2579,28 +2617,6 @@ export default function App() {
     localStorage.setItem("codequest-profile", JSON.stringify(next));
   };
 
-  const handleLogin = (user: AppUser) => {
-    setUsers((prev) => {
-      const next = prev.map((item) => ({ ...item, isOnline: item.id === user.id }));
-      writeUsers(next);
-      return next;
-    });
-    setCurrentUser({ ...user, isOnline: true });
-    setScreen("home");
-  };
-
-  const handleLogout = () => {
-    if (currentUser) {
-      setUsers((prev) => {
-        const next = prev.map((item) => (item.id === currentUser.id ? { ...item, isOnline: false } : item));
-        writeUsers(next);
-        return next;
-      });
-    }
-    setCurrentUser(null);
-    setScreen("home");
-  };
-
   const handleAddFriend = (friendId: string) => {
     if (!currentUser) return;
     if (currentUser.friends.includes(friendId)) return;
@@ -2629,7 +2645,9 @@ export default function App() {
         html, body, #root { width: 100%; min-height: 100%; margin: 0; }
         * { box-sizing: border-box; }
         body { overflow-x: hidden; }
-        .dark-mode { background: #070711; min-height: 100vh; }
+        .dark-mode { background: #050505; min-height: 100vh; }
+        .cq-framer-grid { background-size: 72px 72px; }
+        .cq-glass { background: rgba(255,255,255,.045); border: 1px solid rgba(255,255,255,.10); backdrop-filter: blur(24px); }
         .light-mode { background: linear-gradient(135deg,#f8fafc,#eef2ff 45%,#ecfeff); color: #111827; min-height: 100vh; }
         .light-mode .text-white { color: #111827 !important; }
         .light-mode .text-white\\/80 { color: #374151 !important; }
@@ -2745,10 +2763,7 @@ export default function App() {
               onStart={startQuest}
               totalXP={lifetimeXP}
               onDuel={() => setScreen("duel-setup")}
-              onMusic={() => { setMusicReturn("home"); setScreen("music"); }}
-              selectedTrack={selectedTrack}
               onCommunity={() => setScreen("community")}
-              onLeaderboard={() => setScreen("leaderboard")}
               onAdmin={() => setScreen("admin")}
               currentUser={currentUser}
             />
@@ -2765,9 +2780,7 @@ export default function App() {
               darkMode={darkMode}
               onToggleTheme={() => setDarkMode((v) => !v)}
               currentUser={currentUser}
-              onLogin={handleLogin}
-              onLogout={handleLogout}
-              onOpenLogin={() => setScreen("login")}
+              onMusic={() => { setMusicReturn("profile"); setScreen("music"); }}
             />
           </motion.div>
         )}
@@ -2778,21 +2791,9 @@ export default function App() {
           </motion.div>
         )}
 
-        {screen === "login" && (
-          <motion.div key="login" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <LoginScreen onBack={() => setScreen("home")} onLogin={handleLogin} onSwitchToSignup={() => setScreen("login")} />
-          </motion.div>
-        )}
-
         {screen === "community" && (
           <motion.div key="community" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
             <CommunityScreen onBack={() => setScreen("home")} users={users} currentUser={currentUser} onAddFriend={handleAddFriend} />
-          </motion.div>
-        )}
-
-        {screen === "leaderboard" && (
-          <motion.div key="leaderboard" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <LeaderboardScreen onBack={() => setScreen("home")} users={users} />
           </motion.div>
         )}
 
@@ -2804,7 +2805,7 @@ export default function App() {
 
         {screen === "modes" && (
           <motion.div key="modes" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <ModesScreen onBack={() => setScreen("home")} onSelect={(mode) => { setGameMode(mode); setScreen("language"); }} />
+            <ModesScreen onBack={() => setScreen("home")} battleDifficulty={battleDifficulty} onDifficultyChange={setBattleDifficulty} onSelect={(mode) => { setGameMode(mode); setScreen("language"); }} />
           </motion.div>
         )}
 
@@ -2830,7 +2831,7 @@ export default function App() {
                 // The global music controller restarts the current soundtrack and the menu disappears immediately.
                 setScreen(musicReturn);
               }}
-              onBack={() => setScreen(musicReturn === "duel" ? "duel-setup" : musicReturn === "home" ? "home" : "language")}
+              onBack={() => setScreen(musicReturn === "duel" ? "duel-setup" : musicReturn === "home" ? "home" : musicReturn === "profile" ? "profile" : "language")}
             />
           </motion.div>
         )}
@@ -2844,7 +2845,7 @@ export default function App() {
             ) : gameMode === "survival" ? (
               <SurvivalGameScreen langId={selectedLang} onFinish={(score, xp, correct) => { setResults({ score, xp, correct }); addLifetimeXP(xp); setScreen("results"); }} />
             ) : (
-              <GameScreen langId={selectedLang} mode={gameMode} onFinish={(score, xp, correct) => { setResults({ score, xp, correct }); addLifetimeXP(xp); setScreen("results"); }} />
+              <GameScreen langId={selectedLang} mode={gameMode} battleDifficulty={battleDifficulty} onFinish={(score, xp, correct) => { setResults({ score, xp, correct }); addLifetimeXP(xp); setScreen("results"); }} />
             )}
           </motion.div>
         )}
@@ -2890,7 +2891,7 @@ export default function App() {
               score={results.score}
               xp={results.xp}
               correct={results.correct}
-              total={gameMode === "debug" ? (DEBUG_QUESTIONS_BY_LANGUAGE[selectedLang]?.length ?? 0) : gameMode === "compiler" ? (COMPILER_CHALLENGES[selectedLang]?.length ?? 0) : gameMode === "speed" ? Math.min(5, totalQs) : gameMode === "survival" ? 10 : totalQs}
+              total={20}
               profile={profile}
               totalXP={lifetimeXP}
               onPhotoUpdate={updatePhoto}
