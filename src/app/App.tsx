@@ -759,54 +759,35 @@ const DEBUG_QUESTIONS: Question[] = DEBUG_QUESTIONS_BY_LANGUAGE.javascript;
 
 function WelcomeScreen({ onContinue }: { onContinue: () => void }) {
   return (
-    <div className="cq-screen relative overflow-hidden flex items-center justify-center px-4 py-10">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_25%,rgba(124,58,237,.24),transparent_32%),radial-gradient(circle_at_20%_80%,rgba(6,182,212,.14),transparent_30%),radial-gradient(circle_at_85%_70%,rgba(236,72,153,.12),transparent_30%)]" />
-      <div className="absolute inset-0 pointer-events-none opacity-30">
-        <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 28, ease: "linear" }} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[70vw] max-w-[720px] aspect-square rounded-full border border-purple-400/10" />
-        <motion.div animate={{ rotate: -360 }} transition={{ repeat: Infinity, duration: 18, ease: "linear" }} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[48vw] max-w-[500px] aspect-square rounded-full border border-cyan-400/10 border-dashed" />
-      </div>
-
-      <div className="absolute hidden lg:block top-24 left-8 text-[11px] font-mono text-cyan-300/30 rotate-[-8deg]">{`while(skill){ learn(); levelUp(); }`}</div>
-      <div className="absolute hidden lg:block bottom-28 right-8 text-[11px] font-mono text-purple-300/30 rotate-[7deg]">{`if(correct) { attack(); }`}</div>
-
-      <motion.div initial={{ opacity: 0, scale: .92, y: 30 }} animate={{ opacity: 1, scale: 1, y: 0 }} transition={{ duration: .8, type: "spring" }}
-        className="relative z-10 w-full max-w-5xl text-center">
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-purple-400/30 bg-purple-500/10 backdrop-blur-xl text-purple-200 font-mono text-xs font-black tracking-wider mb-7">
-          <Sparkles size={14} className="text-yellow-300" /> THE ULTIMATE CODING ADVENTURE
+    <div className="cq-screen cq-page relative overflow-hidden px-3 sm:px-6 py-3 sm:py-6">
+      <div className="cq-hero-card relative mx-auto h-full max-w-[1180px] overflow-hidden">
+        <div className="cq-topbar">
+          <div className="cq-brand"><span className="cq-brand-mark">CQ</span><span>CODEQUEST</span></div>
+          <div className="hidden md:flex items-center gap-7 text-[12px] font-semibold text-slate-700"><span>Modes</span><span>Battle</span><span>1V1</span><span>Insights</span><span>About</span></div>
+          <button onClick={onContinue} className="cq-pill-button">Get Started <ArrowRight size={15}/></button>
         </div>
-
-        <motion.div animate={{ y: [0, -7, 0], rotate: [0, 2, -2, 0] }} transition={{ repeat: Infinity, duration: 4 }}
-          className="mx-auto w-20 h-20 rounded-[28px] bg-gradient-to-br from-purple-600 via-fuchsia-500 to-cyan-500 flex items-center justify-center shadow-[0_0_70px_rgba(139,92,246,.45)] mb-7">
-          <Code2 size={42} className="text-white" />
-        </motion.div>
-
-        <p className="text-cyan-300 font-mono font-black tracking-[0.35em] text-xs sm:text-sm mb-3">WELCOME, CODE WARRIOR</p>
-        <h1 className="text-6xl sm:text-7xl md:text-9xl font-mono font-black leading-[.82] tracking-[-.08em]">
-          <span className="text-white">Code</span><span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 via-fuchsia-400 to-cyan-300">Quest</span>
-        </h1>
-        <p className="text-white/55 font-mono text-base sm:text-lg md:text-xl mt-7 max-w-3xl mx-auto">
-          Enter a world where <span className="text-purple-300">answers become weapons</span>, code becomes power, and every challenge makes you stronger.
-        </p>
-
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-3xl mx-auto mt-10 mb-9">
-          {[
-            ["⚔️", "BATTLE", "Fight with code"],
-            ["⚡", "SPEED", "Race the clock"],
-            ["🐛", "DEBUG", "Hunt the bugs"],
-            ["🎵", "MUSIC", "Choose your vibe"],
-          ].map(([icon, title, desc]) => (
-            <motion.div whileHover={{ y: -4 }} key={title} className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-4">
-              <div className="text-2xl mb-2">{icon}</div><p className="text-white font-mono font-black text-xs">{title}</p><p className="text-white/35 font-mono text-[9px] mt-1">{desc}</p>
+        <div className="grid lg:grid-cols-[1.05fr_.95fr] items-center h-[calc(100%-74px)] gap-4 px-7 sm:px-12 lg:px-16 pb-7">
+          <div className="relative z-10">
+            <p className="cq-kicker">THE CODING ARENA / 01</p>
+            <h1 className="cq-mega-title">CODE<br/><span>QUEST.</span></h1>
+            <p className="max-w-xl text-base sm:text-lg lg:text-xl text-slate-600 leading-relaxed mt-5">A competitive coding world where every correct answer becomes energy, every mistake becomes a lesson, and every battle feels like a final boss.</p>
+            <div className="flex flex-wrap gap-3 mt-7">
+              <button onClick={onContinue} className="cq-primary-button">Enter the arena <ArrowRight size={18}/></button>
+              <div className="cq-stat"><strong>20</strong><span>questions / mode</span></div>
+            </div>
+            <div className="mt-8 flex flex-wrap gap-2 text-[10px] font-bold uppercase tracking-[.18em] text-slate-500"><span className="cq-chip">Web based /01</span><span className="cq-chip">Real-time feel /02</span><span className="cq-chip">Global music /03</span></div>
+          </div>
+          <div className="relative h-full min-h-[320px] flex items-center justify-center">
+            <motion.div animate={{ rotate: [0, 360], scale: [1, 1.03, 1] }} transition={{ rotate:{duration:26,repeat:Infinity,ease:"linear"}, scale:{duration:4,repeat:Infinity} }} className="cq-orbit cq-orbit-a" />
+            <motion.div animate={{ rotate: [360, 0] }} transition={{ duration: 18, repeat: Infinity, ease: "linear" }} className="cq-orbit cq-orbit-b" />
+            <motion.div animate={{ y:[0,-10,0], rotate:[0,4,-3,0] }} transition={{ duration:5, repeat:Infinity, ease:"easeInOut" }} className="cq-core-3d">
+              <div className="cq-core-inner"><Code2 size={58} strokeWidth={2.4}/></div>
             </motion.div>
-          ))}
+            <div className="absolute left-0 bottom-6 max-w-[220px] text-[11px] text-slate-500 leading-relaxed"><strong className="block text-slate-900 text-sm mb-1">The coding software that turns skill into spectacle.</strong> Battle, speedrun, debug, survive and challenge a friend.</div>
+            <div className="absolute right-0 top-10 flex flex-col gap-1 text-[10px] font-bold text-slate-500"><span>Web based /01</span><span>Competitive /02</span><span>Global /03</span></div>
+          </div>
         </div>
-
-        <motion.button onClick={onContinue} whileHover={{ scale: 1.04, boxShadow: "0 0 70px rgba(139,92,246,.5)" }} whileTap={{ scale: .97 }}
-          className="group inline-flex items-center gap-3 px-9 sm:px-12 py-4 sm:py-5 rounded-2xl bg-gradient-to-r from-violet-600 via-fuchsia-500 to-cyan-500 text-white font-mono font-black text-base sm:text-lg shadow-2xl shadow-purple-500/25">
-          ENTER CODEQUEST <ArrowRight size={21} className="group-hover:translate-x-1 transition-transform"/>
-        </motion.button>
-        
-      </motion.div>
+      </div>
     </div>
   );
 }
@@ -948,43 +929,31 @@ function MusicPlayer({ compact = false, selectedTrack }: { compact?: boolean; se
   );
 }
 
-function AnimeCoderAvatar({ side = "player", large = false, attacking = false, hit = false, character }: { side?: "player" | "enemy"; large?: boolean; attacking?: boolean; hit?: boolean; character?: AnimeCharacter }) {
+function AnimeCoderAvatar({ side = "player", large = false, attacking = false, hit = false }: { side?: "player" | "enemy"; large?: boolean; attacking?: boolean; hit?: boolean; character?: AnimeCharacter }) {
   const player = side === "player";
-  const fighter = character ?? (player ? ANIME_CHARACTERS[0] : ANIME_CHARACTERS[1]);
-  const main = player ? fighter.color : fighter.accent;
-  const secondary = player ? fighter.accent : fighter.color;
+  const primary = player ? "#c9ff4d" : "#111827";
+  const secondary = player ? "#0f172a" : "#d8ff5a";
   return (
     <motion.div
       animate={{
-        y: hit ? [0, -5, 5, -3, 0] : [0, -5, 0],
-        x: attacking ? (player ? [0, 30, 0] : [0, -30, 0]) : 0,
-        rotate: attacking ? (player ? [0, 8, -2, 0] : [0, -8, 2, 0]) : (player ? [0, 1, 0] : [0, -1, 0]),
-        scale: hit ? [1, 1.06, .96, 1] : 1,
+        y: hit ? [0, -12, 8, -4, 0] : [0, -5, 0],
+        x: attacking ? (player ? [0, 55, -8, 0] : [0, -55, 8, 0]) : 0,
+        rotate: attacking ? (player ? [0, 10, -5, 0] : [0, -10, 5, 0]) : [0, 1, 0],
+        scale: hit ? [1, 1.18, .88, 1] : 1,
       }}
-      transition={{ duration: attacking || hit ? .55 : 2.4, ease: "easeInOut", repeat: attacking || hit ? 0 : Infinity }}
-      className={`${large ? "w-32 h-40 sm:w-40 sm:h-48" : "w-20 h-24"} relative shrink-0`}
-      aria-label={player ? "Anime coding hero" : "Anime code beast"}
+      transition={{ duration: attacking || hit ? .55 : 3, ease: "easeInOut", repeat: attacking || hit ? 0 : Infinity }}
+      className={`${large ? "w-40 h-44 sm:w-56 sm:h-56" : "w-20 h-20"} relative shrink-0 flex items-center justify-center`}
+      aria-label={player ? "Player combat core" : "Opponent combat core"}
     >
-      <div className={`absolute inset-x-1/2 -translate-x-1/2 bottom-0 ${large ? "w-32 h-24" : "w-16 h-14"} rounded-[45%_45%_25%_25%] border-2 ${
-        player ? "border-cyan-300/60" : "border-pink-300/60"
-      } shadow-[0_0_35px_rgba(34,211,238,.18)]`}>
-        <div className={`absolute ${large ? "top-2" : "top-1"} left-1/2 -translate-x-1/2 ${large ? "w-20 h-9" : "w-12 h-6"} rounded-full bg-gradient-to-r from-black/80 via-white/10 to-black/80`} />
-        <div className={`absolute ${large ? "top-9" : "top-7"} left-1/2 -translate-x-1/2 ${large ? "w-24 h-24" : "w-14 h-14"} rounded-[48%] ${
-          player ? "bg-gradient-to-br from-amber-100 via-orange-100 to-amber-200" : "bg-gradient-to-br from-pink-100 via-rose-100 to-purple-100"
-        } border-2 ${player ? "border-cyan-200/60" : "border-pink-200/60"} shadow-xl`}>
-          <div className={`absolute -top-3 left-1/2 -translate-x-1/2 ${large ? "w-28 h-12" : "w-16 h-7"} rounded-[70%_70%_30%_30%] ${
-            player ? "bg-gradient-to-b from-slate-950 via-cyan-950 to-slate-900" : "bg-gradient-to-b from-slate-950 via-fuchsia-950 to-slate-900"
-          }`} />
-          <div className={`absolute ${large ? "top-10" : "top-7"} left-1/2 -translate-x-1/2 flex ${large ? "gap-7" : "gap-3"}`}>
-            <span className={`${large ? "w-4 h-5" : "w-2 h-3"} rounded-full bg-gradient-to-b from-cyan-300 to-blue-500 shadow-[0_0_10px_rgba(34,211,238,.8)]`} />
-            <span className={`${large ? "w-4 h-5" : "w-2 h-3"} rounded-full bg-gradient-to-b from-pink-300 to-purple-500 shadow-[0_0_10px_rgba(236,72,153,.8)]`} />
-          </div>
-          <div className={`absolute ${large ? "bottom-7" : "bottom-4"} left-1/2 -translate-x-1/2 ${large ? "w-8" : "w-4"} h-1 rounded-full ${player ? "bg-cyan-400" : "bg-pink-400"}`} />
-        </div>
-        <div className={`absolute ${large ? "bottom-4" : "bottom-2"} left-1/2 -translate-x-1/2 ${large ? "text-3xl" : "text-lg"}`}>{fighter.emoji}</div>
-      </div>
-      <motion.div animate={attacking ? { scale: [1, 1.5, .8, 1.25, 1], opacity: [0.25, .75, .35, .65, .25], rotate: [0, 90, 180, 270, 360] } : { scale: [1, 1.08, 1], opacity: [.2, .35, .2] }} transition={{ duration: attacking ? .65 : 2.2, repeat: attacking ? 0 : Infinity }} className="absolute left-1/2 -translate-x-1/2 top-0 w-40 h-40 rounded-full blur-2xl" style={{ background: `radial-gradient(circle, ${main}99 0%, ${secondary}40 42%, transparent 72%)` }} />
-      {attacking && <motion.div initial={{ opacity: 0, scale: .3 }} animate={{ opacity: [0, 1, 0], scale: [0.3, 1.5, 2.4], rotate: [0, 12, -12, 0] }} transition={{ duration: .65 }} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-2xl sm:text-4xl font-mono font-black z-10" style={{ color: main, textShadow: `0 0 25px ${main}` }}>{fighter.attack}</motion.div>}
+      <motion.div animate={{ rotate: 360 }} transition={{ duration: 9, repeat: Infinity, ease: "linear" }}
+        className={`absolute ${large ? "w-36 h-36 sm:w-48 sm:h-48" : "w-16 h-16"} rounded-[28%] border-2 ${player ? "border-[#c9ff4d]" : "border-slate-900"} bg-white/70 backdrop-blur-md shadow-[0_25px_80px_rgba(0,0,0,.22)]`}
+        style={{ transform: "rotate(45deg)" }}>
+        <div className="absolute inset-[13%] rounded-full" style={{ background: `radial-gradient(circle at 35% 30%, ${secondary}, ${primary} 45%, rgba(255,255,255,.12) 70%, transparent 72%)`, boxShadow: `inset -18px -18px 35px rgba(0,0,0,.18), 0 0 55px ${player ? "rgba(201,255,77,.55)" : "rgba(17,24,39,.28)"}` }} />
+        <motion.div animate={{ rotate: -720 }} transition={{ duration: 5, repeat: Infinity, ease: "linear" }} className="absolute inset-[-12%] rounded-full border border-dashed border-black/25" />
+      </motion.div>
+      <motion.div animate={{ scale: attacking ? [1, 1.45, .7, 1.15, 1] : [1, 1.08, 1], opacity: attacking ? [0,1,0] : [.35,.7,.35] }} transition={{ duration: attacking ? .65 : 2.1, repeat: attacking ? 0 : Infinity }}
+        className="absolute inset-0 rounded-full blur-3xl pointer-events-none" style={{ background: `radial-gradient(circle, ${player ? "rgba(201,255,77,.8)" : "rgba(17,24,39,.35)"}, transparent 66%)` }} />
+      {attacking && <motion.div initial={{ opacity: 0, scale: .2 }} animate={{ opacity: [0,1,0], scale: [0.2,1.5,2.8], rotate: [0,180,360] }} transition={{ duration: .7 }} className="absolute z-20 text-center font-black text-xl sm:text-4xl tracking-[-.04em]" style={{ color: player ? "#111827" : "#c9ff4d", textShadow: `0 0 30px ${player ? "#c9ff4d" : "#111827"}` }}>{player ? "CODE IMPACT" : "COUNTER"}</motion.div>}
     </motion.div>
   );
 }
@@ -1632,7 +1601,7 @@ function GameScreen({
             {mode === "battle" && (
               <>
               <motion.div animate={{ boxShadow: ["0 0 0 rgba(239,68,68,0)", "0 0 35px rgba(168,85,247,.16)", "0 0 0 rgba(239,68,68,0)"] }} transition={{ repeat: Infinity, duration: 2.5 }}
-                className="rounded-3xl border border-purple-500/20 bg-gradient-to-br from-red-500/10 via-purple-500/10 to-cyan-500/10 p-3 sm:p-4 mb-5 overflow-hidden relative">
+                className="cq-battle-arena rounded-3xl border border-purple-500/20 bg-gradient-to-br from-red-500/10 via-purple-500/10 to-cyan-500/10 p-3 sm:p-4 mb-5 overflow-hidden relative">
                 <div className="absolute inset-0 pointer-events-none opacity-40">
                   {[0,1,2,3,4,5].map((n) => <motion.div key={n} className="absolute w-2 h-2 rounded-full bg-fuchsia-400"
                     animate={{ x: [20 + n * 18, 80 + n * 100, 20 + n * 18], y: [30 + (n % 3) * 70, 10 + n * 40, 30 + (n % 3) * 70], opacity: [0, .9, 0], scale: [0.5, 1.7, .5] }}
@@ -1787,7 +1756,7 @@ function DuelSetupScreen({
   const [friendPhoto, setFriendPhoto] = useState("");
 
   return (
-    <div className="cq-screen px-5 py-10">
+    <div className="cq-screen cq-duel-setup px-5 py-10">
       <div className="max-w-5xl mx-auto">
         <button onClick={onBack} className="flex items-center gap-2 text-white/40 hover:text-white font-mono text-sm mb-7"><ArrowLeft size={16}/> Back</button>
         <div className="text-center mb-9">
@@ -1950,7 +1919,7 @@ function DuelScreen({
   const friendRank = RANKS.find((r) => r.name === friendRankName) ?? RANKS[2];
 
   return (
-    <div className="cq-screen px-4 py-6 relative overflow-hidden">
+    <div className="cq-screen cq-duel-arena px-4 py-6 relative overflow-hidden">
       {showDuelClaps && <ClapCelebration />}
       <div className="absolute inset-0 bg-gradient-to-br from-cyan-950/20 via-purple-950/20 to-pink-950/20 pointer-events-none"/>
       <div className="max-w-6xl mx-auto relative">
@@ -2209,6 +2178,7 @@ function GlobalMusicController({
   const intervalRef = useRef<number | null>(null);
   const activeNodesRef = useRef<Array<{ oscillator: OscillatorNode; gain: GainNode }>>([]);
   const selectedTrackRef = useRef(selectedTrack);
+  const [playing, setPlaying] = useState(false);
 
   useEffect(() => {
     selectedTrackRef.current = selectedTrack;
@@ -2244,6 +2214,7 @@ function GlobalMusicController({
     if (!AudioContextCtor) return;
 
     stopPlayback();
+    setPlaying(true);
 
     const context = audioContextRef.current ?? new AudioContextCtor();
     audioContextRef.current = context;
@@ -2314,7 +2285,13 @@ function GlobalMusicController({
     return () => stopPlayback();
   }, [selectedTrack, startPlayback, stopPlayback]);
 
-  return null;
+  return (
+    <div className="cq-music-dock">
+      <div className="cq-music-dot"><Music size={14}/></div>
+      <div className="min-w-0"><p className="cq-music-label">GLOBAL SOUNDTRACK</p><p className="cq-music-track">{selectedTrack.title}</p></div>
+      <span className={`cq-music-live ${playing ? "is-live" : ""}`}>{playing ? "LIVE" : "READY"}</span>
+    </div>
+  );
 }
 
 // ─── App ─────────────────────────────────────────────────────────────────────
@@ -2339,7 +2316,7 @@ export default function App() {
   const [friendPhoto, setFriendPhoto] = useState("");
   const [darkMode, setDarkMode] = useState(() => {
     const saved = localStorage.getItem("codequest-theme-mode");
-    return saved !== "light";
+    return saved === "dark" ? false : false;
   });
   const [profile, setProfile] = useState<StudentProfile>(() => {
     try {
@@ -2392,10 +2369,118 @@ export default function App() {
   };
 
   return (
-    <div className={`cq-shell ${darkMode ? "dark-mode" : "light-mode"} cq-screen text-foreground overflow-x-hidden`}
+    <div className={`cq-shell cq-neo ${darkMode ? "dark-mode" : "light-mode"} cq-screen text-foreground overflow-x-hidden`}
       style={{ fontFamily: "'JetBrains Mono', 'Inter', monospace" }}>
       <style>{`
         html, body, #root { width: 100%; min-height: 100%; margin: 0; }
+
+        /* CODEQUEST NEO EDITORIAL SYSTEM */
+
+        .cq-battle-arena { position:relative; min-height:300px; background:radial-gradient(circle at 50% 48%,rgba(201,255,77,.22),transparent 22%),linear-gradient(135deg,#f8fafc 0%,#e8e8e8 48%,#d8d8d8 100%) !important; border:2px solid rgba(17,24,39,.08) !important; box-shadow:inset 0 0 0 1px rgba(255,255,255,.8),0 28px 75px rgba(0,0,0,.13) !important; }
+        .cq-battle-arena:before { content:""; position:absolute; inset:0; background:linear-gradient(rgba(17,24,39,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(17,24,39,.055) 1px,transparent 1px); background-size:32px 32px; mask-image:linear-gradient(to bottom,transparent 0%,black 25%,black 75%,transparent 100%); pointer-events:none; }
+        .cq-battle-arena:after { content:""; position:absolute; left:50%; top:50%; width:62%; height:12px; transform:translate(-50%,-50%) rotate(-8deg); background:linear-gradient(90deg,transparent,#c9ff4d,#111827,#c9ff4d,transparent); filter:blur(10px); opacity:.42; pointer-events:none; }
+        .cq-battle-arena > * { position:relative; z-index:2; }
+        .cq-battle-arena .text-white\/80 { color:#111827 !important; }
+        .cq-duel-arena { background:#cfcfcf !important; }
+        .cq-duel-arena > .max-w-6xl { background:#fff; border-radius:28px; padding:clamp(14px,2.2vw,30px); min-height:calc(100svh - 28px); box-shadow:0 25px 80px rgba(0,0,0,.12); }
+        .cq-duel-arena:before { content:""; position:absolute; inset:12%; border-radius:50%; background:radial-gradient(circle,rgba(201,255,77,.14),transparent 62%); pointer-events:none; }
+        .cq-duel-arena .text-white { color:#111827 !important; }
+        .cq-duel-arena .bg-white\/5 { background:rgba(17,24,39,.035) !important; }
+        .cq-duel-arena .border-white\/10 { border-color:rgba(17,24,39,.12) !important; }
+        .cq-duel-arena .bg-black\/10 { background:#f5f5f5 !important; }
+        .cq-duel-arena .cq-duel-beam { height:3px; background:linear-gradient(90deg,transparent,#111827,#c9ff4d,#111827,transparent); box-shadow:0 0 24px rgba(201,255,77,.8); }
+        .cq-duel-setup { background:#cfcfcf !important; }
+        .cq-duel-setup > .max-w-5xl { background:#fff; border-radius:28px; padding:clamp(18px,2.5vw,34px); min-height:calc(100svh - 28px); box-shadow:0 25px 80px rgba(0,0,0,.12); }
+        .cq-duel-setup .text-white { color:#111827 !important; }
+        .cq-duel-setup .text-white\/35,.cq-duel-setup .text-white\/30,.cq-duel-setup .text-white\/25,.cq-duel-setup .text-white\/40 { color:#64748b !important; }
+        @media (max-width:640px){ .cq-battle-arena{min-height:260px}.cq-duel-arena > .max-w-6xl,.cq-duel-setup > .max-w-5xl{min-height:calc(100svh - 16px);border-radius:20px;padding:14px}.cq-battle-arena:before{background-size:24px 24px} }
+
+        html, body, #root { width:100%; min-height:100%; margin:0; }
+        body { background:#cfcfcf !important; color:#111827; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important; }
+        .cq-neo { background:#cfcfcf !important; color:#111827 !important; }
+        .cq-neo .dark-mode, .cq-neo .light-mode { background:#cfcfcf !important; color:#111827 !important; }
+        .cq-neo .cq-page { background:#cfcfcf; }
+        .cq-neo .cq-screen { min-height:100svh; height:100svh; overflow:hidden; }
+        .cq-neo .cq-hero-card, .cq-neo .cq-editorial-card { background:#fff; border:1px solid rgba(255,255,255,.9); border-radius:28px; box-shadow:0 22px 70px rgba(0,0,0,.10); }
+        .cq-topbar { height:74px; display:flex; align-items:center; justify-content:space-between; padding:0 34px; }
+        .cq-brand { display:flex; align-items:center; gap:10px; font-weight:900; letter-spacing:-.04em; color:#111827; font-size:15px; }
+        .cq-brand-mark { width:30px; height:30px; border-radius:10px; display:grid; place-items:center; background:#111827; color:#c9ff4d; font-size:9px; letter-spacing:.04em; }
+        .cq-pill-button { display:inline-flex; align-items:center; gap:8px; padding:12px 17px; border-radius:11px; background:#f4f4f4; color:#111827; border:1px solid #ececec; font-weight:800; font-size:12px; transition:.2s; }
+        .cq-pill-button:hover { transform:translateY(-2px); background:#c9ff4d; border-color:#c9ff4d; }
+        .cq-kicker { font-size:10px; letter-spacing:.28em; font-weight:900; color:#64748b; margin-bottom:15px; }
+        .cq-mega-title { font-size:clamp(5rem, 13vw, 11rem); line-height:.78; letter-spacing:-.095em; font-weight:950; color:#111827; margin:0; }
+        .cq-mega-title span { color:#aeb4bb; }
+        .cq-primary-button { display:inline-flex; align-items:center; gap:10px; border:0; background:#111827; color:#fff; border-radius:13px; padding:15px 21px; font-weight:900; font-size:13px; box-shadow:0 14px 35px rgba(17,24,39,.18); transition:.2s; }
+        .cq-primary-button:hover { transform:translateY(-3px); background:#c9ff4d; color:#111827; }
+        .cq-stat { display:flex; align-items:center; gap:8px; padding:10px 14px; border-radius:13px; background:#f3f3f3; color:#64748b; font-size:10px; text-transform:uppercase; letter-spacing:.12em; }
+        .cq-stat strong { color:#111827; font-size:20px; letter-spacing:-.06em; }
+        .cq-chip { border:1px solid #e7e7e7; background:#fafafa; padding:7px 10px; border-radius:999px; }
+        .cq-core-3d { width:min(34vw,330px); aspect-ratio:1; border-radius:43% 57% 51% 49% / 49% 43% 57% 51%; transform:rotate(14deg); background:radial-gradient(circle at 32% 25%,#efffb0 0 8%,#c9ff4d 22%,#8aa900 48%,#111827 78%); box-shadow:inset -32px -35px 60px rgba(0,0,0,.32), inset 22px 18px 38px rgba(255,255,255,.42), 0 35px 80px rgba(0,0,0,.22); display:grid; place-items:center; position:relative; z-index:3; }
+        .cq-core-3d:before,.cq-core-3d:after { content:""; position:absolute; border-radius:50%; border:2px solid rgba(17,24,39,.32); width:122%; height:28%; transform:rotate(-24deg); }
+        .cq-core-3d:after { width:136%; height:36%; transform:rotate(20deg); border-color:rgba(201,255,77,.8); }
+        .cq-core-inner { width:34%; aspect-ratio:1; border-radius:30%; background:#111827; color:#c9ff4d; display:grid; place-items:center; transform:rotate(-14deg); box-shadow:0 15px 35px rgba(0,0,0,.3); }
+        .cq-orbit { position:absolute; border:1px solid rgba(17,24,39,.18); border-radius:50%; z-index:1; }
+        .cq-orbit-a { width:min(48vw,480px); aspect-ratio:1; }
+        .cq-orbit-b { width:min(40vw,390px); aspect-ratio:1; border-style:dashed; }
+        .cq-music-dock { position:fixed; left:18px; bottom:18px; z-index:90; display:flex; align-items:center; gap:10px; max-width:min(360px,calc(100vw - 36px)); padding:10px 12px; border-radius:15px; background:rgba(255,255,255,.92); border:1px solid rgba(255,255,255,.9); box-shadow:0 16px 40px rgba(0,0,0,.14); backdrop-filter:blur(18px); }
+        .cq-music-dot { width:32px; height:32px; display:grid; place-items:center; border-radius:10px; background:#111827; color:#c9ff4d; flex:none; }
+        .cq-music-label { font-size:8px; font-weight:900; letter-spacing:.18em; color:#94a3b8; }
+        .cq-music-track { max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:11px; font-weight:900; color:#111827; }
+        .cq-music-live { margin-left:auto; font-size:8px; font-weight:900; letter-spacing:.14em; color:#94a3b8; }
+        .cq-music-live.is-live { color:#6d8b00; }
+        .cq-neo .text-white { color:#111827 !important; }
+        .cq-neo .text-white\/80,.cq-neo .text-white\/70 { color:#334155 !important; }
+        .cq-neo .text-white\/60,.cq-neo .text-white\/55,.cq-neo .text-white\/50,.cq-neo .text-white\/45,.cq-neo .text-white\/40 { color:#64748b !important; }
+        .cq-neo .text-white\/35,.cq-neo .text-white\/30,.cq-neo .text-white\/25,.cq-neo .text-white\/20 { color:#94a3b8 !important; }
+        .cq-neo .border-white\/10 { border-color:rgba(15,23,42,.12) !important; }
+        .cq-neo .border-white\/20 { border-color:rgba(15,23,42,.18) !important; }
+        .cq-neo .bg-white\/5 { background:rgba(15,23,42,.035) !important; }
+        .cq-neo .bg-white\/10 { background:rgba(15,23,42,.06) !important; }
+        .cq-neo .bg-black\/10,.cq-neo .bg-black\/15,.cq-neo .bg-black\/20,.cq-neo .bg-black\/25,.cq-neo .bg-black\/30,.cq-neo .bg-black\/35 { background:rgba(248,250,252,.88) !important; }
+        .cq-neo input,.cq-neo select,.cq-neo textarea { background:#fff !important; color:#111827 !important; border-color:#dfe3e7 !important; }
+        .cq-neo .cq-screen > .max-w-6xl, .cq-neo .cq-screen > .max-w-5xl { background:#fff; border-radius:28px; padding:clamp(16px,2.2vw,32px); box-shadow:0 22px 70px rgba(0,0,0,.10); min-height:calc(100svh - 28px); }
+        .cq-neo .cq-screen > div.max-w-6xl, .cq-neo .cq-screen > div.max-w-5xl { border:1px solid rgba(255,255,255,.85); }
+        .cq-neo button { -webkit-tap-highlight-color:transparent; }
+        .cq-neo .font-mono { font-family:Inter,ui-sans-serif,system-ui,sans-serif !important; }
+        .cq-neo pre,.cq-neo code { font-family:"SFMono-Regular",Consolas,monospace !important; }
+        .cq-neo [class*="bg-gradient-to-br"], .cq-neo [class*="bg-gradient-to-r"] { background-color:#fff; }
+        .cq-neo .shadow-2xl,.cq-neo .shadow-xl { box-shadow:0 18px 55px rgba(0,0,0,.09) !important; }
+        .cq-neo .cq-screen .rounded-3xl { border-radius:24px; }
+        .cq-neo .cq-screen .rounded-2xl { border-radius:18px; }
+        .cq-neo .cq-screen .rounded-xl { border-radius:14px; }
+        .cq-neo .cq-screen .bg-gradient-to-r.from-purple-600,.cq-neo .cq-screen .bg-gradient-to-r.from-pink-600 { background:#111827 !important; }
+        .cq-neo .cq-screen .bg-gradient-to-r.from-cyan-600 { background:#c9ff4d !important; color:#111827 !important; }
+        .cq-neo .cq-screen .bg-gradient-to-r.from-purple-600:hover,.cq-neo .cq-screen .bg-gradient-to-r.from-pink-600:hover { background:#c9ff4d !important; color:#111827 !important; }
+        .cq-neo .cq-screen [class*="text-purple-300"] { color:#6b7280 !important; }
+        .cq-neo .cq-screen [class*="text-cyan-300"] { color:#516600 !important; }
+        .cq-neo .cq-screen [class*="text-pink-300"] { color:#111827 !important; }
+        .cq-neo .cq-screen [class*="text-red-300"] { color:#b42318 !important; }
+        .cq-neo .cq-screen [class*="text-yellow-300"] { color:#667500 !important; }
+        .cq-neo .cq-screen [class*="text-green-300"] { color:#477000 !important; }
+        .cq-neo .cq-screen [class*="bg-purple-500\/10"],[class*="bg-purple-500\/15"] { background:rgba(201,255,77,.12) !important; }
+        .cq-neo .cq-screen [class*="bg-cyan-500\/10"],[class*="bg-cyan-500\/15"] { background:rgba(201,255,77,.10) !important; }
+        .cq-neo .cq-screen [class*="bg-pink-500\/10"],[class*="bg-pink-500\/15"] { background:rgba(17,24,39,.055) !important; }
+        .cq-neo .cq-screen [class*="bg-red-500\/10"] { background:rgba(180,35,24,.06) !important; }
+        .cq-neo .cq-screen [class*="bg-green-500\/10"] { background:rgba(71,112,0,.08) !important; }
+        @media (max-width: 900px) {
+          .cq-topbar { padding:0 18px; }
+          .cq-hero-card { border-radius:22px; }
+          .cq-mega-title { font-size:clamp(4.6rem,18vw,8rem); }
+          .cq-core-3d { width:min(52vw,290px); }
+          .cq-orbit-a { width:min(70vw,400px); }
+          .cq-orbit-b { width:min(60vw,340px); }
+        }
+        @media (max-width: 640px) {
+          .cq-neo .cq-screen { height:100svh; min-height:100svh; }
+          .cq-hero-card { height:100%; border-radius:18px; }
+          .cq-topbar { height:60px; }
+          .cq-topbar .cq-brand span:last-child { font-size:12px; }
+          .cq-hero-card > .grid { height:calc(100% - 60px); grid-template-rows:auto 1fr; overflow:hidden; }
+          .cq-core-3d { width:210px; }
+          .cq-neo .cq-screen > .max-w-6xl, .cq-neo .cq-screen > .max-w-5xl { min-height:calc(100svh - 16px); padding:14px; border-radius:20px; overflow:hidden; }
+          .cq-music-dock { left:10px; bottom:10px; }
+        }
+
         * { box-sizing: border-box; }
         body { overflow-x: hidden; }
         .dark-mode { background: #070711; min-height: 100vh; }
